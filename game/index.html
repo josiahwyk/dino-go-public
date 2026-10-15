@@ -41,7 +41,8 @@ h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
 
 /* Art boxes */
 .art{position:relative;aspect-ratio:1;width:100%;max-width:100%;display:grid;place-items:center}
-.art img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;display:block}
+.art img{width:100%;height:100%;object-fit:contain;display:block}
+.art img.jpg{mix-blend-mode:multiply}
 .flip img{transform:scaleX(-1)}
 .ph{width:86%;height:86%;border-radius:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
   background:radial-gradient(circle at 50% 38%,#fff 0 30%,var(--c) 31% 100%);color:#fff;font-family:var(--display);font-weight:800;text-align:center;padding:8px}
@@ -60,28 +61,78 @@ h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
   box-shadow:0 10px 0 #0001,inset -10px -14px 0 #0000000d;animation:bob 2.4s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-8px) rotate(3deg)}}
 .hint{color:var(--muted);font-size:1rem}
+.mystery{position:relative;width:min(190px,22vw);border:0;background:none;padding:0;animation:bob 2.6s ease-in-out infinite}
+.team .mystery .art{width:100%}
+.mystery .art img{filter:brightness(0) opacity(.8)}
+.mystery .art img.jpg{filter:grayscale(1) brightness(.56) contrast(30)}
+.mystery .qm{position:absolute;left:50%;top:50%;width:1.3em;height:1.3em;margin:-.65em 0 0 -.65em;border-radius:50%;display:grid;place-items:center;
+  background:var(--lava);box-shadow:0 0 0 4px #fff,0 5px 0 4px #0002;font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,5vw,2.8rem);line-height:1;color:#fff;pointer-events:none}
+.tease{margin:-8px 0 0;font-family:var(--display);font-weight:800;font-size:1.3rem;color:var(--leaf)}
 
 /* Battle */
 .headline{text-align:center}
 .arena{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end;min-height:0}
 .fighter{display:flex;flex-direction:column;gap:6px;min-width:0}
-.fighter .art{max-width:330px;margin:0 auto}
+.spot{position:relative;max-width:min(300px,30vh);width:100%;margin:0 auto}
+.spot::before{content:"";position:absolute;left:2%;right:2%;bottom:-3%;height:24%;border-radius:50%;
+  background:radial-gradient(closest-side,#4E8F3E66 0 50%,#7DBA6255 51% 78%,#7DBA6200 80%)}
+.fighter .art img{transform-origin:50% 90%;animation:breathe 2.8s ease-in-out infinite;will-change:translate,rotate,scale}
+.fighter:nth-child(2) .art img{animation-delay:-1.4s}
+@keyframes breathe{50%{scale:1.015 1.03}}
+.fx{position:absolute;left:0;top:0;pointer-events:none;z-index:5}
+.burst{width:160px;height:160px;margin:-80px 0 0 -80px;
+  background:radial-gradient(circle,#fff 0 16%,#FFE066 17% 40%,var(--c,var(--lava)) 41% 64%,transparent 65%);
+  clip-path:polygon(50% 0,60% 30%,93% 15%,73% 45%,100% 58%,68% 66%,78% 100%,50% 78%,22% 100%,32% 66%,0 58%,27% 45%,7% 15%,40% 30%)}
+.spark{width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--c,#FFD23F)}
+.dmg{font-family:var(--display);font-weight:800;font-size:3.6rem;line-height:1;color:var(--lava);white-space:nowrap;
+  text-shadow:3px 3px 0 #fff,-3px 3px 0 #fff,3px -3px 0 #fff,-3px -3px 0 #fff,0 3px 0 #fff,0 -3px 0 #fff,3px 0 0 #fff,-3px 0 0 #fff,0 8px 0 #0002}
+.callout{font-family:var(--display);font-weight:800;font-size:clamp(1.2rem,4vw,1.7rem);background:#fff;color:var(--ink);padding:4px 18px;border-radius:999px;box-shadow:0 4px 0 var(--line);white-space:nowrap;border:3px solid var(--c,var(--lava))}
+.shield{width:190px;height:190px;margin:-95px 0 0 -95px;border-radius:50%;border:7px solid #7CC3FF;box-shadow:0 0 22px #7CC3FF,inset 0 0 22px #7CC3FF}
+.dizzy{width:110px;height:110px;margin:-55px 0 0 -55px}
+.dizzy i{position:absolute;width:26px;height:26px;background:#FFC93C;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.dizzy i:nth-child(1){left:42px;top:0} .dizzy i:nth-child(2){left:0;top:62px} .dizzy i:nth-child(3){left:84px;top:62px}
 .plate{background:#fff;border-radius:18px;padding:8px 14px;box-shadow:0 3px 0 var(--line);font-family:var(--display);font-weight:800;font-size:1.15rem;display:flex;flex-direction:column;gap:4px;min-width:0}
 .plate .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .plate small{font-family:var(--body);font-weight:700;color:var(--muted);font-size:.9rem}
-.hp{height:16px;border-radius:999px;background:#E7E2D2;overflow:hidden}
-.hp i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#4DBA5A,#8BD36A);border-radius:999px;transition:width .5s}
+.hp{position:relative;height:16px;border-radius:999px;background:#E7E2D2;overflow:hidden}
+.hp b,.hp i{position:absolute;left:0;top:0;bottom:0;width:100%;border-radius:999px}
+.hp b{background:#F7C873;transition:width .6s .45s ease-out}
+.hp i{background:linear-gradient(90deg,#4DBA5A,#8BD36A);transition:width .25s}
 .hp.low i{background:linear-gradient(90deg,#E5533D,#F2A13A)}
-.floater{position:absolute;font-family:var(--display);font-weight:800;font-size:3rem;color:var(--lava);text-shadow:0 3px 0 #fff;pointer-events:none;right:22%;top:20%}
-.q{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
-.sum{display:flex;align-items:flex-start;gap:12px;font-family:var(--display);font-weight:800;font-size:clamp(2.6rem,9vw,4rem);line-height:1}
-.num{display:flex;flex-direction:column;align-items:center;gap:6px}
-.dots{display:flex;flex-wrap:wrap;gap:4px;max-width:96px;justify-content:center}
-.dots i{width:14px;height:14px;border-radius:50%;background:var(--lava)}
-.dots.b i{background:var(--t-sea)}
-.pad{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-width:640px;width:100%;margin:0 auto}
-.pad button{border:0;border-radius:22px;background:#fff;min-height:76px;font-family:var(--display);font-weight:800;font-size:2.4rem;box-shadow:0 6px 0 var(--line)}
-.pad button:active{transform:translateY(4px);box-shadow:0 2px 0 var(--line)}
+
+/* Maths question */
+.q{display:flex;align-items:center;justify-content:center;gap:14px}
+.qbox{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
+.eq{font-family:var(--display);font-weight:800;font-size:clamp(2.2rem,7vw,3.4rem);line-height:1;font-variant-numeric:tabular-nums;text-align:center}
+.eq.words{font-size:clamp(1.3rem,4vw,1.8rem);line-height:1.2;max-width:22em}
+.row-vis{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+.tf{display:grid;grid-template-columns:repeat(5,24px);grid-auto-rows:24px;gap:3px;background:#fff;padding:5px;border-radius:10px;box-shadow:0 3px 0 var(--line)}
+.tf i{border-radius:50%;background:#EFEADB;position:relative}
+.tf i.a{background:var(--lava)} .tf i.b{background:var(--t-sea)}
+.tf i.e{background:#fff;box-shadow:inset 0 0 0 3px #F2762E88}
+.tf i.x{background:#F2762E40}
+.tf i.x::after{content:"";position:absolute;inset:3px;background:linear-gradient(45deg,transparent 40%,#B3361F 40% 60%,transparent 60%),linear-gradient(-45deg,transparent 40%,#B3361F 40% 60%,transparent 60%)}
+.strip{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.strip b{min-width:60px;height:60px;padding:0 8px;border-radius:16px;background:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1.9rem;box-shadow:0 4px 0 var(--line)}
+.strip b.ask{background:var(--lava);color:#fff}
+.base{display:flex;align-items:flex-end;gap:5px;flex-wrap:wrap;justify-content:center}
+.rod{width:16px;height:120px;border-radius:4px;background:repeating-linear-gradient(180deg,#3E9B4F 0 10px,#2F6B3A 10px 12px);box-shadow:0 2px 0 var(--line)}
+.cubes{display:grid;grid-template-columns:repeat(2,12px);gap:2px;align-content:end;margin-left:8px}
+.cube{width:12px;height:12px;border-radius:3px;background:var(--lava);box-shadow:0 2px 0 var(--line)}
+.grp{display:grid;gap:4px;padding:8px;border:3px solid var(--leaf);border-radius:18px;background:#ffffffaa}
+.grp i,.berry{width:16px;height:16px;border-radius:50%;background:var(--t-meat);display:block}
+.coin{width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE9A8,#E2B23C 70%,#C9961F);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1rem;color:#6E4C00;box-shadow:0 2px 0 var(--line)}
+.mini{width:56px}
+.shp{display:block;width:40px;height:40px}
+.shp.circle{border-radius:50%;background:var(--lava)}
+.shp.square{border-radius:6px;background:var(--t-sea)}
+.shp.tri{background:var(--t-plant);clip-path:polygon(50% 4%,98% 96%,2% 96%)}
+.shp.star{background:#E8B300;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.choices{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;max-width:760px;width:100%;margin:0 auto}
+.choices button{flex:1 1 130px;max-width:180px;min-height:84px;border:0;border-radius:22px;background:#fff;font-family:var(--display);font-weight:800;font-size:2.4rem;box-shadow:0 6px 0 var(--line);display:grid;place-items:center}
+.choices button:active{transform:translateY(4px);box-shadow:0 2px 0 var(--line)}
+.choices button.nope{opacity:.3;pointer-events:none}
+.choices .shp{width:52px;height:52px}
 .glow{animation:glow 1s ease-in-out infinite;outline:5px solid var(--lava)!important}
 @keyframes glow{50%{transform:scale(1.08)}}
 .shake{animation:shake .35s}
@@ -149,8 +200,8 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
 .assign div{display:flex;flex-direction:column;gap:6px;border:2px solid #1E2B1F1a;border-radius:14px;padding:6px}
 .assign select{font:inherit;font-size:.95rem;padding:4px;border-radius:8px;background:#fff;color:var(--ink);max-width:100%}
 .status{font-weight:700;color:var(--leaf)}
-@media (max-width:560px){.stats{grid-template-columns:repeat(3,1fr)} .pad button{min-height:64px;font-size:2rem} .tile{width:66px;height:66px;font-size:2.4rem} .slot{width:50px;height:64px;font-size:2.2rem}}
-@media (prefers-reduced-motion:reduce){.egg-hero,.glow{animation:none}}
+@media (max-width:560px){.stats{grid-template-columns:repeat(3,1fr)} .choices button{min-height:68px;font-size:2rem} .tile{width:66px;height:66px;font-size:2.4rem} .slot{width:50px;height:64px;font-size:2.2rem} .tf{grid-template-columns:repeat(5,18px);grid-auto-rows:18px} .rod{height:100px}}
+@media (prefers-reduced-motion:reduce){.egg-hero,.glow,.mystery,.fighter .art img{animation:none}}
 </style>
 
 <div id="app">
@@ -163,6 +214,7 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
     <div class="center">
       <h1>Dino Go</h1>
       <div id="h-team" class="team"></div>
+      <p class="tease" id="h-tease" hidden>Who's hiding? Tap one!</p>
       <button class="big" id="find">Find a dino!</button>
       <button class="big green small" id="to-book">My dinos <span id="h-count" class="count" style="color:#fff"></span></button>
     </div>
@@ -176,19 +228,14 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
   <section id="s-battle" class="screen" hidden>
     <div class="topbar"><button class="icon-btn" data-home aria-label="Home">🏠</button><h2 class="headline" id="b-title" style="flex:1"></h2><span style="width:60px"></span></div>
     <div class="arena" id="arena">
-      <div class="fighter"><div class="art" id="b-me"></div><div class="plate"><span class="nm" id="b-me-name"></span><small id="b-me-lv"></small></div></div>
-      <div class="fighter"><div class="art flip" id="b-wild"></div><div class="plate"><span class="nm" id="b-wild-name"></span><div class="hp" id="b-hp"><i></i></div><small id="b-hp-num"></small></div></div>
+      <div class="fighter"><div class="spot"><div class="art" id="b-me"></div></div><div class="plate"><span class="nm" id="b-me-name"></span><small id="b-me-lv"></small></div></div>
+      <div class="fighter"><div class="spot"><div class="art flip" id="b-wild"></div></div><div class="plate"><span class="nm" id="b-wild-name"></span><div class="hp" id="b-hp"><b></b><i></i></div><small id="b-hp-num"></small></div></div>
     </div>
     <div class="q">
       <button class="icon-btn" id="b-say" aria-label="Say the question again">🔊</button>
-      <div class="sum" aria-live="polite">
-        <span class="num"><span id="q-a"></span><span class="dots" id="d-a"></span></span>
-        <span>+</span>
-        <span class="num"><span id="q-b"></span><span class="dots b" id="d-b"></span></span>
-        <span>=</span><span>?</span>
-      </div>
+      <div class="qbox" id="qbox" aria-live="polite"></div>
     </div>
-    <div class="pad" id="pad"></div>
+    <div class="choices" id="choices"></div>
   </section>
 
   <section id="s-catch" class="screen" hidden>
@@ -229,10 +276,16 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
       </div>
       <div class="panel">
         <h3>Maths in battles</h3>
-        <p>Adding questions. It moves up to "within 10" by itself after 4 right answers in a row, and back down if he's stuck.</p>
-        <div class="seg" id="p-math">
-          <button data-m="5" aria-pressed="false">Adding within 5</button>
-          <button data-m="10" aria-pressed="false">Adding within 10</button>
+        <p>Questions follow the Australian Curriculum (v9) for Year 1. It moves up a level by itself after 5 right first time in a row, and back down if he's stuck twice. About 1 in 3 questions reviews an easier level.</p>
+        <div class="seg" id="p-math"></div>
+      </div>
+      <div class="panel">
+        <h3>Battle length</h3>
+        <p>How many right answers it takes to beat a wild dino.</p>
+        <div class="seg" id="p-hits">
+          <button data-h="4" aria-pressed="false">Short (4)</button>
+          <button data-h="6" aria-pressed="false">Medium (6)</button>
+          <button data-h="8" aria-pressed="false">Long (8)</button>
         </div>
       </div>
       <div class="panel">
@@ -320,23 +373,30 @@ const BUILTIN=new Set(["01_triceratops","02_stegosaurus","03_brachiosaurus","04_
 /* ---------- State ---------- */
 const KEY="dinogo.v1";
 const DEFAULT_WORDS=["come","there","should","could","said","they","was","here"];
-let S={owned:{},words:DEFAULT_WORDS.slice(),mathMax:5,streak:0,stuck:0,last:null,lastWord:null};
+let S={owned:{},words:DEFAULT_WORDS.slice(),mathLvl:3,hits:6,streak:0,stuck:0,last:null,lastWord:null};
 try{const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw));}catch(e){}
+if(!(S.mathLvl>=1&&S.mathLvl<=6))S.mathLvl=3; if(![4,6,8].includes(S.hits))S.hits=6; delete S.mathMax;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 const lvl=o=>1+Math.floor((o.xp||0)/3);
 const rand=n=>Math.floor(Math.random()*n);
+const pick=a=>a[rand(a.length)];
+const between=(lo,hi)=>lo+rand(hi-lo+1);
+const rep=(n,c)=>Array(n).fill(c);
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=rand(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
 const $=id=>document.getElementById(id);
 
 /* ---------- Pictures (IndexedDB, this device only) ---------- */
 const IMG={}; // id -> objectURL
+const JPG=new Set(); // uploaded pictures still on a white background (older uploads)
 let db=null;
 function openDB(){return new Promise(res=>{try{const r=indexedDB.open("dinogo",1);r.onupgradeneeded=()=>r.result.createObjectStore("img");r.onsuccess=()=>{db=r.result;res(db)};r.onerror=()=>res(null)}catch(e){res(null)}})}
 function idb(mode,fn){return new Promise(res=>{if(!db)return res(null);try{const tx=db.transaction("img",mode);const st=tx.objectStore("img");const out=fn(st);tx.oncomplete=()=>res(out&&out.result!==undefined?out.result:true);tx.onerror=()=>res(null)}catch(e){res(null)}})}
-async function loadImgs(){await openDB(); if(!db)return; await new Promise(res=>{try{const tx=db.transaction("img","readonly");const c=tx.objectStore("img").openCursor();c.onsuccess=()=>{const cur=c.result;if(cur){IMG[cur.key]=URL.createObjectURL(cur.value);cur.continue()}else res()};c.onerror=()=>res()}catch(e){res()}})}
-async function putImg(id,blob){if(IMG[id])URL.revokeObjectURL(IMG[id]); IMG[id]=URL.createObjectURL(blob); await idb("readwrite",st=>st.put(blob,id));}
+async function loadImgs(){await openDB(); if(!db)return; await new Promise(res=>{try{const tx=db.transaction("img","readonly");const c=tx.objectStore("img").openCursor();c.onsuccess=()=>{const cur=c.result;if(cur){IMG[cur.key]=URL.createObjectURL(cur.value);if(cur.value&&cur.value.type==="image/jpeg")JPG.add(cur.key);cur.continue()}else res()};c.onerror=()=>res()}catch(e){res()}})}
+async function putImg(id,blob){if(IMG[id])URL.revokeObjectURL(IMG[id]); IMG[id]=URL.createObjectURL(blob); JPG[blob.type==="image/jpeg"?"add":"delete"](id); await idb("readwrite",st=>st.put(blob,id));}
 async function getBlob(id){return await idb("readonly",st=>st.get(id));}
-async function delImg(id){if(IMG[id])URL.revokeObjectURL(IMG[id]); delete IMG[id]; await idb("readwrite",st=>st.delete(id));}
-const src=id=>IMG[id]||(BUILTIN.has(id)?"dinos/"+id+".jpg":null);
+async function delImg(id){if(IMG[id])URL.revokeObjectURL(IMG[id]); delete IMG[id]; JPG.delete(id); await idb("readwrite",st=>st.delete(id));}
+// Built-in art is cut out of its white background (tools/cutout.py makes dinos/<id>.webp)
+const src=id=>IMG[id]||(BUILTIN.has(id)?"dinos/"+id+".webp":null);
 const hasArt=id=>!!src(id);
 
 function art(el,sp){
@@ -344,7 +404,7 @@ function art(el,sp){
   const s=src(sp.id);
   const ph=()=>{el.innerHTML=`<div class="ph" style="--c:var(--t-${sp.type})"><span class="e">${TYPES[sp.type].e}</span><span class="n">${sp.name}</span></div>`};
   if(!s)return ph();
-  const i=new Image(); i.alt=sp.name; i.decoding="async"; i.onerror=ph; i.src=s; el.appendChild(i);
+  const i=new Image(); i.alt=sp.name; i.decoding="async"; i.onerror=ph; if(IMG[sp.id]&&JPG.has(sp.id))i.className="jpg"; i.src=s; el.appendChild(i);
 }
 const pill=(el,sp)=>{el.className="pill t-"+sp.type; el.textContent=TYPES[sp.type].label;};
 
@@ -354,7 +414,9 @@ function pickVoice(){try{const vs=speechSynthesis.getVoices();for(const l of ["e
 try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice}catch(e){}
 function say(text,queue){try{if(!queue)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=.88;u.pitch=1.1;if(VOICE){u.voice=VOICE;u.lang=VOICE.lang}else u.lang="en-AU";speechSynthesis.speak(u)}catch(e){}}
 function tone(freqs,dur=.12,type="triangle",gap=.09){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t0=AC.currentTime;freqs.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.0001,t0+i*gap);g.gain.exponentialRampToValueAtTime(.25,t0+i*gap+.02);g.gain.exponentialRampToValueAtTime(.0001,t0+i*gap+dur);o.connect(g).connect(AC.destination);o.start(t0+i*gap);o.stop(t0+i*gap+dur+.02)})}catch(e){}}
-const sfx={good:()=>tone([660,880]),bad:()=>tone([220,180],.18,"square"),hit:()=>tone([140,90],.16,"sawtooth",.05),win:()=>tone([523,659,784,1046],.18),catch:()=>tone([784,988,1175,1568],.2)};
+function noise(dur,freq,to,vol=.35,q=.9){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t0=AC.currentTime,n=Math.floor(AC.sampleRate*dur),buf=AC.createBuffer(1,n,AC.sampleRate),d=buf.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=buf;f.type="bandpass";f.Q.value=q;f.frequency.setValueAtTime(freq,t0);if(to)f.frequency.exponentialRampToValueAtTime(to,t0+dur);g.gain.value=vol;s.connect(f).connect(g).connect(AC.destination);s.start(t0)}catch(e){}}
+const sfx={good:()=>tone([660,880]),bad:()=>tone([220,180],.18,"square"),win:()=>tone([523,659,784,1046],.18),catch:()=>tone([784,988,1175,1568],.2),
+  whoosh:()=>noise(.28,500,2600,.25),hit:()=>{noise(.22,160,60,.7,.7);tone([110,60],.2,"sine",.03)},block:()=>tone([880,660],.1,"triangle",.05)};
 document.addEventListener("pointerdown",()=>{try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume()}catch(e){}},{once:true});
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const anim=(el,k,o)=>{try{return el.animate(k,Object.assign({duration:400},o,reduce?{duration:Math.min(150,(o&&o.duration)||400)}:{})).finished}catch(e){return Promise.resolve()}};
@@ -365,11 +427,23 @@ function show(id){document.querySelectorAll(".screen").forEach(s=>s.hidden=s.id!
 document.querySelectorAll("[data-home]").forEach(b=>b.onclick=()=>{try{speechSynthesis.cancel()}catch(e){} goHome()});
 
 function goHome(){
-  const ids=Object.keys(S.owned).sort((a,b)=>(S.owned[b].t||0)-(S.owned[a].t||0)).slice(0,4);
   const team=$("h-team"); team.innerHTML="";
-  if(!ids.length){team.innerHTML='<div class="egg-hero" aria-hidden="true"></div>'}
-  ids.forEach(id=>{const d=document.createElement("div");d.className="art";art(d,BY[id]);team.appendChild(d)});
-  $("h-count").textContent=`${ids.length?Object.keys(S.owned).length:0}/40`;
+  // Up to 4 dinos he hasn't caught yet, as "?" shadows. Tapping one finds that dino.
+  const hiding=shuffle(SPECIES.filter(s=>hasArt(s.id)&&!S.owned[s.id])).slice(0,4);
+  $("h-tease").hidden=!hiding.length;
+  hiding.forEach((sp,i)=>{
+    const b=document.createElement("button"),a=document.createElement("div");
+    b.className="mystery"; b.style.animationDelay=(-i*.65)+"s"; b.setAttribute("aria-label","Mystery dino");
+    a.className="art"; art(a,sp); a.querySelectorAll("img").forEach(im=>im.alt="");
+    b.append(a); b.insertAdjacentHTML("beforeend",'<span class="qm" aria-hidden="true">?</span>');
+    b.onclick=()=>startEncounter(sp); team.appendChild(b);
+  });
+  if(!hiding.length){
+    const ids=Object.keys(S.owned).sort((a,b)=>(S.owned[b].t||0)-(S.owned[a].t||0)).slice(0,4);
+    if(!ids.length)team.innerHTML='<div class="egg-hero" aria-hidden="true"></div>';
+    ids.forEach(id=>{const d=document.createElement("div");d.className="art";art(d,BY[id]);team.appendChild(d)});
+  }
+  $("h-count").textContent=`${Object.keys(S.owned).length}/40`;
   show("s-home");
 }
 
@@ -382,8 +456,8 @@ function pickWild(){
   let w=from[rand(from.length)]; if(from.length>1&&w.id===S.lastWild)w=from[rand(from.length)];
   S.lastWild=w.id; return w;
 }
-function startEncounter(){
-  const wild=pickWild(); E={wild};
+function startEncounter(chosen){
+  const wild=chosen||pickWild(); S.lastWild=wild.id; E={wild};
   const owned=Object.keys(S.owned);
   const intro=`A wild ${wild.say} appeared!`;
   if(!owned.length){E.first=true; startCatch(intro+" Catch your very first dino!"); return;}
@@ -398,54 +472,216 @@ function startEncounter(){
   show("s-pick"); say(intro+" Who will battle?");
 }
 
+/* ---------- Maths questions: Australian Curriculum v9, Year 1 ---------- */
+// Level 1 is Foundation revision; levels 2-6 cover the Year 1 number and algebra content descriptions.
+const LEVELS=[null,
+  {name:"1. Adding to 10",code:"Foundation revision"},
+  {name:"2. Make 10, take away",code:"AC9M1N04"},
+  {name:"3. Add and take away to 20",code:"AC9M1N04"},
+  {name:"4. Numbers to 120, tens and ones",code:"AC9M1N01, AC9M1N02"},
+  {name:"5. Skip counting, groups, patterns",code:"AC9M1A01, AC9M1N03, AC9M1A02"},
+  {name:"6. Story problems, sharing, money",code:"AC9M1N05, AC9M1N06"}];
+const SHAPES={circle:"circle",square:"square",tri:"triangle",star:"star"};
+const shape=k=>`<i class="shp ${k}"></i>`;
+const eq=t=>`<div class="eq">${t}</div>`, words=t=>`<div class="eq words">${t}</div>`;
+const strip=xs=>`<div class="strip">${xs.map(x=>x==="?"?'<b class="ask">?</b>':`<b>${x}</b>`).join("")}</div>`;
+function frames(cells){let h="";for(let i=0;i<cells.length;i+=10){const c=cells.slice(i,i+10);while(c.length<10)c.push("");h+=`<div class="tf">${c.map(x=>`<i class="${x}"></i>`).join("")}</div>`}return `<div class="row-vis">${h}</div>`}
+function nums(ans,spread=[1,2],min=0){const s=new Set([ans]);for(let g=0;s.size<4&&g<80;g++){const v=ans+pick(spread)*(Math.random()<.5?-1:1);if(v>=min)s.add(v)}return [...s].sort((a,b)=>a-b)}
+const plural=(n,one,many)=>n===1?one:many;
+
+const add=(a,b)=>({html:eq(`${a} + ${b} = ?`)+frames([...rep(a,"a"),...rep(b,"b")]),say:`${a} plus ${b}?`,ans:a+b,choices:nums(a+b,[1,2],1)});
+const sub=(a,b)=>({html:eq(`${a} − ${b} = ?`)+frames([...rep(a-b,"a"),...rep(b,"x")]),say:`${a} take away ${b}?`,ans:a-b,choices:nums(a-b,[1,2])});
+function makeTen(){const a=between(1,9);return {html:eq(`${a} + ? = 10`)+frames([...rep(a,"a"),...rep(10-a,"e")]),say:`${a} and how many more make 10?`,ans:10-a,choices:nums(10-a,[1,2])}}
+function tensOnes(){
+  const t=between(1,9),o=between(0,9),ans=t*10+o,s=new Set([ans]);
+  if(o>0&&o!==t)s.add(o*10+t); s.add(ans+(ans<100?10:-10)); s.add(ans+(o<9?1:-1));
+  const choices=[...s].slice(0,4); for(const v of nums(ans,[1,10]))if(choices.length<4&&!choices.includes(v))choices.push(v);
+  return {html:`<div class="base">${'<i class="rod"></i>'.repeat(t)}<div class="cubes">${'<i class="cube"></i>'.repeat(o)}</div></div>`+words(`${t} ${plural(t,"ten","tens")} and ${o} ${plural(o,"one","ones")}`),
+    say:`${t} ${plural(t,"ten","tens")} and ${o} ${plural(o,"one","ones")}. What number is that?`,ans,choices:choices.sort((a,b)=>a-b)};
+}
+function nextTo(){const n=between(10,119);return Math.random()<.6
+  ?{html:strip([n-1,n,"?"]),say:`What number comes after ${n}?`,ans:n+1,choices:nums(n+1,[1,2,10])}
+  :{html:strip(["?",n,n+1]),say:`What number comes before ${n}?`,ans:n-1,choices:nums(n-1,[1,2,10])};}
+function bigger(){const a=between(10,120);let b=a;while(b===a)b=Math.random()<.5?Math.floor(a/10)*10+rand(10):between(10,120);
+  return {html:words("Which number is bigger?"),say:`Which number is bigger, ${a} or ${b}?`,ans:Math.max(a,b),choices:[a,b]};}
+function skip(){
+  const step=pick([2,5,10]),start=step*rand(step===2?20:step===5?12:8),seq=[0,1,2,3,4].map(i=>start+i*step);
+  const hide=Math.random()<.7?4:between(1,3),ans=seq[hide];
+  return {html:strip(seq.map((v,i)=>i===hide?"?":v))+words(`Count by ${step}s`),
+    say:`Count by ${step}s. ${seq.map((v,i)=>i===hide?"what":v).join(", ")}?`,ans,choices:nums(ans,[1,step])};
+}
+function groups(){
+  const k=pick([2,5,10]),g=between(2,5),cols=Math.min(k,5);
+  const grp=`<div class="grp" style="grid-template-columns:repeat(${cols},16px)">${"<i></i>".repeat(k)}</div>`;
+  return {html:`<div class="row-vis">${grp.repeat(g)}</div>`+words(`${g} groups of ${k}`),
+    say:`${g} groups of ${k}. How many altogether? Count by ${k}s.`,ans:g*k,choices:nums(g*k,[k,1],1)};
+}
+function pattern(){
+  const [A,B,C]=shuffle(Object.keys(SHAPES)),unit=pick([[A,B],[A,A,B],[A,B,B],[A,B,C]]);
+  const len=unit.length*2+rand(unit.length),seq=Array.from({length:len},(_,i)=>unit[i%unit.length]),ans=unit[len%unit.length];
+  const choices=shuffle([...new Set([...unit,...Object.keys(SHAPES)])].slice(0,3)); if(!choices.includes(ans))choices[0]=ans;
+  return {html:`<div class="strip">${seq.map(k=>`<b>${shape(k)}</b>`).join("")}<b class="ask">?</b></div>`,
+    say:`${seq.map(k=>SHAPES[k]).join(", ")}. What shape comes next?`,ans,choices,label:shape,sayAns:k=>SHAPES[k]};
+}
+
+function share(){
+  const d=between(2,4),each=between(1,5),n=d*each,s=src(E.me);
+  const dino=s?`<img class="mini" src="${s}" alt="">`:'<span style="font-size:2.4rem">🦕</span>';
+  return {html:`<div class="row-vis">${'<i class="berry"></i>'.repeat(n)}</div><div class="row-vis">${dino.repeat(d)}</div>`+words(`${n} berries shared by ${d} dinos`),
+    say:`${n} berries, shared equally between ${d} dinos. How many berries does each dino get?`,ans:each,choices:nums(each,[1,2],1)};
+}
+function story(){
+  const me=BY[E.me].name,wild=E.wild.name;
+  return pick([
+    ()=>{const a=between(5,15),b=between(1,a-1),t=`There are ${a} eggs in the nest. ${b} ${plural(b,"egg hatches","eggs hatch")}. How many eggs are left?`;
+      return {html:words(t)+frames([...rep(a-b,"a"),...rep(b,"x")]),say:t,ans:a-b,choices:nums(a-b,[1,2])}},
+    ()=>{const a=between(3,12),b=between(2,20-a),t=`Your ${me} ate ${a} berries, then ${b} more. How many berries altogether?`;
+      return {html:words(t)+frames([...rep(a,"a"),...rep(b,"b")]),say:t,ans:a+b,choices:nums(a+b,[1,2],1)}},
+    ()=>{const a=between(6,15),b=between(2,a-1),t=`Your ${me} found ${a} leaves. The wild ${wild} found ${b}. How many more did your ${me} find?`;
+      return {html:words(t)+frames([...rep(b,"b"),...rep(a-b,"a")]),say:t,ans:a-b,choices:nums(a-b,[1,2])}},
+  ])();
+}
+function money(){
+  const a=between(3,10),b=between(1,a-1),t=`You have ${a} dollars. A dino egg costs ${b} ${plural(b,"dollar","dollars")}. How much money is left?`;
+  const coins=Array.from({length:a},(_,i)=>`<span class="coin" style="${i>=a-b?"opacity:.3":""}">$1</span>`).join("");
+  return {html:words(t)+`<div class="row-vis">${coins}</div>`,say:t,ans:a-b,choices:nums(a-b,[1,2])};
+}
+const QUESTIONS={
+  1:[()=>{const a=between(1,9);return add(a,between(1,10-a))}],
+  2:[makeTen,()=>{const a=between(3,10);return sub(a,between(1,a-1))}],
+  3:[()=>{const n=between(1,9);return Math.random()<.5?add(10,n):add(n,10)},
+     ()=>{const a=between(11,17);return add(a,between(1,19-a))},
+     ()=>{const a=between(6,9);return add(a,between(11-a,9))},
+     ()=>{const a=between(11,19);return sub(a,between(1,a-10))},
+     ()=>{const a=between(11,18);return sub(a,between(a-9,9))}],
+  4:[tensOnes,nextTo,bigger],
+  5:[skip,groups,pattern],
+  6:[share,story,money],
+};
+function makeQ(){
+  const L=S.mathLvl, lv=(L>1&&Math.random()<.33)?between(1,L-1):L; let q,g=0;
+  do{q=pick(QUESTIONS[lv])();g++}while(E.q&&q.say===E.q.say&&g<6);
+  q.lvl=lv; return q;
+}
+
+/* ---------- Battle effects ---------- */
+const MOVES={plant:["Tail swipe!","Big stomp!","Head bump!"],meat:["Chomp!","Claw slash!","Mighty roar!"],sea:["Splash attack!","Tail slap!"],fly:["Dive bomb!","Wing gust!"]};
+const TCOL={plant:"#3E9B4F",meat:"#D9443A",sea:"#2F7FD1",fly:"#8A55C9"};
+const fig=box=>box.firstElementChild||box; // the picture (or placeholder card) inside an .art box
+function center(el){const a=$("arena").getBoundingClientRect(),r=el.getBoundingClientRect();return {x:r.left-a.left+r.width/2,y:r.top-a.top+r.height/2,h:r.height}}
+function fx(cls,x,y,html=""){const d=document.createElement("div");d.className="fx "+cls;d.style.left=x+"px";d.style.top=y+"px";d.innerHTML=html;$("arena").appendChild(d);return d}
+const pop=(d,k,o)=>anim(d,k,o).then(()=>d.remove());
+const settle=el=>{try{el.getAnimations().forEach(a=>{if(!a.animationName)a.cancel()})}catch(e){}};
+const gap=()=>($("b-wild").getBoundingClientRect().left-$("b-me").getBoundingClientRect().left);
+function callout(text,box,col,dy=-.55){
+  const c=center(box),d=fx("callout",c.x,c.y+c.h*dy,text); d.style.setProperty("--c",col);
+  return pop(d,[{transform:"translate(-50%,-50%) scale(.4)",opacity:0},{transform:"translate(-50%,-50%) scale(1.12)",opacity:1,offset:.12},{transform:"translate(-50%,-50%) scale(1)",opacity:1,offset:.25},{transform:"translate(-50%,-65%)",opacity:1,offset:.8},{transform:"translate(-50%,-85%)",opacity:0}],{duration:1400});
+}
+function shake(){anim($("arena"),[{translate:"0 0"},{translate:"-8px 5px"},{translate:"7px -4px"},{translate:"-4px 2px"},{translate:"0 0"}],{duration:300})}
+function impact(box,col,dmg){
+  const c=center(box),t=fig(box);
+  const b=fx("burst",c.x,c.y); b.style.setProperty("--c",col);
+  pop(b,[{transform:"scale(.2) rotate(0deg)",opacity:1},{transform:"scale(1.1) rotate(20deg)",opacity:1,offset:.4},{transform:"scale(1.4) rotate(35deg)",opacity:0}],{duration:460,easing:"ease-out"});
+  for(let i=0;i<12;i++){const s=fx("spark",c.x,c.y),a=Math.random()*Math.PI*2,r=70+Math.random()*90; s.style.setProperty("--c",i%3?"#FFD23F":col);
+    pop(s,[{transform:"translate(0,0) scale(1)",opacity:1},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r}px) scale(.2)`,opacity:0}],{duration:500+rand(250),easing:"cubic-bezier(.15,.7,.3,1)"})}
+  pop(fx("dmg",c.x,c.y-c.h*.15,"−"+dmg),[{transform:"translate(-50%,-50%) scale(.3)",opacity:0},{transform:"translate(-50%,-85%) scale(1.3)",opacity:1,offset:.18},{transform:"translate(-50%,-100%) scale(1)",opacity:1,offset:.65},{transform:"translate(-50%,-160%) scale(.9)",opacity:0}],{duration:1250,easing:"ease-out"});
+  anim(t,[{filter:"brightness(1)"},{filter:"brightness(1.9) saturate(.4)"},{filter:"brightness(1)"},{filter:"brightness(1.9) saturate(.4)"},{filter:"brightness(1)"}],{duration:340});
+  anim(t,[{translate:"0 0",rotate:"0deg"},{translate:"28px -8px",rotate:"7deg"},{translate:"-8px 0",rotate:"-3deg"},{translate:"0 0",rotate:"0deg"}],{duration:440,easing:"ease-out"});
+  shake();
+}
+
+async function lunge(box,dir,dist){ // dir 1 = to the right
+  const t=fig(box),back=`${-24*dir}px 6px`,hit=`${dist*dir}px -10px`;
+  await anim(t,[{translate:"0 0",rotate:"0deg"},{translate:back,rotate:`${-6*dir}deg`}],{duration:210,easing:"ease-out",fill:"forwards"});
+  sfx.whoosh();
+  await anim(t,[{translate:back,rotate:`${-6*dir}deg`},{translate:hit,rotate:`${8*dir}deg`}],{duration:160,easing:"cubic-bezier(.5,0,1,.5)",fill:"forwards"});
+  return ()=>anim(t,[{translate:hit,rotate:`${8*dir}deg`},{translate:"0 0",rotate:"0deg"}],{duration:420,easing:"cubic-bezier(.3,1.4,.5,1)",fill:"forwards"}).then(()=>settle(t));
+}
+async function attack(move){
+  const col=TCOL[BY[E.me].type];
+  callout(move,$("b-me"),col);
+  const back=await lunge($("b-me"),1,gap()*.55);
+  const dmg=E.dmg[E.turn]||1; E.turn++;
+  E.hp=E.turn>=E.dmg.length?0:Math.max(1,E.hp-dmg);
+  impact($("b-wild"),col,dmg); sfx.hit(); hpBar();
+  await back();
+}
+async function counter(){
+  const col=TCOL[E.wild.type];
+  callout(pick(MOVES[E.wild.type]),$("b-wild"),col);
+  const back=await lunge($("b-wild"),-1,gap()*.5);
+  const c=center($("b-me")); sfx.block();
+  pop(fx("shield",c.x,c.y),[{transform:"scale(.5)",opacity:0},{transform:"scale(1.05)",opacity:1,offset:.3},{transform:"scale(1.25)",opacity:0}],{duration:650,easing:"ease-out"});
+  callout("Blocked!",$("b-me"),"#2F7FD1",-.1);
+  anim(fig($("b-me")),[{translate:"0 0"},{translate:"-12px 0"},{translate:"0 0"}],{duration:320});
+  await back();
+}
+function dodge(){
+  sfx.whoosh(); callout("Missed!",$("b-wild"),"#56664F",-.45);
+  anim(fig($("b-wild")),[{translate:"0 0",rotate:"0deg"},{translate:"44px -34px",rotate:"10deg",offset:.4},{translate:"0 0",rotate:"0deg"}],{duration:540,easing:"ease-out"});
+}
+async function knockout(){
+  const c=center($("b-wild")),dz=fx("dizzy",c.x,c.y-c.h*.4,"<i></i><i></i><i></i>");
+  anim(dz,[{transform:"scaleY(.45) rotate(0deg)"},{transform:"scaleY(.45) rotate(360deg)"}],{duration:900,iterations:3}).then(()=>dz.remove());
+  anim(fig($("b-me")),[{translate:"0 0"},{translate:"0 -44px",offset:.25},{translate:"0 0",offset:.5},{translate:"0 -30px",offset:.75},{translate:"0 0"}],{duration:950,delay:300});
+  const m=center($("b-me"));
+  for(let i=0;i<16;i++){const s=fx("spark",m.x,m.y-m.h*.3),a=-Math.PI*(.15+Math.random()*.7),r=90+Math.random()*90; s.style.setProperty("--c",pick(Object.values(TCOL).concat("#FFD23F")));
+    pop(s,[{transform:"translate(0,0)",opacity:1},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r}px)`,opacity:1,offset:.6},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r+60}px)`,opacity:0}],{duration:1200,delay:300,easing:"ease-out"})}
+  await anim(fig($("b-wild")),[{rotate:"0deg",translate:"0 0",opacity:1},{rotate:"-12deg",translate:"0 6px",offset:.3},{rotate:"10deg",translate:"0 10px",offset:.6},{rotate:"0deg",translate:"0 20px",scale:"1 .9",opacity:.5}],{duration:1300,fill:"forwards"});
+}
+
 /* ---------- Battle (maths) ---------- */
 function startBattle(meId,intro){
   E.me=meId; const me=BY[meId],w=E.wild,o=S.owned[meId];
-  E.maxHp=S.mathMax<=5?8+rand(5):14+rand(7); E.hp=E.maxHp;
+  // The wild dino's health (from SPECIES) is split into S.hits hits, so every battle takes the same number of right answers.
+  E.maxHp=w.hp; E.hp=E.maxHp; E.turn=0; E.q=null;
+  const n=S.hits,base=Math.floor(E.maxHp/n); E.dmg=rep(n,base); for(let i=0;i<E.maxHp-base*n;i++)E.dmg[i]++;
+  for(let i=0;i<n;i++){const a=rand(n),b=rand(n);if(E.dmg[a]>2){E.dmg[a]--;E.dmg[b]++}}
+  shuffle(E.dmg);
   art($("b-me"),me); art($("b-wild"),w);
   $("b-me-name").textContent=me.name; $("b-me-lv").textContent=`Your dino · Level ${lvl(o)}`;
   $("b-wild-name").textContent=w.name; $("b-title").textContent=`Battle the wild ${w.name}!`;
   hpBar(); show("s-battle"); newQ();
-  say(`${intro} Your ${me.say} is ready! Get the answer to attack. ${E.q.a} plus ${E.q.b}?`);
+  anim(fig($("b-me")),[{translate:"-120% 0",opacity:0},{translate:"0 0",opacity:1}],{duration:550,easing:"cubic-bezier(.2,.8,.3,1.15)"});
+  anim(fig($("b-wild")),[{translate:"120% 0",opacity:0},{translate:"0 0",opacity:1}],{duration:550,delay:150,easing:"cubic-bezier(.2,.8,.3,1.15)"});
+  say(`${intro} Your ${me.say} is ready! Get it right to attack. ${E.q.say}`);
 }
-function hpBar(){const p=E.hp/E.maxHp; $("b-hp").querySelector("i").style.width=(p*100)+"%"; $("b-hp").classList.toggle("low",p<.35); $("b-hp-num").textContent=`Health ${E.hp}`;}
-function dots(el,n){el.innerHTML="<i></i>".repeat(n)}
+function hpBar(){const p=E.hp/E.maxHp,bar=$("b-hp"); bar.querySelector("i").style.width=bar.querySelector("b").style.width=(p*100)+"%"; bar.classList.toggle("low",p<.35); $("b-hp-num").textContent=`Health ${E.hp}`;}
 function newQ(){
-  const m=S.mathMax; let a=1+rand(m-1), b=1+rand(m-a);
-  if(E.q&&E.q.a===a&&E.q.b===b){a=1+rand(m-1);b=1+rand(m-a)}
-  E.q={a,b}; E.miss=0; E.busy=false;
-  $("q-a").textContent=a; $("q-b").textContent=b; dots($("d-a"),a); dots($("d-b"),b);
-  const pad=$("pad"); pad.innerHTML="";
-  for(let i=1;i<=m;i++){const k=document.createElement("button");k.textContent=i;k.dataset.n=i;k.onclick=()=>answer(i,k);pad.appendChild(k)}
+  E.q=makeQ(); E.miss=0; E.busy=false;
+  $("qbox").innerHTML=E.q.html;
+  const box=$("choices"); box.innerHTML="";
+  E.q.choices.forEach(v=>{const k=document.createElement("button");k.innerHTML=E.q.label?E.q.label(v):v;k.dataset.v=v;
+    k.setAttribute("aria-label",E.q.sayAns?E.q.sayAns(v):String(v));k.onclick=()=>answer(v,k);box.appendChild(k)});
 }
-async function answer(n,btn){
-  if(E.busy)return; const right=E.q.a+E.q.b;
-  if(n!==right){
-    E.miss++; sfx.bad(); btn.classList.remove("shake"); void btn.offsetWidth; btn.classList.add("shake");
-    anim($("b-wild"),[{transform:"translateX(0)"},{transform:"translateX(40px)"},{transform:"translateX(0)"}],{duration:380});
-    if(E.miss>=2){const g=$("pad").querySelector(`[data-n="${right}"]`); if(g)g.classList.add("glow");}
-    say(`It dodged! Try again. ${E.q.a} plus ${E.q.b}?`); return;
+$("b-say").onclick=()=>{if(E.q)say(E.q.say)};
+async function answer(v,btn){
+  if(E.busy)return; const q=E.q;
+  if(v!==q.ans){
+    E.miss++; sfx.bad(); btn.classList.add("nope"); dodge();
+    if(E.miss>=2){const g=[...$("choices").children].find(b=>b.dataset.v===String(q.ans)); if(g)g.classList.add("glow");}
+    say(`It dodged! Try again. ${q.say}`); return;
   }
-  E.busy=true; sfx.hit();
-  // adapt difficulty
-  if(E.miss===0){S.streak++; S.stuck=0; if(S.streak>=4&&S.mathMax<10){S.mathMax=10;S.streak=0}}
-  else {S.streak=0; if(E.miss>=3){S.stuck++; if(S.stuck>=2&&S.mathMax>5){S.mathMax=5;S.stuck=0}}}
-  save();
-  say(`${right}! ${right} hits!`);
-  anim($("b-me"),[{transform:"translateX(0)"},{transform:"translateX(60px) rotate(6deg)"},{transform:"translateX(0)"}],{duration:420});
-  const f=document.createElement("div"); f.className="floater"; f.textContent=`${right} hits!`; $("arena").appendChild(f);
-  anim(f,[{transform:"translateY(0)",opacity:1},{transform:"translateY(-60px)",opacity:0}],{duration:1100}).then(()=>f.remove());
-  await wait(200);
-  anim($("b-wild"),[{transform:"translateX(0)"},{transform:"translateX(-14px)"},{transform:"translateX(14px)"},{transform:"translateX(0)"}],{duration:360});
-  E.hp=Math.max(0,E.hp-right); hpBar();
-  await wait(1100);
-  if(E.hp>0){newQ(); say(`${E.q.a} plus ${E.q.b}?`,true); return;}
+  E.busy=true;
+  // adapt difficulty, counting only questions at his current level (not the review ones)
+  if(q.lvl===S.mathLvl){
+    if(E.miss===0){S.streak++; S.stuck=0; if(S.streak>=5&&S.mathLvl<6){S.mathLvl++;S.streak=0}}
+    else {S.streak=0; if(E.miss>=2){S.stuck++; if(S.stuck>=2&&S.mathLvl>1){S.mathLvl--;S.stuck=0}}}
+    save();
+  }
+  const move=pick(MOVES[BY[E.me].type]);
+  say(`${q.sayAns?q.sayAns(v):v}! ${move}`);
+  await attack(move);
+  if(E.hp>0){
+    if(Math.random()<.5){await wait(250); await counter();}
+    await wait(300); newQ(); say(E.q.say,true); return;
+  }
   // win
   const o=S.owned[E.me], before=lvl(o); o.wins=(o.wins||0)+1; o.xp=(o.xp||0)+1; save(); sfx.win();
   const up=lvl(o)>before;
-  anim($("b-wild"),[{opacity:1,transform:"scale(1)"},{opacity:.35,transform:"scale(.85) translateY(10px)"}],{duration:500,fill:"forwards"});
   say(`You won! ${up?`Level up! Your ${BY[E.me].say} is now level ${lvl(o)}! `:""}Now spell the word to catch the ${E.wild.say}!`);
-  await wait(up?3400:2600);
+  await knockout();
+  await wait(up?2200:1400);
   startCatch("");
 }
 
@@ -502,8 +738,8 @@ function caught(){
   show("s-caught");
   say(isNew?`You caught a ${w.say}! ${w.fun}`:`Another ${w.say}! Your ${w.say} got stronger!`);
 }
-$("k-again").onclick=startEncounter; $("k-book").onclick=openBook;
-$("find").onclick=startEncounter; $("to-book").onclick=openBook;
+$("k-again").onclick=()=>startEncounter(); $("k-book").onclick=openBook;
+$("find").onclick=()=>startEncounter(); $("to-book").onclick=openBook;
 
 /* ---------- Dino book + stats ---------- */
 function openBook(){
@@ -545,8 +781,13 @@ $("p-save-words").onclick=()=>{
   S.words=w.length?w:DEFAULT_WORDS.slice(); save(); $("p-words").value=S.words.join(", ");
   $("p-words-status").textContent=`Saved ${S.words.length} words.`;
 };
-function syncMath(){document.querySelectorAll("#p-math button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.m===S.mathMax)))}
-document.querySelectorAll("#p-math button").forEach(b=>b.onclick=()=>{S.mathMax=+b.dataset.m;S.streak=0;S.stuck=0;save();syncMath()});
+function syncMath(){
+  const box=$("p-math"); box.innerHTML="";
+  for(let i=1;i<LEVELS.length;i++){const b=document.createElement("button");b.innerHTML=`${LEVELS[i].name}<small style="display:block;font-weight:400;opacity:.75">${LEVELS[i].code}</small>`;
+    b.setAttribute("aria-pressed",String(S.mathLvl===i));b.onclick=()=>{S.mathLvl=i;S.streak=0;S.stuck=0;save();syncMath()};box.appendChild(b)}
+  document.querySelectorAll("#p-hits button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.h===S.hits)));
+}
+document.querySelectorAll("#p-hits button").forEach(b=>b.onclick=()=>{S.hits=+b.dataset.h;save();syncMath()});
 $("p-reset").onclick=()=>{$("p-reset-yes").hidden=false};
 $("p-reset-yes").onclick=()=>{S.owned={};S.last=null;S.streak=0;S.stuck=0;save();$("p-reset-yes").hidden=true;$("p-reset").textContent="Progress reset";};
 
@@ -557,8 +798,21 @@ async function shrink(file){
     const k=Math.min(1,560/Math.max(img.naturalWidth,img.naturalHeight)); const c=document.createElement("canvas");
     c.width=Math.round(img.naturalWidth*k); c.height=Math.round(img.naturalHeight*k);
     const x=c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,c.width,c.height); x.drawImage(img,0,0,c.width,c.height);
-    return await new Promise(r=>c.toBlob(b=>r(b||file),"image/jpeg",.86));
+    try{cutout(c); return await new Promise(r=>c.toBlob(b=>r(b||file),"image/png"));}
+    catch(e){return await new Promise(r=>c.toBlob(b=>r(b||file),"image/jpeg",.86));}
   }catch(e){return file}finally{URL.revokeObjectURL(url)}
+}
+// Same as tools/cutout.py: white connected to the border becomes transparent; the edge is softened.
+function cutout(c){
+  const x=c.getContext("2d"),w=c.width,h=c.height,N=w*h,D=x.getImageData(0,0,w,h),p=D.data,bg=new Uint8Array(N),st=new Int32Array(N*4+2*(w+h));let sp=0;
+  const white=i=>p[i*4]>=236&&p[i*4+1]>=236&&p[i*4+2]>=236;
+  for(let X=0;X<w;X++){st[sp++]=X;st[sp++]=N-w+X} for(let Y=0;Y<h;Y++){st[sp++]=Y*w;st[sp++]=Y*w+w-1}
+  while(sp){const i=st[--sp];if(bg[i]||!white(i))continue;bg[i]=1;const X=i%w;if(X>0)st[sp++]=i-1;if(X<w-1)st[sp++]=i+1;if(i>=w)st[sp++]=i-w;if(i<N-w)st[sp++]=i+w}
+  let near=bg; for(let r=0;r<2;r++){const n2=near.slice();for(let i=0;i<N;i++){if(near[i])continue;const X=i%w;if((X>0&&near[i-1])||(X<w-1&&near[i+1])||(i>=w&&near[i-w])||(i<N-w&&near[i+w]))n2[i]=1}near=n2}
+  for(let i=0;i<N;i++){const k=i*4; if(bg[i]){p[k+3]=0;continue} if(!near[i])continue;
+    const a=Math.min(1,Math.max(0,(250-(p[k]+p[k+1]+p[k+2])/3)/160)); if(!a){p[k+3]=0;continue}
+    for(let j=0;j<3;j++)p[k+j]=Math.max(0,Math.min(255,(p[k+j]-(1-a)*255)/a)); p[k+3]=Math.round(a*255)}
+  x.putImageData(D,0,0);
 }
 function matchName(fn){
   fn=fn.toLowerCase();
