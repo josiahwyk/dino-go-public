@@ -1,0 +1,603 @@
+<title>Dino Go</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Baloo+2:wght@600;800&display=swap">
+<style>
+/* Layout: one-screen game, a stack of full-height "screens" swapped in place; jungle floor below, sky above. Single deliberate look (no dark theme). */
+:root{
+  --sky:#CDEBF5; --leaf:#2F6B3A; --fern:#9FD08A; --sand:#FBF1D6; --lava:#F2762E; --lava-dk:#C9561A;
+  --ink:#1E2B1F; --muted:#56664F; --line:#1E2B1F22;
+  --t-plant:#3E9B4F; --t-meat:#D9443A; --t-sea:#2F7FD1; --t-fly:#8A55C9;
+  --display:"Baloo 2","Arial Rounded MT Bold",ui-rounded,system-ui,sans-serif;
+  --body:"Andika","Comic Neue",ui-rounded,system-ui,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{background:linear-gradient(180deg,var(--sky) 0%,#E4F4E0 55%,var(--fern) 100%);background-color:var(--sky);color:var(--ink);font-family:var(--body);font-size:18px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px;box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;overflow-x:hidden}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible,select:focus-visible,textarea:focus-visible{outline:4px solid var(--lava);outline-offset:3px}
+#app{max-width:980px;margin:0 auto;height:100%;display:flex;flex-direction:column}
+.screen{flex:1;display:flex;flex-direction:column;gap:16px;min-height:0}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(3rem,10vw,5.5rem);font-weight:800;color:var(--leaf);letter-spacing:-.01em}
+h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.icon-btn{width:60px;height:60px;border-radius:50%;border:0;background:#fff;box-shadow:0 3px 0 var(--line);font-size:1.6rem;display:grid;place-items:center;flex:none}
+.big{border:0;border-radius:28px;font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,6vw,2.6rem);padding:18px 36px;min-height:88px;
+  background:var(--lava);color:#fff;box-shadow:0 8px 0 var(--lava-dk);transition:transform .08s}
+.big:active{transform:translateY(6px);box-shadow:0 2px 0 var(--lava-dk)}
+.big.green{background:var(--leaf);box-shadow:0 8px 0 #1C4424}
+.big.small{font-size:1.4rem;min-height:64px;padding:12px 24px;box-shadow:0 6px 0 var(--lava-dk)}
+.big.green.small{box-shadow:0 6px 0 #1C4424}
+.center{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:20px;flex:1}
+.row{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+
+/* Art boxes */
+.art{position:relative;aspect-ratio:1;width:100%;max-width:100%;display:grid;place-items:center}
+.art img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;display:block}
+.flip img{transform:scaleX(-1)}
+.ph{width:86%;height:86%;border-radius:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  background:radial-gradient(circle at 50% 38%,#fff 0 30%,var(--c) 31% 100%);color:#fff;font-family:var(--display);font-weight:800;text-align:center;padding:8px}
+.ph .e{font-size:clamp(2rem,9vw,4rem);line-height:1}
+.ph .n{font-size:clamp(.8rem,2.4vw,1.1rem);text-shadow:0 1px 2px #0005;line-height:1.1}
+
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:4px 14px 4px 10px;font-family:var(--display);font-weight:800;font-size:1rem;background:#fff;color:var(--ink);box-shadow:0 2px 0 var(--line)}
+.pill::before{content:"";width:14px;height:14px;border-radius:50%;background:var(--c)}
+.t-plant{--c:var(--t-plant)} .t-meat{--c:var(--t-meat)} .t-sea{--c:var(--t-sea)} .t-fly{--c:var(--t-fly)}
+
+/* Home */
+.team{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.team .art{width:110px}
+.egg-hero{width:150px;height:186px;border-radius:50% 50% 46% 46%/60% 60% 40% 40%;
+  background:radial-gradient(circle at 30% 35%,#E9C77E 0 9%,transparent 10%),radial-gradient(circle at 65% 55%,#E9C77E 0 12%,transparent 13%),radial-gradient(circle at 42% 75%,#E9C77E 0 7%,transparent 8%),radial-gradient(circle at 35% 25%,#fff,#F6E4B5 60%,#E8CB86);
+  box-shadow:0 10px 0 #0001,inset -10px -14px 0 #0000000d;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px) rotate(3deg)}}
+.hint{color:var(--muted);font-size:1rem}
+
+/* Battle */
+.headline{text-align:center}
+.arena{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end;min-height:0}
+.fighter{display:flex;flex-direction:column;gap:6px;min-width:0}
+.fighter .art{max-width:330px;margin:0 auto}
+.plate{background:#fff;border-radius:18px;padding:8px 14px;box-shadow:0 3px 0 var(--line);font-family:var(--display);font-weight:800;font-size:1.15rem;display:flex;flex-direction:column;gap:4px;min-width:0}
+.plate .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plate small{font-family:var(--body);font-weight:700;color:var(--muted);font-size:.9rem}
+.hp{height:16px;border-radius:999px;background:#E7E2D2;overflow:hidden}
+.hp i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#4DBA5A,#8BD36A);border-radius:999px;transition:width .5s}
+.hp.low i{background:linear-gradient(90deg,#E5533D,#F2A13A)}
+.floater{position:absolute;font-family:var(--display);font-weight:800;font-size:3rem;color:var(--lava);text-shadow:0 3px 0 #fff;pointer-events:none;right:22%;top:20%}
+.q{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
+.sum{display:flex;align-items:flex-start;gap:12px;font-family:var(--display);font-weight:800;font-size:clamp(2.6rem,9vw,4rem);line-height:1}
+.num{display:flex;flex-direction:column;align-items:center;gap:6px}
+.dots{display:flex;flex-wrap:wrap;gap:4px;max-width:96px;justify-content:center}
+.dots i{width:14px;height:14px;border-radius:50%;background:var(--lava)}
+.dots.b i{background:var(--t-sea)}
+.pad{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-width:640px;width:100%;margin:0 auto}
+.pad button{border:0;border-radius:22px;background:#fff;min-height:76px;font-family:var(--display);font-weight:800;font-size:2.4rem;box-shadow:0 6px 0 var(--line)}
+.pad button:active{transform:translateY(4px);box-shadow:0 2px 0 var(--line)}
+.glow{animation:glow 1s ease-in-out infinite;outline:5px solid var(--lava)!important}
+@keyframes glow{50%{transform:scale(1.08)}}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+/* Pick */
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;overflow:auto;padding:4px}
+.pick-grid button{border:0;background:#fff;border-radius:22px;padding:8px;box-shadow:0 5px 0 var(--line);display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--display);font-weight:800;font-size:1rem}
+.pick-grid small{font-family:var(--body);color:var(--muted)}
+
+/* Catch */
+.catch-stage{position:relative;display:flex;justify-content:center;align-items:flex-end;gap:20px;min-height:0}
+.catch-stage .art{width:min(320px,52vw)}
+.egg{--charge:0;position:relative;width:96px;height:96px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:conic-gradient(var(--lava) calc(var(--charge)*1turn),#ffffff99 0);transition:--charge .3s;margin-bottom:12px}
+.egg b{width:62px;height:78px;border-radius:50% 50% 46% 46%/60% 60% 40% 40%;display:block;
+  background:radial-gradient(circle at 30% 35%,#E9C77E 0 9%,transparent 10%),radial-gradient(circle at 66% 58%,#E9C77E 0 12%,transparent 13%),radial-gradient(circle at 35% 25%,#fff,#F6E4B5 60%,#E8CB86);box-shadow:0 4px 0 #0002}
+.slots{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.slot{width:62px;height:76px;border-radius:16px;background:#ffffffaa;border-bottom:6px solid var(--leaf);display:grid;place-items:center;font-family:var(--body);font-weight:700;font-size:2.8rem;color:var(--leaf)}
+.tiles{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;max-width:720px;margin:0 auto}
+.tile{width:80px;height:80px;border:0;border-radius:20px;background:#fff;font-family:var(--body);font-weight:700;font-size:3rem;line-height:1;box-shadow:0 6px 0 var(--line)}
+.tile:active{transform:translateY(4px);box-shadow:0 2px 0 var(--line)}
+.tile.used{visibility:hidden}
+.listen{border:0;background:#fff;border-radius:999px;padding:12px 22px;font-family:var(--display);font-weight:800;font-size:1.3rem;box-shadow:0 4px 0 var(--line)}
+
+/* Caught */
+.caught-art{width:min(340px,70vw);position:relative}
+.ribbon{position:absolute;top:4%;left:-4%;background:var(--lava);color:#fff;font-family:var(--display);font-weight:800;padding:4px 16px;border-radius:12px;transform:rotate(-8deg);font-size:1.3rem;z-index:2}
+.fact{max-width:34em;font-size:1.25rem;line-height:1.45}
+
+/* Book */
+.book{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:12px;overflow:auto;padding:4px 4px 24px}
+.book button{border:0;background:#fff;border-radius:20px;padding:6px 6px 10px;box-shadow:0 4px 0 var(--line);display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--display);font-weight:800;font-size:.95rem;min-width:0}
+.book button span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.book .empty{background:#ffffff66;box-shadow:none;border:3px dashed #1E2B1F33;color:#1E2B1F55}
+.book .empty .art{font-family:var(--display);font-size:3rem}
+.count{font-family:var(--display);font-weight:800;font-size:1.3rem;color:var(--leaf);font-variant-numeric:tabular-nums}
+
+/* Sheet */
+.sheet-bg{position:fixed;inset:0;background:#1E2B1F88;display:flex;align-items:flex-end;justify-content:center;z-index:10;
+  padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+.sheet{background:var(--sand);width:100%;max-width:720px;max-height:92%;overflow:auto;border-radius:28px 28px 0 0;padding:20px 20px calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.sheet-head{display:flex;gap:16px;align-items:center}
+.sheet-head .art{width:140px;flex:none}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.stat{background:#fff;border-radius:16px;padding:8px 4px;text-align:center}
+.stat b{display:block;font-family:var(--display);font-weight:800;font-size:1.7rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat small{color:var(--muted);font-size:.85rem}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;background:#fff;border-radius:18px;padding:14px 16px;font-size:1.05rem}
+.facts dt{font-family:var(--display);font-weight:800;color:var(--muted)}
+.facts dd{margin:0}
+
+/* Parent */
+.parent{overflow:auto;display:flex;flex-direction:column;gap:18px;padding-bottom:24px;user-select:text;-webkit-user-select:text}
+.panel{background:#fff;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.panel h3{font-size:1.3rem}
+.panel p{margin:0;color:var(--muted);font-size:1rem;line-height:1.4}
+textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B1F33;padding:10px;min-height:90px;background:#fff;color:var(--ink);resize:vertical}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button{border:2px solid var(--leaf);background:#fff;border-radius:999px;padding:8px 16px;font-weight:700}
+.seg button[aria-pressed="true"]{background:var(--leaf);color:#fff}
+.plain{border:0;background:var(--leaf);color:#fff;border-radius:12px;padding:10px 16px;font-weight:700;align-self:flex-start}
+.plain.danger{background:#B3361F}
+.assign{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.assign div{display:flex;flex-direction:column;gap:6px;border:2px solid #1E2B1F1a;border-radius:14px;padding:6px}
+.assign select{font:inherit;font-size:.95rem;padding:4px;border-radius:8px;background:#fff;color:var(--ink);max-width:100%}
+.status{font-weight:700;color:var(--leaf)}
+@media (max-width:560px){.stats{grid-template-columns:repeat(3,1fr)} .pad button{min-height:64px;font-size:2rem} .tile{width:66px;height:66px;font-size:2.4rem} .slot{width:50px;height:64px;font-size:2.2rem}}
+@media (prefers-reduced-motion:reduce){.egg-hero,.glow{animation:none}}
+</style>
+
+<div id="app">
+
+  <section id="s-home" class="screen">
+    <div class="topbar">
+      <span class="hint" id="h-hint">Grown-ups: hold ⚙️</span>
+      <button class="icon-btn" id="gear" aria-label="Grown-up settings (press and hold)">⚙️</button>
+    </div>
+    <div class="center">
+      <h1>Dino Go</h1>
+      <div id="h-team" class="team"></div>
+      <button class="big" id="find">Find a dino!</button>
+      <button class="big green small" id="to-book">My dinos <span id="h-count" class="count" style="color:#fff"></span></button>
+    </div>
+  </section>
+
+  <section id="s-pick" class="screen" hidden>
+    <div class="topbar"><button class="icon-btn" data-home aria-label="Home">🏠</button><h2 id="p-title" class="headline" style="flex:1"></h2><span style="width:60px"></span></div>
+    <div class="pick-grid" id="pick-grid"></div>
+  </section>
+
+  <section id="s-battle" class="screen" hidden>
+    <div class="topbar"><button class="icon-btn" data-home aria-label="Home">🏠</button><h2 class="headline" id="b-title" style="flex:1"></h2><span style="width:60px"></span></div>
+    <div class="arena" id="arena">
+      <div class="fighter"><div class="art" id="b-me"></div><div class="plate"><span class="nm" id="b-me-name"></span><small id="b-me-lv"></small></div></div>
+      <div class="fighter"><div class="art flip" id="b-wild"></div><div class="plate"><span class="nm" id="b-wild-name"></span><div class="hp" id="b-hp"><i></i></div><small id="b-hp-num"></small></div></div>
+    </div>
+    <div class="q">
+      <button class="icon-btn" id="b-say" aria-label="Say the question again">🔊</button>
+      <div class="sum" aria-live="polite">
+        <span class="num"><span id="q-a"></span><span class="dots" id="d-a"></span></span>
+        <span>+</span>
+        <span class="num"><span id="q-b"></span><span class="dots b" id="d-b"></span></span>
+        <span>=</span><span>?</span>
+      </div>
+    </div>
+    <div class="pad" id="pad"></div>
+  </section>
+
+  <section id="s-catch" class="screen" hidden>
+    <div class="topbar"><button class="icon-btn" data-home aria-label="Home">🏠</button><h2 class="headline" id="c-title" style="flex:1"></h2><span style="width:60px"></span></div>
+    <div class="catch-stage" id="c-stage">
+      <div class="art flip" id="c-art"></div>
+      <div class="egg" id="egg"><b></b></div>
+    </div>
+    <div class="row"><button class="listen" id="c-say">🔊 Hear the word</button></div>
+    <div class="slots" id="slots"></div>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <section id="s-caught" class="screen" hidden>
+    <div class="center">
+      <h2 id="k-title"></h2>
+      <div class="caught-art"><span class="ribbon" id="k-new" hidden>New!</span><div class="art" id="k-art"></div></div>
+      <span class="pill" id="k-type"></span>
+      <p class="fact" id="k-fact"></p>
+      <div class="row"><button class="big" id="k-again">Find another!</button><button class="big green small" id="k-book">My dinos</button></div>
+    </div>
+  </section>
+
+  <section id="s-book" class="screen" hidden>
+    <div class="topbar"><button class="icon-btn" data-home aria-label="Home">🏠</button><h2 style="flex:1;text-align:center">My dinos <span class="count" id="b-count"></span></h2><span style="width:60px"></span></div>
+    <div class="book" id="book"></div>
+  </section>
+
+  <section id="s-parent" class="screen" hidden>
+    <div class="topbar"><button class="icon-btn" data-home aria-label="Home">🏠</button><h2 style="flex:1;text-align:center">Grown-up settings</h2><span style="width:60px"></span></div>
+    <div class="parent">
+      <div class="panel">
+        <h3>This week's spelling words</h3>
+        <p>Type the words from the homework book, separated by spaces or commas. He spells one to catch each dino.</p>
+        <textarea id="p-words" aria-label="Spelling words"></textarea>
+        <button class="plain" id="p-save-words">Save words</button>
+        <span class="status" id="p-words-status"></span>
+      </div>
+      <div class="panel">
+        <h3>Maths in battles</h3>
+        <p>Adding questions. It moves up to "within 10" by itself after 4 right answers in a row, and back down if he's stuck.</p>
+        <div class="seg" id="p-math">
+          <button data-m="5" aria-pressed="false">Adding within 5</button>
+          <button data-m="10" aria-pressed="false">Adding within 10</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Dino pictures</h3>
+        <p>Pick the dino images from Photos or Files. Pictures named like <code>04_ankylosaurus</code> match automatically. Otherwise they're matched in download order, so check each one below and fix any that are wrong. Pictures are saved on this device only.</p>
+        <input type="file" id="p-files" accept="image/*" multiple>
+        <span class="status" id="p-img-status"></span>
+        <div class="assign" id="p-assign"></div>
+      </div>
+      <div class="panel">
+        <h3>Start over</h3>
+        <p>Deletes every caught dino and level on this device. Pictures and words stay.</p>
+        <button class="plain danger" id="p-reset">Reset progress</button>
+        <button class="plain danger" id="p-reset-yes" hidden>Yes, delete all progress</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="sheet-bg" id="sheet-bg" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-name">
+      <div class="sheet-head">
+        <div class="art" id="sh-art"></div>
+        <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+          <h2 id="sh-name"></h2>
+          <span class="pill" id="sh-type"></span>
+        </div>
+      </div>
+      <div class="stats" id="sh-stats"></div>
+      <dl class="facts" id="sh-facts"></dl>
+      <div class="row"><button class="listen" id="sh-say">🔊 Read it to me</button><button class="big green small" id="sh-close">Close</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- Data ---------- */
+const TYPES={plant:{label:"Plant-eater",e:"🦕"},meat:{label:"Meat-eater",e:"🦖"},sea:{label:"Sea reptile",e:"🌊"},fly:{label:"Flying reptile",e:"☁️"}};
+// id, name, type, length, food, when, where, fun, hp, atk, say (TTS spelling for tricky names)
+const SPECIES=[
+["01_triceratops","Triceratops","plant","About 9 metres, as long as a fire truck","Plants","68 to 66 million years ago","North America","Its name means three-horned face.",26,5],
+["02_stegosaurus","Stegosaurus","plant","About 9 metres","Plants","155 to 150 million years ago","North America","The spikes on its tail are called a thagomizer.",24,5],
+["03_brachiosaurus","Brachiosaurus","plant","About 22 metres, almost two buses long","Plants","154 to 150 million years ago","North America","It could lift its head higher than a three-storey building.",30,4],
+["04_ankylosaurus","Ankylosaurus","plant","About 7 metres","Plants","68 to 66 million years ago","North America","It swung the heavy club on its tail to protect itself.",28,4],
+["05_parasaurolophus","Parasaurolophus","plant","About 9 metres","Plants","76 to 73 million years ago","North America","Air going through its long crest may have made a loud honking sound.",22,3],
+["06_diplodocus","Diplodocus","plant","About 26 metres, more than two buses long","Plants","154 to 152 million years ago","North America","Its tail had about 80 bones in it.",30,3],
+["07_iguanodon","Iguanodon","plant","About 10 metres","Plants","126 to 122 million years ago","Europe","It was one of the very first dinosaurs ever named, back in 1825.",22,4],
+["08_pachycephalosaurus","Pachycephalosaurus","plant","About 4.5 metres","Plants","70 to 66 million years ago","North America","The dome on its head was made of very thick bone.",18,5,"pack-ee-seff-allo-saw-rus"],
+["09_styracosaurus","Styracosaurus","plant","About 5.5 metres","Plants","About 75 million years ago","North America","Its name means spiked lizard.",22,5,"sty-rack-oh-saw-rus"],
+["10_argentinosaurus","Argentinosaurus","plant","About 35 metres, three buses long","Plants","About 95 million years ago","South America","It is one of the biggest land animals that ever lived.",34,3],
+["11_protoceratops","Protoceratops","plant","About 2 metres, as long as a sofa","Plants","75 to 71 million years ago","Asia","One fossil shows a Protoceratops and a Velociraptor locked in a fight.",14,3],
+["12_kentrosaurus","Kentrosaurus","plant","About 4.5 metres","Plants","About 152 million years ago","Africa","It was a smaller cousin of Stegosaurus.",18,5],
+["13_edmontosaurus","Edmontosaurus","plant","About 12 metres, as long as a bus","Plants","73 to 66 million years ago","North America","It had hundreds of teeth for grinding up plants.",24,3],
+["14_corythosaurus","Corythosaurus","plant","About 9 metres","Plants","77 to 75 million years ago","North America","Its name means helmet lizard.",22,3,"co-rith-oh-saw-rus"],
+["15_therizinosaurus","Therizinosaurus","plant","About 9 metres","Mostly plants","About 70 million years ago","Asia","Its claws were as long as your arm, but it mostly ate plants.",24,6,"theh-rizz-in-oh-saw-rus"],
+["16_amargasaurus","Amargasaurus","plant","About 10 metres","Plants","129 to 122 million years ago","South America","It was found in Argentina, near a place called La Amarga.",24,4],
+["17_psittacosaurus","Psittacosaurus","plant","About 2 metres","Plants","125 to 100 million years ago","Asia","Its name means parrot lizard.",14,3,"sit-ack-oh-saw-rus"],
+["18_maiasaura","Maiasaura","plant","About 9 metres","Plants","About 77 million years ago","North America","Its name means good mother lizard. Scientists found its nests with babies.",22,3,"my-ah-saw-rah"],
+["19_muttaburrasaurus","Muttaburrasaurus","plant","About 8 metres","Plants","About 100 million years ago","Australia (Queensland)","It was named after the town of Muttaburra in Queensland.",22,4,"mutta-burra-saw-rus"],
+["20_minmi","Minmi","plant","About 3 metres","Plants","About 115 million years ago","Australia (Queensland)","It was named after Minmi Crossing in Queensland, where it was found.",18,4],
+["21_trex","T. rex","meat","About 12 metres, as long as a bus","Meat","68 to 66 million years ago","North America","It had one of the strongest bites of any land animal ever.",30,7,"Tyrannosaurus rex"],
+["22_velociraptor","Velociraptor","meat","About 2 metres, as big as a turkey","Meat","75 to 71 million years ago","Asia","It was covered in feathers.",14,6],
+["23_spinosaurus","Spinosaurus","meat","About 14 metres","Fish and meat","About 95 million years ago","Africa","It ate lots of fish and spent time in the water.",30,7],
+["24_allosaurus","Allosaurus","meat","About 8.5 metres","Meat","155 to 145 million years ago","North America","It was the top hunter in the time of Stegosaurus.",26,6],
+["25_carnotaurus","Carnotaurus","meat","About 8 metres","Meat","72 to 69 million years ago","South America","Its name means meat-eating bull.",24,6],
+["26_giganotosaurus","Giganotosaurus","meat","About 12 metres, as long as a bus","Meat","About 98 million years ago","South America","It was about as big as T. rex, maybe a little bigger.",30,7,"jig-a-note-oh-saw-rus"],
+["27_dilophosaurus","Dilophosaurus","meat","About 7 metres","Meat","About 190 million years ago","North America","Its name means two-crested lizard.",22,6,"die-loff-oh-saw-rus"],
+["28_baryonyx","Baryonyx","meat","About 9 metres","Fish and meat","About 125 million years ago","Europe (England)","Scientists found fish scales inside its stomach.",24,6,"barry-on-ix"],
+["29_utahraptor","Utahraptor","meat","About 6 metres","Meat","About 135 million years ago","North America","It is the biggest raptor ever found.",22,7],
+["30_microraptor","Microraptor","meat","Less than 1 metre","Small animals, fish and lizards","About 120 million years ago","Asia","It had four feathered wings, and its feathers were shiny black.",12,4],
+["31_deinonychus","Deinonychus","meat","About 3.4 metres","Meat","115 to 108 million years ago","North America","Its name means terrible claw.",18,6,"die-non-ick-us"],
+["32_compsognathus","Compsognathus","meat","About 1 metre, as big as a chicken","Lizards and insects","About 150 million years ago","Europe","It was one of the smallest dinosaurs.",10,4,"comp-sog-nay-thus"],
+["33_yutyrannus","Yutyrannus","meat","About 9 metres","Meat","About 125 million years ago","Asia","Its full name means beautiful feathered tyrant.",26,7,"you-tie-ran-us"],
+["34_australovenator","Australovenator","meat","About 6 metres","Meat","About 95 million years ago","Australia (Queensland)","Scientists nicknamed it Banjo, after the poet Banjo Paterson.",20,6,"oss-tral-oh-ven-ah-tor"],
+["35_mosasaurus","Mosasaurus","sea","Up to about 15 metres","Fish, turtles and other sea animals","82 to 66 million years ago","Seas around the world","It was not a dinosaur. It was a giant sea lizard, related to snakes and monitor lizards.",30,7,"moe-za-saw-rus"],
+["36_plesiosaurus","Plesiosaurus","sea","About 3.5 metres","Fish and squid-like animals","About 195 million years ago","Europe (England)","A fossil hunter called Mary Anning found the first full skeleton in 1823.",18,4,"plee-zee-oh-saw-rus"],
+["37_ichthyosaurus","Ichthyosaurus","sea","About 2 metres","Fish and squid-like animals","200 to 190 million years ago","Europe","It gave birth to live babies in the water, like dolphins do.",16,4,"ick-thee-oh-saw-rus"],
+["38_kronosaurus","Kronosaurus","sea","About 10 metres","Sea animals","About 110 million years ago","Australia (Queensland)","Its fossils were found in Queensland, where an inland sea used to be.",30,7],
+["39_pteranodon","Pteranodon","fly","Wings about 6 metres wide","Fish","86 to 84 million years ago","North America","Its name means wing without teeth. It was a flying reptile, not a dinosaur.",18,5,"ter-an-oh-don"],
+["40_quetzalcoatlus","Quetzalcoatlus","fly","Wings about 10 metres wide","Small animals","68 to 66 million years ago","North America","Standing up, it was as tall as a giraffe.",24,6,"ket-sal-co-at-lus"]
+].map(a=>({id:a[0],n:+a[0].slice(0,2),name:a[1],type:a[2],len:a[3],food:a[4],when:a[5],where:a[6],fun:a[7],hp:a[8],atk:a[9],say:a[10]||a[1]}));
+const BY=Object.fromEntries(SPECIES.map(s=>[s.id,s]));
+// Pictures published with the game (dinos/<id>.jpg). Filled in when images are added to the artifact.
+const BUILTIN=new Set(["01_triceratops","02_stegosaurus","03_brachiosaurus","04_ankylosaurus","05_parasaurolophus","06_diplodocus","07_iguanodon","08_pachycephalosaurus","09_styracosaurus","10_argentinosaurus","11_protoceratops","12_kentrosaurus","13_edmontosaurus","14_corythosaurus","15_therizinosaurus","16_amargasaurus","17_psittacosaurus","18_maiasaura","19_muttaburrasaurus"]);
+
+/* ---------- State ---------- */
+const KEY="dinogo.v1";
+const DEFAULT_WORDS=["come","there","should","could","said","they","was","here"];
+let S={owned:{},words:DEFAULT_WORDS.slice(),mathMax:5,streak:0,stuck:0,last:null,lastWord:null};
+try{const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const lvl=o=>1+Math.floor((o.xp||0)/3);
+const rand=n=>Math.floor(Math.random()*n);
+const $=id=>document.getElementById(id);
+
+/* ---------- Pictures (IndexedDB, this device only) ---------- */
+const IMG={}; // id -> objectURL
+let db=null;
+function openDB(){return new Promise(res=>{try{const r=indexedDB.open("dinogo",1);r.onupgradeneeded=()=>r.result.createObjectStore("img");r.onsuccess=()=>{db=r.result;res(db)};r.onerror=()=>res(null)}catch(e){res(null)}})}
+function idb(mode,fn){return new Promise(res=>{if(!db)return res(null);try{const tx=db.transaction("img",mode);const st=tx.objectStore("img");const out=fn(st);tx.oncomplete=()=>res(out&&out.result!==undefined?out.result:true);tx.onerror=()=>res(null)}catch(e){res(null)}})}
+async function loadImgs(){await openDB(); if(!db)return; await new Promise(res=>{try{const tx=db.transaction("img","readonly");const c=tx.objectStore("img").openCursor();c.onsuccess=()=>{const cur=c.result;if(cur){IMG[cur.key]=URL.createObjectURL(cur.value);cur.continue()}else res()};c.onerror=()=>res()}catch(e){res()}})}
+async function putImg(id,blob){if(IMG[id])URL.revokeObjectURL(IMG[id]); IMG[id]=URL.createObjectURL(blob); await idb("readwrite",st=>st.put(blob,id));}
+async function getBlob(id){return await idb("readonly",st=>st.get(id));}
+async function delImg(id){if(IMG[id])URL.revokeObjectURL(IMG[id]); delete IMG[id]; await idb("readwrite",st=>st.delete(id));}
+const src=id=>IMG[id]||(BUILTIN.has(id)?"dinos/"+id+".jpg":null);
+const hasArt=id=>!!src(id);
+
+function art(el,sp){
+  el.innerHTML="";
+  const s=src(sp.id);
+  const ph=()=>{el.innerHTML=`<div class="ph" style="--c:var(--t-${sp.type})"><span class="e">${TYPES[sp.type].e}</span><span class="n">${sp.name}</span></div>`};
+  if(!s)return ph();
+  const i=new Image(); i.alt=sp.name; i.decoding="async"; i.onerror=ph; i.src=s; el.appendChild(i);
+}
+const pill=(el,sp)=>{el.className="pill t-"+sp.type; el.textContent=TYPES[sp.type].label;};
+
+/* ---------- Sound + voice ---------- */
+let AC=null, VOICE=null;
+function pickVoice(){try{const vs=speechSynthesis.getVoices();for(const l of ["en-AU","en-GB","en-NZ","en-US"]){const v=vs.find(v=>(v.lang||"").replace("_","-").startsWith(l));if(v){VOICE=v;return}}}catch(e){}}
+try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice}catch(e){}
+function say(text,queue){try{if(!queue)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=.88;u.pitch=1.1;if(VOICE){u.voice=VOICE;u.lang=VOICE.lang}else u.lang="en-AU";speechSynthesis.speak(u)}catch(e){}}
+function tone(freqs,dur=.12,type="triangle",gap=.09){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t0=AC.currentTime;freqs.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.0001,t0+i*gap);g.gain.exponentialRampToValueAtTime(.25,t0+i*gap+.02);g.gain.exponentialRampToValueAtTime(.0001,t0+i*gap+dur);o.connect(g).connect(AC.destination);o.start(t0+i*gap);o.stop(t0+i*gap+dur+.02)})}catch(e){}}
+const sfx={good:()=>tone([660,880]),bad:()=>tone([220,180],.18,"square"),hit:()=>tone([140,90],.16,"sawtooth",.05),win:()=>tone([523,659,784,1046],.18),catch:()=>tone([784,988,1175,1568],.2)};
+document.addEventListener("pointerdown",()=>{try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume()}catch(e){}},{once:true});
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const anim=(el,k,o)=>{try{return el.animate(k,Object.assign({duration:400},o,reduce?{duration:Math.min(150,(o&&o.duration)||400)}:{})).finished}catch(e){return Promise.resolve()}};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ---------- Screens ---------- */
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.hidden=s.id!==id); window.scrollTo(0,0);}
+document.querySelectorAll("[data-home]").forEach(b=>b.onclick=()=>{try{speechSynthesis.cancel()}catch(e){} goHome()});
+
+function goHome(){
+  const ids=Object.keys(S.owned).sort((a,b)=>(S.owned[b].t||0)-(S.owned[a].t||0)).slice(0,4);
+  const team=$("h-team"); team.innerHTML="";
+  if(!ids.length){team.innerHTML='<div class="egg-hero" aria-hidden="true"></div>'}
+  ids.forEach(id=>{const d=document.createElement("div");d.className="art";art(d,BY[id]);team.appendChild(d)});
+  $("h-count").textContent=`${ids.length?Object.keys(S.owned).length:0}/40`;
+  show("s-home");
+}
+
+/* ---------- Encounter ---------- */
+let E={};
+function pickWild(){
+  let pool=SPECIES.filter(s=>hasArt(s.id)); if(!pool.length)pool=SPECIES;
+  const fresh=pool.filter(s=>!S.owned[s.id]);
+  const from=(fresh.length&&Math.random()<.7)?fresh:pool;
+  let w=from[rand(from.length)]; if(from.length>1&&w.id===S.lastWild)w=from[rand(from.length)];
+  S.lastWild=w.id; return w;
+}
+function startEncounter(){
+  const wild=pickWild(); E={wild};
+  const owned=Object.keys(S.owned);
+  const intro=`A wild ${wild.say} appeared!`;
+  if(!owned.length){E.first=true; startCatch(intro+" Catch your very first dino!"); return;}
+  if(owned.length===1){startBattle(owned[0],intro); return;}
+  $("p-title").textContent=`A wild ${wild.name}! Who will battle?`;
+  const g=$("pick-grid"); g.innerHTML="";
+  owned.sort((a,b)=>lvl(S.owned[b])-lvl(S.owned[a])).forEach(id=>{
+    const sp=BY[id],b=document.createElement("button"),a=document.createElement("div");a.className="art";art(a,sp);
+    b.append(a);b.insertAdjacentHTML("beforeend",`<span>${sp.name}</span><small>Level ${lvl(S.owned[id])}</small>`);
+    b.onclick=()=>startBattle(id,"");g.appendChild(b);
+  });
+  show("s-pick"); say(intro+" Who will battle?");
+}
+
+/* ---------- Battle (maths) ---------- */
+function startBattle(meId,intro){
+  E.me=meId; const me=BY[meId],w=E.wild,o=S.owned[meId];
+  E.maxHp=S.mathMax<=5?8+rand(5):14+rand(7); E.hp=E.maxHp;
+  art($("b-me"),me); art($("b-wild"),w);
+  $("b-me-name").textContent=me.name; $("b-me-lv").textContent=`Your dino · Level ${lvl(o)}`;
+  $("b-wild-name").textContent=w.name; $("b-title").textContent=`Battle the wild ${w.name}!`;
+  hpBar(); show("s-battle"); newQ();
+  say(`${intro} Your ${me.say} is ready! Get the answer to attack. ${E.q.a} plus ${E.q.b}?`);
+}
+function hpBar(){const p=E.hp/E.maxHp; $("b-hp").querySelector("i").style.width=(p*100)+"%"; $("b-hp").classList.toggle("low",p<.35); $("b-hp-num").textContent=`Health ${E.hp}`;}
+function dots(el,n){el.innerHTML="<i></i>".repeat(n)}
+function newQ(){
+  const m=S.mathMax; let a=1+rand(m-1), b=1+rand(m-a);
+  if(E.q&&E.q.a===a&&E.q.b===b){a=1+rand(m-1);b=1+rand(m-a)}
+  E.q={a,b}; E.miss=0; E.busy=false;
+  $("q-a").textContent=a; $("q-b").textContent=b; dots($("d-a"),a); dots($("d-b"),b);
+  const pad=$("pad"); pad.innerHTML="";
+  for(let i=1;i<=m;i++){const k=document.createElement("button");k.textContent=i;k.dataset.n=i;k.onclick=()=>answer(i,k);pad.appendChild(k)}
+}
+async function answer(n,btn){
+  if(E.busy)return; const right=E.q.a+E.q.b;
+  if(n!==right){
+    E.miss++; sfx.bad(); btn.classList.remove("shake"); void btn.offsetWidth; btn.classList.add("shake");
+    anim($("b-wild"),[{transform:"translateX(0)"},{transform:"translateX(40px)"},{transform:"translateX(0)"}],{duration:380});
+    if(E.miss>=2){const g=$("pad").querySelector(`[data-n="${right}"]`); if(g)g.classList.add("glow");}
+    say(`It dodged! Try again. ${E.q.a} plus ${E.q.b}?`); return;
+  }
+  E.busy=true; sfx.hit();
+  // adapt difficulty
+  if(E.miss===0){S.streak++; S.stuck=0; if(S.streak>=4&&S.mathMax<10){S.mathMax=10;S.streak=0}}
+  else {S.streak=0; if(E.miss>=3){S.stuck++; if(S.stuck>=2&&S.mathMax>5){S.mathMax=5;S.stuck=0}}}
+  save();
+  say(`${right}! ${right} hits!`);
+  anim($("b-me"),[{transform:"translateX(0)"},{transform:"translateX(60px) rotate(6deg)"},{transform:"translateX(0)"}],{duration:420});
+  const f=document.createElement("div"); f.className="floater"; f.textContent=`${right} hits!`; $("arena").appendChild(f);
+  anim(f,[{transform:"translateY(0)",opacity:1},{transform:"translateY(-60px)",opacity:0}],{duration:1100}).then(()=>f.remove());
+  await wait(200);
+  anim($("b-wild"),[{transform:"translateX(0)"},{transform:"translateX(-14px)"},{transform:"translateX(14px)"},{transform:"translateX(0)"}],{duration:360});
+  E.hp=Math.max(0,E.hp-right); hpBar();
+  await wait(1100);
+  if(E.hp>0){newQ(); say(`${E.q.a} plus ${E.q.b}?`,true); return;}
+  // win
+  const o=S.owned[E.me], before=lvl(o); o.wins=(o.wins||0)+1; o.xp=(o.xp||0)+1; save(); sfx.win();
+  const up=lvl(o)>before;
+  anim($("b-wild"),[{opacity:1,transform:"scale(1)"},{opacity:.35,transform:"scale(.85) translateY(10px)"}],{duration:500,fill:"forwards"});
+  say(`You won! ${up?`Level up! Your ${BY[E.me].say} is now level ${lvl(o)}! `:""}Now spell the word to catch the ${E.wild.say}!`);
+  await wait(up?3400:2600);
+  startCatch("");
+}
+
+/* ---------- Catch (spelling) ---------- */
+function pickWord(){const w=(S.words&&S.words.length?S.words:DEFAULT_WORDS);let x=w[rand(w.length)];if(w.length>1&&x===S.lastWord)x=w[rand(w.length)];S.lastWord=x;save();return x}
+function startCatch(intro){
+  const w=E.wild, word=pickWord(); E.word=word; E.pos=0; E.lm=0; E.busy=false;
+  art($("c-art"),w); $("c-title").textContent=E.first?`Catch your first dino!`:`Catch the ${w.name}!`;
+  $("egg").style.setProperty("--charge",0); $("egg").style.transform="";
+  const slots=$("slots"); slots.innerHTML=""; for(let i=0;i<word.length;i++){const s=document.createElement("div");s.className="slot";slots.appendChild(s)}
+  const letters=word.split(""); const pool="abcdefghijklmnoprstuvwy".split("").filter(c=>!letters.includes(c));
+  for(let i=0;i<3&&pool.length;i++)letters.push(pool.splice(rand(pool.length),1)[0]);
+  letters.sort(()=>Math.random()-.5);
+  const tiles=$("tiles"); tiles.innerHTML="";
+  letters.forEach(c=>{const t=document.createElement("button");t.className="tile";t.textContent=c;t.dataset.c=c;t.onclick=()=>tap(t);tiles.appendChild(t)});
+  show("s-catch");
+  say(`${intro} Spell... ${word}.`);
+}
+$("c-say").onclick=()=>say(E.word);
+function tap(t){
+  if(E.busy||t.classList.contains("used"))return;
+  const need=E.word[E.pos];
+  if(t.dataset.c===need){
+    sfx.good(); t.classList.add("used"); document.querySelectorAll(".tile.glow").forEach(x=>x.classList.remove("glow"));
+    $("slots").children[E.pos].textContent=need; E.pos++; E.lm=0;
+    $("egg").style.setProperty("--charge",E.pos/E.word.length);
+    if(E.pos===E.word.length)throwEgg();
+    return;
+  }
+  E.lm++; sfx.bad(); t.classList.remove("shake"); void t.offsetWidth; t.classList.add("shake");
+  if(E.lm>=2){const g=[...document.querySelectorAll(".tile:not(.used)")].find(x=>x.dataset.c===need); if(g)g.classList.add("glow"); say(`Listen... ${E.word}.`);}
+  else say("Try again!");
+}
+async function throwEgg(){
+  E.busy=true; say(`${E.word}! Throw!`);
+  const egg=$("egg"), a=$("c-art"); const er=egg.getBoundingClientRect(), ar=a.getBoundingClientRect();
+  const dx=(ar.left+ar.width/2)-(er.left+er.width/2), dy=(ar.top+ar.height/2)-(er.top+er.height/2);
+  await wait(500);
+  await anim(egg,[{transform:"translate(0,0) rotate(0)"},{transform:`translate(${dx}px,${dy-60}px) rotate(200deg)`,offset:.6},{transform:`translate(${dx}px,${dy}px) rotate(360deg)`}],{duration:700,easing:"ease-out",fill:"forwards"});
+  await anim(a,[{transform:"scale(1)",opacity:1},{transform:"scale(.1)",opacity:0}],{duration:350,fill:"forwards"});
+  const base=`translate(${dx}px,${dy}px)`;
+  await anim(egg,[{transform:base+" rotate(0)"},{transform:base+" rotate(-18deg)"},{transform:base+" rotate(18deg)"},{transform:base+" rotate(-12deg)"},{transform:base+" rotate(12deg)"},{transform:base+" rotate(0)"}],{duration:1200,fill:"forwards"});
+  sfx.catch(); await wait(300);
+  try{a.getAnimations().forEach(x=>x.cancel()); egg.getAnimations().forEach(x=>x.cancel())}catch(e){}
+  caught();
+}
+function caught(){
+  const w=E.wild; const o=S.owned[w.id]; const isNew=!o;
+  if(isNew)S.owned[w.id]={xp:0,wins:0,caught:1,t:Date.now()}; else {o.caught=(o.caught||1)+1; o.xp=(o.xp||0)+1; o.t=Date.now();}
+  save();
+  $("k-title").textContent=isNew?`You caught a ${w.name}!`:`Another ${w.name}!`;
+  $("k-new").hidden=!isNew; art($("k-art"),w); pill($("k-type"),w);
+  $("k-fact").textContent=isNew?w.fun:`Your ${w.name} got stronger! It's now level ${lvl(S.owned[w.id])}.`;
+  show("s-caught");
+  say(isNew?`You caught a ${w.say}! ${w.fun}`:`Another ${w.say}! Your ${w.say} got stronger!`);
+}
+$("k-again").onclick=startEncounter; $("k-book").onclick=openBook;
+$("find").onclick=startEncounter; $("to-book").onclick=openBook;
+
+/* ---------- Dino book + stats ---------- */
+function openBook(){
+  const b=$("book"); b.innerHTML=""; let n=0;
+  SPECIES.forEach(sp=>{
+    const o=S.owned[sp.id], btn=document.createElement("button"), a=document.createElement("div"); a.className="art";
+    if(o){n++; art(a,sp); btn.append(a); btn.insertAdjacentHTML("beforeend",`<span>${sp.name}</span>`); btn.onclick=()=>openSheet(sp.id);}
+    else {btn.className="empty"; a.textContent="?"; btn.append(a); btn.insertAdjacentHTML("beforeend",`<span>No. ${sp.n}</span>`); btn.onclick=()=>say("Not caught yet. Keep looking!");}
+    b.appendChild(btn);
+  });
+  $("b-count").textContent=`${n}/40`; show("s-book"); say(n?`You have ${n} dinos! Tap one to see it.`:"No dinos yet. Go find one!");
+}
+let sheetSp=null;
+function openSheet(id){
+  const sp=BY[id], o=S.owned[id], L=lvl(o); sheetSp=sp;
+  art($("sh-art"),sp); $("sh-name").textContent=sp.name; pill($("sh-type"),sp);
+  const st=[["Level",L],["Health",sp.hp+(L-1)*2],["Attack",sp.atk+(L-1)],["Wins",o.wins||0],["Caught",o.caught||1]];
+  $("sh-stats").innerHTML=st.map(([k,v])=>`<div class="stat"><b>${v}</b><small>${k}</small></div>`).join("");
+  $("sh-facts").innerHTML=[["Size",sp.len],["Ate",sp.food],["Lived",sp.when],["Found in",sp.where],["Fun fact",sp.fun]].map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join("");
+  $("sheet-bg").hidden=false; readSheet();
+}
+function readSheet(){const sp=sheetSp,o=S.owned[sp.id];say(`${sp.say}. A ${TYPES[sp.type].label}. Level ${lvl(o)}. ${sp.len}. It lived ${sp.when}. ${sp.fun}`)}
+$("sh-say").onclick=readSheet;
+$("sh-close").onclick=()=>{$("sheet-bg").hidden=true;try{speechSynthesis.cancel()}catch(e){}};
+$("sheet-bg").onclick=e=>{if(e.target.id==="sheet-bg")$("sh-close").onclick()};
+
+/* ---------- Grown-up settings ---------- */
+let holdT=null;
+const gear=$("gear");
+gear.addEventListener("pointerdown",()=>{holdT=setTimeout(openParent,1200)});
+["pointerup","pointerleave","pointercancel"].forEach(ev=>gear.addEventListener(ev,()=>clearTimeout(holdT)));
+gear.onclick=()=>{$("h-hint").textContent="Grown-ups: press and hold ⚙️ for 1 second"};
+function openParent(){
+  $("p-words").value=(S.words||[]).join(", "); $("p-words-status").textContent="";
+  syncMath(); renderAssign(); show("s-parent");
+}
+$("p-save-words").onclick=()=>{
+  const w=[...new Set($("p-words").value.toLowerCase().split(/[\s,;]+/).filter(x=>/^[a-z]+$/.test(x)))].slice(0,30);
+  S.words=w.length?w:DEFAULT_WORDS.slice(); save(); $("p-words").value=S.words.join(", ");
+  $("p-words-status").textContent=`Saved ${S.words.length} words.`;
+};
+function syncMath(){document.querySelectorAll("#p-math button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.m===S.mathMax)))}
+document.querySelectorAll("#p-math button").forEach(b=>b.onclick=()=>{S.mathMax=+b.dataset.m;S.streak=0;S.stuck=0;save();syncMath()});
+$("p-reset").onclick=()=>{$("p-reset-yes").hidden=false};
+$("p-reset-yes").onclick=()=>{S.owned={};S.last=null;S.streak=0;S.stuck=0;save();$("p-reset-yes").hidden=true;$("p-reset").textContent="Progress reset";};
+
+async function shrink(file){
+  const url=URL.createObjectURL(file);
+  try{
+    const img=new Image(); await new Promise((r,j)=>{img.onload=r;img.onerror=j;img.src=url});
+    const k=Math.min(1,560/Math.max(img.naturalWidth,img.naturalHeight)); const c=document.createElement("canvas");
+    c.width=Math.round(img.naturalWidth*k); c.height=Math.round(img.naturalHeight*k);
+    const x=c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,c.width,c.height); x.drawImage(img,0,0,c.width,c.height);
+    return await new Promise(r=>c.toBlob(b=>r(b||file),"image/jpeg",.86));
+  }catch(e){return file}finally{URL.revokeObjectURL(url)}
+}
+function matchName(fn){
+  fn=fn.toLowerCase();
+  const m=fn.match(/^(\d{1,2})[_\- ]/); if(m){const sp=SPECIES.find(s=>s.n===+m[1]); if(sp)return sp.id}
+  for(const s of SPECIES){const key=s.id.slice(3); if(fn.includes(key))return s.id}
+  if(fn.includes("rex")||fn.includes("tyranno"))return "21_trex";
+  return null;
+}
+$("p-files").onchange=async e=>{
+  const files=[...e.target.files]; if(!files.length)return;
+  const st=$("p-img-status"); st.textContent=`Adding ${files.length} pictures…`;
+  const named=[],rest=[];
+  files.forEach(f=>{const id=matchName(f.name); id?named.push([id,f]):rest.push(f)});
+  rest.sort((a,b)=>(a.lastModified-b.lastModified)||a.name.localeCompare(b.name,undefined,{numeric:true}));
+  const taken=new Set(named.map(x=>x[0]));
+  const free=SPECIES.filter(s=>!taken.has(s.id)&&!IMG[s.id]);
+  const plan=named.concat(rest.map((f,i)=>free[i]?[free[i].id,f]:null).filter(Boolean));
+  let done=0; for(const [id,f] of plan){await putImg(id,await shrink(f)); done++; st.textContent=`Added ${done} of ${plan.length}…`;}
+  const skipped=files.length-plan.length;
+  st.textContent=`Added ${done} pictures.${skipped?` ${skipped} didn't fit (all 40 dinos already have pictures).`:""} Check each one below.`;
+  e.target.value=""; renderAssign();
+};
+function renderAssign(){
+  const box=$("p-assign"); box.innerHTML="";
+  const ids=SPECIES.filter(s=>IMG[s.id]).map(s=>s.id);
+  if(!ids.length){box.innerHTML='<p>No pictures added yet. Dinos show as coloured cards until you add them.</p>';return}
+  ids.forEach(id=>{
+    const d=document.createElement("div"),a=document.createElement("div");a.className="art";art(a,BY[id]);
+    const sel=document.createElement("select"); sel.id="as-"+id; sel.setAttribute("aria-label","Which dino is this picture?");
+    SPECIES.forEach(s=>{const o=document.createElement("option");o.value=s.id;o.textContent=`${s.n}. ${s.name}`;if(s.id===id)o.selected=true;sel.appendChild(o)});
+    const opt=document.createElement("option");opt.value="__del";opt.textContent="Remove this picture";sel.appendChild(opt);
+    sel.onchange=async()=>{
+      const to=sel.value; if(to===id)return;
+      const mine=await getBlob(id);
+      if(to==="__del"){await delImg(id)}
+      else{const theirs=IMG[to]?await getBlob(to):null; if(mine)await putImg(to,mine); if(theirs)await putImg(id,theirs); else await delImg(id);}
+      renderAssign();
+    };
+    d.append(a,sel); box.appendChild(d);
+  });
+}
+
+/* ---------- Boot ---------- */
+(async()=>{await loadImgs(); goHome();})();
+</script>
