@@ -398,6 +398,10 @@ async function delImg(id){if(IMG[id])URL.revokeObjectURL(IMG[id]); delete IMG[id
 // Built-in art is cut out of its white background (tools/cutout.py makes dinos/<id>.webp)
 const src=id=>IMG[id]||(BUILTIN.has(id)?"dinos/"+id+".webp":null);
 const hasArt=id=>!!src(id);
+// Attack pose shown during a lunge (built-in art only; uploaded pictures keep their one pose)
+const atkSrc=id=>!IMG[id]&&BUILTIN.has(id)?"dinos/"+id+"_attack.webp":null;
+const ATK_OK=new Set(); // poses that have finished loading
+function preloadAtk(id){const a=atkSrc(id);if(!a||ATK_OK.has(id))return;const i=new Image();i.onload=()=>ATK_OK.add(id);i.src=a}
 
 function art(el,sp){
   el.innerHTML="";
@@ -419,8 +423,11 @@ const sfx={good:()=>tone([660,880]),bad:()=>tone([220,180],.18,"square"),win:()=
   whoosh:()=>noise(.28,500,2600,.25),hit:()=>{noise(.22,160,60,.7,.7);tone([110,60],.2,"sine",.03)},block:()=>tone([880,660],.1,"triangle",.05)};
 document.addEventListener("pointerdown",()=>{try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume()}catch(e){}},{once:true});
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
-const anim=(el,k,o)=>{try{return el.animate(k,Object.assign({duration:400},o,reduce?{duration:Math.min(150,(o&&o.duration)||400)}:{})).finished}catch(e){return Promise.resolve()}};
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
+// Resolves when the animation ends, or on a timer if the page's animation clock is paused (e.g. hidden tab), so a battle never gets stuck.
+const anim=(el,k,o)=>{try{const opt=Object.assign({duration:400},o,reduce?{duration:Math.min(150,(o&&o.duration)||400)}:{});
+  const a=el.animate(k,opt),total=(opt.delay||0)+opt.duration*(opt.iterations||1);
+  return Promise.race([a.finished,wait(total+250)]).catch(()=>{})}catch(e){return Promise.resolve()}};
 
 /* ---------- Screens ---------- */
 function show(id){document.querySelectorAll(".screen").forEach(s=>s.hidden=s.id!==id); window.scrollTo(0,0);}
@@ -590,17 +597,19 @@ function impact(box,col,dmg){
   shake();
 }
 
-async function lunge(box,dir,dist){ // dir 1 = to the right
+async function lunge(box,dir,dist,id){ // dir 1 = to the right
   const t=fig(box),back=`${-24*dir}px 6px`,hit=`${dist*dir}px -10px`;
+  const pose=t.tagName==="IMG"&&ATK_OK.has(id)&&atkSrc(id), still=t.src;
+  if(pose)t.src=pose;
   await anim(t,[{translate:"0 0",rotate:"0deg"},{translate:back,rotate:`${-6*dir}deg`}],{duration:210,easing:"ease-out",fill:"forwards"});
   sfx.whoosh();
   await anim(t,[{translate:back,rotate:`${-6*dir}deg`},{translate:hit,rotate:`${8*dir}deg`}],{duration:160,easing:"cubic-bezier(.5,0,1,.5)",fill:"forwards"});
-  return ()=>anim(t,[{translate:hit,rotate:`${8*dir}deg`},{translate:"0 0",rotate:"0deg"}],{duration:420,easing:"cubic-bezier(.3,1.4,.5,1)",fill:"forwards"}).then(()=>settle(t));
+  return ()=>anim(t,[{translate:hit,rotate:`${8*dir}deg`},{translate:"0 0",rotate:"0deg"}],{duration:420,easing:"cubic-bezier(.3,1.4,.5,1)",fill:"forwards"}).then(()=>{settle(t);if(pose)t.src=still});
 }
 async function attack(move){
   const col=TCOL[BY[E.me].type];
   callout(move,$("b-me"),col);
-  const back=await lunge($("b-me"),1,gap()*.55);
+  const back=await lunge($("b-me"),1,gap()*.55,E.me);
   const dmg=E.dmg[E.turn]||1; E.turn++;
   E.hp=E.turn>=E.dmg.length?0:Math.max(1,E.hp-dmg);
   impact($("b-wild"),col,dmg); sfx.hit(); hpBar();
@@ -609,7 +618,7 @@ async function attack(move){
 async function counter(){
   const col=TCOL[E.wild.type];
   callout(pick(MOVES[E.wild.type]),$("b-wild"),col);
-  const back=await lunge($("b-wild"),-1,gap()*.5);
+  const back=await lunge($("b-wild"),-1,gap()*.5,E.wild.id);
   const c=center($("b-me")); sfx.block();
   pop(fx("shield",c.x,c.y),[{transform:"scale(.5)",opacity:0},{transform:"scale(1.05)",opacity:1,offset:.3},{transform:"scale(1.25)",opacity:0}],{duration:650,easing:"ease-out"});
   callout("Blocked!",$("b-me"),"#2F7FD1",-.1);
@@ -639,6 +648,7 @@ function startBattle(meId,intro){
   for(let i=0;i<n;i++){const a=rand(n),b=rand(n);if(E.dmg[a]>2){E.dmg[a]--;E.dmg[b]++}}
   shuffle(E.dmg);
   art($("b-me"),me); art($("b-wild"),w);
+  preloadAtk(me.id); preloadAtk(w.id); // so the pose swap doesn't flicker
   $("b-me-name").textContent=me.name; $("b-me-lv").textContent=`Your dino · Level ${lvl(o)}`;
   $("b-wild-name").textContent=w.name; $("b-title").textContent=`Battle the wild ${w.name}!`;
   hpBar(); show("s-battle"); newQ();
