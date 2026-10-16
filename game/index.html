@@ -408,7 +408,7 @@ async function putImg(id,blob){if(IMG[id])URL.revokeObjectURL(IMG[id]); IMG[id]=
 async function getBlob(id){return await idb("readonly",st=>st.get(id));}
 async function delImg(id){if(IMG[id])URL.revokeObjectURL(IMG[id]); delete IMG[id]; JPG.delete(id); await idb("readwrite",st=>st.delete(id));}
 // Built-in art is cut out of its white background (tools/cutout.py makes dinos/<id>.webp)
-const ART_V="2"; // bump when a picture changes but keeps its file name, so devices don't show a cached old copy
+const ART_V="3"; // bump when a picture changes but keeps its file name, so devices don't show a cached old copy
 const src=id=>IMG[id]||(BUILTIN.has(id)?"dinos/"+id+".webp?v="+ART_V:null);
 const hasArt=id=>!!src(id);
 // Attack pose shown during a lunge (built-in art only; uploaded pictures keep their one pose)
