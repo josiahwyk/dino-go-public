@@ -20,6 +20,7 @@ To add a dino: put its 512px .jpg in game/dinos/, run `python3 tools/cutout.py g
 Battle questions follow the Australian Curriculum v9, Year 1 (number + algebra strands): see LEVELS and QUESTIONS in index.html. Six levels, auto-adjusting; the parent screen can set the level and battle length (4/6/8 hits).
 
 ## Rules
-- Designed for a young child: every instruction spoken aloud (speechSynthesis), big buttons, he never loses, difficulty adapts.
+- Designed for a young child: every instruction spoken aloud (speechSynthesis), big buttons, difficulty adapts.
+- Battles: right answer = his dino hits; wrong answer = his attack misses and the wild dino hits back. 3 right first time in a row charges a shield that blocks the next hit. His dino's health is its dino-book Health stat; it faints after roughly 5-6 wrong answers in one fight and the wild dino runs away (chosen by Josiah, 2026-10-16; this replaced "he never loses").
 - Dino facts in SPECIES haven't been checked against a source yet.
 - Later scope: printed track cards (fill-in-the-blank words), NFC, evolution, raids, Cantonese.

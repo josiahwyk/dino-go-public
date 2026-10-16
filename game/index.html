@@ -99,6 +99,12 @@ h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
 .hp b{background:#F7C873;transition:width .6s .45s ease-out}
 .hp i{background:linear-gradient(90deg,#4DBA5A,#8BD36A);transition:width .25s}
 .hp.low i{background:linear-gradient(90deg,#E5533D,#F2A13A)}
+.pips{display:flex;gap:4px;align-items:center;font-family:var(--body);font-weight:700;font-size:.85rem;color:var(--muted)}
+.pips i{width:12px;height:12px;border-radius:50%;background:#E7E2D2;transition:background .3s}
+.pips i.on{background:#7CC3FF;box-shadow:0 0 6px #7CC3FF}
+.pips.ready{color:#2F7FD1}
+.spot.shielded::after{content:"";position:absolute;inset:4% 8%;border-radius:50%;border:5px solid #7CC3FFbb;box-shadow:0 0 18px #7CC3FF,inset 0 0 18px #7CC3FF66;animation:shieldPulse 1.6s ease-in-out infinite;pointer-events:none}
+@keyframes shieldPulse{50%{opacity:.55;scale:1.04}}
 
 /* Maths question */
 .q{display:flex;align-items:center;justify-content:center;gap:14px}
@@ -201,7 +207,7 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
 .assign select{font:inherit;font-size:.95rem;padding:4px;border-radius:8px;background:#fff;color:var(--ink);max-width:100%}
 .status{font-weight:700;color:var(--leaf)}
 @media (max-width:560px){.stats{grid-template-columns:repeat(3,1fr)} .choices button{min-height:68px;font-size:2rem} .tile{width:66px;height:66px;font-size:2.4rem} .slot{width:50px;height:64px;font-size:2.2rem} .tf{grid-template-columns:repeat(5,18px);grid-auto-rows:18px} .rod{height:100px}}
-@media (prefers-reduced-motion:reduce){.egg-hero,.glow,.mystery,.fighter .art img{animation:none}}
+@media (prefers-reduced-motion:reduce){.egg-hero,.glow,.mystery,.fighter .art img,.spot.shielded::after{animation:none}}
 </style>
 
 <div id="app">
@@ -228,7 +234,7 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
   <section id="s-battle" class="screen" hidden>
     <div class="topbar"><button class="icon-btn" data-home aria-label="Home">🏠</button><h2 class="headline" id="b-title" style="flex:1"></h2><span style="width:60px"></span></div>
     <div class="arena" id="arena">
-      <div class="fighter"><div class="spot"><div class="art" id="b-me"></div></div><div class="plate"><span class="nm" id="b-me-name"></span><small id="b-me-lv"></small></div></div>
+      <div class="fighter"><div class="spot"><div class="art" id="b-me"></div></div><div class="plate"><span class="nm" id="b-me-name"></span><div class="hp" id="b-me-hp"><b></b><i></i></div><small id="b-me-lv"></small><div class="pips" id="b-pips"></div></div></div>
       <div class="fighter"><div class="spot"><div class="art flip" id="b-wild"></div></div><div class="plate"><span class="nm" id="b-wild-name"></span><div class="hp" id="b-hp"><b></b><i></i></div><small id="b-hp-num"></small></div></div>
     </div>
     <div class="q">
@@ -585,7 +591,7 @@ function callout(text,box,col,dy=-.55){
   return pop(d,[{transform:"translate(-50%,-50%) scale(.4)",opacity:0},{transform:"translate(-50%,-50%) scale(1.12)",opacity:1,offset:.12},{transform:"translate(-50%,-50%) scale(1)",opacity:1,offset:.25},{transform:"translate(-50%,-65%)",opacity:1,offset:.8},{transform:"translate(-50%,-85%)",opacity:0}],{duration:1400});
 }
 function shake(){anim($("arena"),[{translate:"0 0"},{translate:"-8px 5px"},{translate:"7px -4px"},{translate:"-4px 2px"},{translate:"0 0"}],{duration:300})}
-function impact(box,col,dmg){
+function impact(box,col,dmg,dir=1){ // dir: which way the target gets knocked (1 = right)
   const c=center(box),t=fig(box);
   const b=fx("burst",c.x,c.y); b.style.setProperty("--c",col);
   pop(b,[{transform:"scale(.2) rotate(0deg)",opacity:1},{transform:"scale(1.1) rotate(20deg)",opacity:1,offset:.4},{transform:"scale(1.4) rotate(35deg)",opacity:0}],{duration:460,easing:"ease-out"});
@@ -593,7 +599,7 @@ function impact(box,col,dmg){
     pop(s,[{transform:"translate(0,0) scale(1)",opacity:1},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r}px) scale(.2)`,opacity:0}],{duration:500+rand(250),easing:"cubic-bezier(.15,.7,.3,1)"})}
   pop(fx("dmg",c.x,c.y-c.h*.15,"−"+dmg),[{transform:"translate(-50%,-50%) scale(.3)",opacity:0},{transform:"translate(-50%,-85%) scale(1.3)",opacity:1,offset:.18},{transform:"translate(-50%,-100%) scale(1)",opacity:1,offset:.65},{transform:"translate(-50%,-160%) scale(.9)",opacity:0}],{duration:1250,easing:"ease-out"});
   anim(t,[{filter:"brightness(1)"},{filter:"brightness(1.9) saturate(.4)"},{filter:"brightness(1)"},{filter:"brightness(1.9) saturate(.4)"},{filter:"brightness(1)"}],{duration:340});
-  anim(t,[{translate:"0 0",rotate:"0deg"},{translate:"28px -8px",rotate:"7deg"},{translate:"-8px 0",rotate:"-3deg"},{translate:"0 0",rotate:"0deg"}],{duration:440,easing:"ease-out"});
+  anim(t,[{translate:"0 0",rotate:"0deg"},{translate:`${28*dir}px -8px`,rotate:`${7*dir}deg`},{translate:`${-8*dir}px 0`,rotate:`${-3*dir}deg`},{translate:"0 0",rotate:"0deg"}],{duration:440,easing:"ease-out"});
   shake();
 }
 
@@ -615,23 +621,43 @@ async function attack(move){
   impact($("b-wild"),col,dmg); sfx.hit(); hpBar();
   await back();
 }
+// The wild dino hits back after a wrong answer. A charged shield blocks it. Returns true if blocked.
 async function counter(){
   const col=TCOL[E.wild.type];
   callout(pick(MOVES[E.wild.type]),$("b-wild"),col);
   const back=await lunge($("b-wild"),-1,gap()*.5,E.wild.id);
-  const c=center($("b-me")); sfx.block();
-  pop(fx("shield",c.x,c.y),[{transform:"scale(.5)",opacity:0},{transform:"scale(1.05)",opacity:1,offset:.3},{transform:"scale(1.25)",opacity:0}],{duration:650,easing:"ease-out"});
-  callout("Blocked!",$("b-me"),"#2F7FD1",-.1);
-  anim(fig($("b-me")),[{translate:"0 0"},{translate:"-12px 0"},{translate:"0 0"}],{duration:320});
-  await back();
+  const blocked=E.shield;
+  if(blocked){
+    E.shield=false; const c=center($("b-me")); sfx.block();
+    pop(fx("shield",c.x,c.y),[{transform:"scale(.5)",opacity:0},{transform:"scale(1.05)",opacity:1,offset:.3},{transform:"scale(1.25)",opacity:0}],{duration:650,easing:"ease-out"});
+    callout("Blocked!",$("b-me"),"#2F7FD1",-.1);
+    anim(fig($("b-me")),[{translate:"0 0"},{translate:"-12px 0"},{translate:"0 0"}],{duration:320});
+  } else {
+    E.myHp=Math.max(0,E.myHp-E.wildDmg); impact($("b-me"),col,E.wildDmg,-1); sfx.hit();
+  }
+  hpBar(); await back(); return blocked;
+}
+function dizzy(box){
+  const c=center(box),dz=fx("dizzy",c.x,c.y-c.h*.4,"<i></i><i></i><i></i>");
+  anim(dz,[{transform:"scaleY(.45) rotate(0deg)"},{transform:"scaleY(.45) rotate(360deg)"}],{duration:900,iterations:3}).then(()=>dz.remove());
+}
+// His dino runs out of health: it flops over, the wild dino runs off, back to the home screen.
+async function faint(){
+  const me=BY[E.me],w=E.wild;
+  say(`Oh no! Your ${me.say} is too tired to keep going, and the wild ${w.say} ran away! Let's rest and find another dino.`);
+  dizzy($("b-me"));
+  await anim(fig($("b-me")),[{rotate:"0deg",translate:"0 0",opacity:1},{rotate:"12deg",translate:"0 8px",offset:.3},{rotate:"-8deg",translate:"0 14px",offset:.6},{rotate:"0deg",translate:"0 22px",scale:"1 .88",opacity:.5}],{duration:1300,fill:"forwards"});
+  callout("Ran away!",$("b-wild"),"#56664F",-.45); sfx.whoosh();
+  await anim(fig($("b-wild")),[{translate:"0 0",opacity:1},{translate:"-20px -6px",offset:.2},{translate:"160% -10px",opacity:0}],{duration:1000,easing:"ease-in",fill:"forwards"});
+  await wait(3200);
+  goHome();
 }
 function dodge(){
   sfx.whoosh(); callout("Missed!",$("b-wild"),"#56664F",-.45);
   anim(fig($("b-wild")),[{translate:"0 0",rotate:"0deg"},{translate:"44px -34px",rotate:"10deg",offset:.4},{translate:"0 0",rotate:"0deg"}],{duration:540,easing:"ease-out"});
 }
 async function knockout(){
-  const c=center($("b-wild")),dz=fx("dizzy",c.x,c.y-c.h*.4,"<i></i><i></i><i></i>");
-  anim(dz,[{transform:"scaleY(.45) rotate(0deg)"},{transform:"scaleY(.45) rotate(360deg)"}],{duration:900,iterations:3}).then(()=>dz.remove());
+  dizzy($("b-wild"));
   anim(fig($("b-me")),[{translate:"0 0"},{translate:"0 -44px",offset:.25},{translate:"0 0",offset:.5},{translate:"0 -30px",offset:.75},{translate:"0 0"}],{duration:950,delay:300});
   const m=center($("b-me"));
   for(let i=0;i<16;i++){const s=fx("spark",m.x,m.y-m.h*.3),a=-Math.PI*(.15+Math.random()*.7),r=90+Math.random()*90; s.style.setProperty("--c",pick(Object.values(TCOL).concat("#FFD23F")));
@@ -647,16 +673,27 @@ function startBattle(meId,intro){
   const n=S.hits,base=Math.floor(E.maxHp/n); E.dmg=rep(n,base); for(let i=0;i<E.maxHp-base*n;i++)E.dmg[i]++;
   for(let i=0;i<n;i++){const a=rand(n),b=rand(n);if(E.dmg[a]>2){E.dmg[a]--;E.dmg[b]++}}
   shuffle(E.dmg);
+  // His dino's health is its dino-book Health stat. Each wrong answer costs about a sixth of it
+  // (a bit more against strong wild dinos), so it faints after roughly 5-6 wrong answers in one fight.
+  E.myMax=me.hp+(lvl(o)-1)*2; E.myHp=E.myMax; E.wildDmg=Math.max(2,Math.round(E.myMax*(.13+.01*w.atk)));
+  E.shieldN=0; E.shield=false;
   art($("b-me"),me); art($("b-wild"),w);
   preloadAtk(me.id); preloadAtk(w.id); // so the pose swap doesn't flicker
-  $("b-me-name").textContent=me.name; $("b-me-lv").textContent=`Your dino · Level ${lvl(o)}`;
+  $("b-me-name").textContent=me.name;
   $("b-wild-name").textContent=w.name; $("b-title").textContent=`Battle the wild ${w.name}!`;
   hpBar(); show("s-battle"); newQ();
   anim(fig($("b-me")),[{translate:"-120% 0",opacity:0},{translate:"0 0",opacity:1}],{duration:550,easing:"cubic-bezier(.2,.8,.3,1.15)"});
   anim(fig($("b-wild")),[{translate:"120% 0",opacity:0},{translate:"0 0",opacity:1}],{duration:550,delay:150,easing:"cubic-bezier(.2,.8,.3,1.15)"});
   say(`${intro} Your ${me.say} is ready! Get it right to attack. ${E.q.say}`);
 }
-function hpBar(){const p=E.hp/E.maxHp,bar=$("b-hp"); bar.querySelector("i").style.width=bar.querySelector("b").style.width=(p*100)+"%"; bar.classList.toggle("low",p<.35); $("b-hp-num").textContent=`Health ${E.hp}`;}
+function setBar(id,hp,max){const p=hp/max,bar=$(id); bar.querySelector("i").style.width=bar.querySelector("b").style.width=(p*100)+"%"; bar.classList.toggle("low",p<.35);}
+function hpBar(){
+  setBar("b-hp",E.hp,E.maxHp); $("b-hp-num").textContent=`Health ${E.hp}`;
+  setBar("b-me-hp",E.myHp,E.myMax); $("b-me-lv").textContent=`Level ${lvl(S.owned[E.me])} · Health ${E.myHp}`;
+  const n=E.shield?3:E.shieldN, p=$("b-pips");
+  p.innerHTML=(E.shield?"Shield ready":"Shield")+[0,1,2].map(i=>`<i class="${i<n?"on":""}"></i>`).join("");
+  p.classList.toggle("ready",E.shield); $("b-me").parentElement.classList.toggle("shielded",E.shield);
+}
 function newQ(){
   E.q=makeQ(); E.miss=0; E.busy=false;
   $("qbox").innerHTML=E.q.html;
@@ -668,11 +705,20 @@ $("b-say").onclick=()=>{if(E.q)say(E.q.say)};
 async function answer(v,btn){
   if(E.busy)return; const q=E.q;
   if(v!==q.ans){
-    E.miss++; sfx.bad(); btn.classList.add("nope"); dodge();
+    // Wrong: his attack misses and the wild dino hits back (unless his shield is charged).
+    E.busy=true; E.miss++; E.shieldN=0; sfx.bad(); btn.classList.add("nope"); hpBar();
+    say("Missed! Look out!"); dodge();
+    await wait(650);
+    const blocked=await counter();
+    if(E.myHp<=0){await faint(); return;}
     if(E.miss>=2){const g=[...$("choices").children].find(b=>b.dataset.v===String(q.ans)); if(g)g.classList.add("glow");}
-    say(`It dodged! Try again. ${q.say}`); return;
+    E.busy=false;
+    say(`${blocked?"Blocked! Your shield saved you.":"Ouch!"} Try again. ${q.say}`); return;
   }
   E.busy=true;
+  // Right first time charges the shield; 3 in a row makes it ready.
+  let shieldUp=false;
+  if(E.miss===0&&!E.shield){E.shieldN++; if(E.shieldN>=3){E.shield=true;E.shieldN=0;shieldUp=true}}
   // adapt difficulty, counting only questions at his current level (not the review ones)
   if(q.lvl===S.mathLvl){
     if(E.miss===0){S.streak++; S.stuck=0; if(S.streak>=5&&S.mathLvl<6){S.mathLvl++;S.streak=0}}
@@ -680,12 +726,10 @@ async function answer(v,btn){
     save();
   }
   const move=pick(MOVES[BY[E.me].type]);
-  say(`${q.sayAns?q.sayAns(v):v}! ${move}`);
+  say(`${q.sayAns?q.sayAns(v):v}! ${move}${shieldUp?" Shield ready!":""}`);
   await attack(move);
-  if(E.hp>0){
-    if(Math.random()<.5){await wait(250); await counter();}
-    await wait(300); newQ(); say(E.q.say,true); return;
-  }
+  if(shieldUp&&E.hp>0){sfx.block(); callout("Shield ready!",$("b-me"),"#2F7FD1",-.1); await wait(700);}
+  if(E.hp>0){await wait(300); newQ(); say(E.q.say,true); return;}
   // win
   const o=S.owned[E.me], before=lvl(o); o.wins=(o.wins||0)+1; o.xp=(o.xp||0)+1; save(); sfx.win();
   const up=lvl(o)>before;
