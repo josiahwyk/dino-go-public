@@ -129,6 +129,10 @@ h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
 .grp i,.berry{width:16px;height:16px;border-radius:50%;background:var(--t-meat);display:block}
 .coin{width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE9A8,#E2B23C 70%,#C9961F);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1rem;color:#6E4C00;box-shadow:0 2px 0 var(--line)}
 .mini{width:56px}
+.note{width:60px;height:32px;border-radius:5px;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1rem;box-shadow:0 2px 0 var(--line)}
+.note.five{background:linear-gradient(135deg,#F3B5D8,#C99BE0);color:#5B2A6E} .note.ten{background:linear-gradient(135deg,#9FD3F5,#6FA8E8);color:#163E6E}
+.rod.stack{background:repeating-linear-gradient(180deg,#F2C94C 0 10px,#C9961F 10px 12px)}
+.cube.gold{background:#F2C94C;border-radius:50%}
 .shp{display:block;width:40px;height:40px}
 .shp.circle{border-radius:50%;background:var(--lava)}
 .shp.square{border-radius:6px;background:var(--t-sea)}
@@ -279,6 +283,8 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
         <textarea id="p-words" aria-label="Spelling words"></textarea>
         <button class="plain" id="p-save-words">Save words</button>
         <span class="status" id="p-words-status"></span>
+        <p>Challenge words: about 1 catch in 4 uses a Year 1 word instead (blends like "frog", long vowels like "rain", word families like "played", two-syllable words like "rabbit").</p>
+        <div class="seg" id="p-chal"><button data-c="1" aria-pressed="false">Challenge words on</button><button data-c="0" aria-pressed="false">Homework words only</button></div>
       </div>
       <div class="panel">
         <h3>Maths in battles</h3>
@@ -489,11 +495,11 @@ function startEncounter(chosen){
 // Level 1 is Foundation revision; levels 2-6 cover the Year 1 number and algebra content descriptions.
 const LEVELS=[null,
   {name:"1. Adding to 10",code:"Foundation revision"},
-  {name:"2. Make 10, take away",code:"AC9M1N04"},
-  {name:"3. Add and take away to 20",code:"AC9M1N04"},
+  {name:"2. Make 10, missing parts, take away",code:"AC9M1N02, AC9M1N04"},
+  {name:"3. Add and take away to 20",code:"AC9M1N02, AC9M1N04"},
   {name:"4. Numbers to 120, tens and ones",code:"AC9M1N01, AC9M1N02"},
-  {name:"5. Skip counting, groups, patterns",code:"AC9M1A01, AC9M1N03, AC9M1A02"},
-  {name:"6. Story problems, sharing, money",code:"AC9M1N05, AC9M1N06"}];
+  {name:"5. Skip counting, coins, groups, patterns",code:"AC9M1A01, AC9M1A02, AC9M1N03, AC9M1N06"},
+  {name:"6. Story problems, money, sharing",code:"AC9M1N05, AC9M1N06"}];
 const SHAPES={circle:"circle",square:"square",tri:"triangle",star:"star"};
 const shape=k=>`<i class="shp ${k}"></i>`;
 const eq=t=>`<div class="eq">${t}</div>`, words=t=>`<div class="eq words">${t}</div>`;
@@ -559,20 +565,75 @@ function money(){
   const coins=Array.from({length:a},(_,i)=>`<span class="coin" style="${i>=a-b?"opacity:.3":""}">$1</span>`).join("");
   return {html:words(t)+`<div class="row-vis">${coins}</div>`,say:t,ans:a-b,choices:nums(a-b,[1,2])};
 }
+/* Harder Year 1 variants, each modelled on an official AC9 elaboration */
+const ONES=["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"],TENS=["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+const numWord=n=>n<20?ONES[n]:n>=100?"one hundred"+(n>100?" and "+numWord(n-100):""):TENS[Math.floor(n/10)]+(n%10?"-"+ONES[n%10]:"");
+// AC9M1N02 part-part-whole: "4 and how many more make 9?"
+function missingPart(max){const b=between(5,max),a=between(1,b-1);return {html:eq(`${a} + ? = ${b}`)+frames([...rep(a,"a"),...rep(b-a,"e")]),say:`${a} and how many more make ${b}?`,ans:b-a,choices:nums(b-a,[1,2])}}
+// AC9M1N02: "35 is 2 tens and 15 ones"
+function tensOnesOther(){
+  const t=between(2,9),o=between(0,9),n=t*10+o,ans=10+o,s=new Set([ans,o,ans+1,ans-1]);
+  return {html:eq(String(n))+`<div class="base">${'<i class="rod"></i>'.repeat(t-1)}<div class="strip" style="margin-left:8px"><b class="ask">?</b></div></div>`+words(`${t-1} ${plural(t-1,"ten","tens")} and ? ones`),
+    say:`${n} is ${t-1} ${plural(t-1,"ten","tens")} and how many ones?`,ans,choices:[...s].filter(v=>v>=0).slice(0,4).sort((a,b)=>a-b)};
+}
+// AC9M1N01: numbers that look and sound alike, e.g. 16, 60, 61, 66
+function lookAlike(){
+  let a=between(1,9),b=between(1,9); while(b===a)b=between(1,9);
+  const opts=shuffle([...new Set([a*10+b,b*10+a,a*11,b*10,a*10])]).slice(0,4),ans=pick(opts);
+  return {html:words("Tap the number")+words(`<b style="font-size:1.4em">${numWord(ans)}</b>`),say:`Tap the number ${ans}.`,ans,choices:opts.sort((x,y)=>x-y)};
+}
+// AC9M1N01 hundreds chart: 10 more / 10 less
+function tenMore(){const n=between(10,110),up=n+10<=120&&Math.random()<.6,ans=up?n+10:n-10;
+  return {html:strip(up?[n,"?"]:["?",n])+words(up?"10 more":"10 less"),say:`What is 10 ${up?"more":"less"} than ${n}?`,ans,choices:nums(ans,[1,10])};}
+// AC9M1A01: count $2 coins by twos, $5 and $10 notes by fives and tens
+function countMoney(){
+  const [v,cls]=pick([[2,"coin"],[5,"note five"],[10,"note ten"]]),k=between(2,v===2?10:v===5?8:6);
+  return {html:`<div class="row-vis">${`<span class="${cls}">$${v}</span>`.repeat(k)}</div>`+words(`Count by ${v}s`),
+    say:`Count by ${v}s. How many dollars altogether?`,ans:k*v,choices:nums(k*v,[v,1],1)};
+}
+// AC9M1N03: stacks of ten $1 coins plus leftovers
+function coinStacks(){const g=between(1,9),o=between(0,9),ans=g*10+o;
+  return {html:`<div class="base">${'<i class="rod stack"></i>'.repeat(g)}<div class="cubes">${'<i class="cube gold"></i>'.repeat(o)}</div></div>`+words(`${g} ${plural(g,"stack","stacks")} of 10 $1 coins and ${o} more`),
+    say:`${g} ${plural(g,"stack","stacks")} of 10 coins, and ${o} more ${plural(o,"coin","coins")}. How many dollars?`,ans,choices:nums(ans,[1,10],1)};}
+// AC9M1A02: longer repeating units, e.g. SSCSC
+function longPattern(){
+  const [A,B,C]=shuffle(Object.keys(SHAPES)),unit=pick([[A,A,B,A,B],[A,B,C,C],[A,B,B,C]]);
+  const len=unit.length+1+rand(unit.length),seq=Array.from({length:len},(_,i)=>unit[i%unit.length]),ans=unit[len%unit.length];
+  const choices=shuffle([...new Set(unit)]); if(choices.length<3)choices.push(Object.keys(SHAPES).find(k=>!choices.includes(k)));
+  return {html:`<div class="strip">${seq.map(k=>`<b>${shape(k)}</b>`).join("")}<b class="ask">?</b></div>`,
+    say:`${seq.map(k=>SHAPES[k]).join(", ")}. What shape comes next?`,ans,choices,label:shape,sayAns:k=>SHAPES[k]};
+}
+// AC9M1N06: "How many wheels are needed for 3 cars?"
+function equalGroups(){
+  const o=pick([{n:"cars",e:4,w:"wheels"},{n:"dinos",e:4,w:"legs"},{n:"birds",e:2,w:"legs"},{n:"hands",e:5,w:"fingers"},{n:"tricycles",e:3,w:"wheels"}]),g=between(2,5);
+  const grp=`<div class="grp" style="grid-template-columns:repeat(${Math.min(o.e,3)},16px)">${"<i></i>".repeat(o.e)}</div>`;
+  return {html:`<div class="row-vis">${grp.repeat(g)}</div>`+words(`${g} ${o.n}: how many ${o.w}?`),say:`How many ${o.w} on ${g} ${o.n}?`,ans:g*o.e,choices:nums(g*o.e,[o.e,1],1)};
+}
+// AC9M1N05: whole-dollar money stories ("I had $14 and was given $15")
+function moneyAdd(){const a=between(5,15),b=between(5,15),t=`You had ${a} dollars. You got ${b} dollars for your birthday. How many dollars do you have now?`;
+  return {html:words(t),say:t,ans:a+b,choices:nums(a+b,[1,2,10],1)};}
+// AC9M1N05: people getting on and off a bus
+function bus(){const a=between(4,12),off=between(1,a-1),on=between(1,8),t=`${a} people are on the bus. ${off} get off. Then ${on} get on. How many people are on the bus now?`;
+  return {html:words(t),say:t,ans:a-off+on,choices:nums(a-off+on,[1,2])};}
+// AC9M1N06: grouping, "How many bags?"
+function bags(){const k=pick([2,3,4,5]),b=between(2,5),n=k*b;
+  return {html:`<div class="row-vis">${'<i class="berry"></i>'.repeat(n)}</div>`+words(`${n} berries in bags of ${k}`),say:`${n} berries go into bags of ${k}. How many bags do you need?`,ans:b,choices:nums(b,[1,2],1)};}
+
 const QUESTIONS={
   1:[()=>{const a=between(1,9);return add(a,between(1,10-a))}],
-  2:[makeTen,()=>{const a=between(3,10);return sub(a,between(1,a-1))}],
+  2:[makeTen,()=>missingPart(10),()=>{const a=between(3,10);return sub(a,between(1,a-1))}],
   3:[()=>{const n=between(1,9);return Math.random()<.5?add(10,n):add(n,10)},
      ()=>{const a=between(11,17);return add(a,between(1,19-a))},
      ()=>{const a=between(6,9);return add(a,between(11-a,9))},
      ()=>{const a=between(11,19);return sub(a,between(1,a-10))},
-     ()=>{const a=between(11,18);return sub(a,between(a-9,9))}],
-  4:[tensOnes,nextTo,bigger],
-  5:[skip,groups,pattern],
-  6:[share,story,money],
+     ()=>{const a=between(11,18);return sub(a,between(a-9,9))},
+     ()=>missingPart(20), ()=>{const a=between(4,9);return add(a,a+1)}, ()=>sub(20,between(3,12))],
+  4:[tensOnes,tensOnesOther,nextTo,tenMore,bigger,lookAlike],
+  5:[skip,groups,pattern,longPattern,countMoney,coinStacks,equalGroups],
+  6:[share,story,money,moneyAdd,bus,bags],
 };
 function makeQ(){
-  const L=S.mathLvl, lv=(L>1&&Math.random()<.33)?between(1,L-1):L; let q,g=0;
+  const L=S.mathLvl, lv=(L>1&&Math.random()<.2)?between(1,L-1):L; let q,g=0;
   do{q=pick(QUESTIONS[lv])();g++}while(E.q&&q.say===E.q.say&&g<6);
   q.lvl=lv; return q;
 }
@@ -740,19 +801,34 @@ async function answer(v,btn){
 }
 
 /* ---------- Catch (spelling) ---------- */
-function pickWord(){const w=(S.words&&S.words.length?S.words:DEFAULT_WORDS);let x=w[rand(w.length)];if(w.length>1&&x===S.lastWord)x=w[rand(w.length)];S.lastWord=x;save();return x}
+// Year 1 challenge words (AC9 English), mixed in with his homework words about 1 catch in 4.
+const CHALLENGE=[
+  "wish","rest","ship","chat","shop","then","stop","frog","swim","flag","black","step", // digraphs and blends (AC9E1LY11, LY13)
+  "time","cake","rain","play","keep","boat","ride","home",                          // common long vowels (AC9E1LY11)
+  "plays","played","playing","jumped","helped","looking",                         // word families (AC9E1LY15)
+  "rabbit","sunset","picnic","dinner","garden","robot",                            // two-syllable words (AC9E1LY13)
+  "one","have","pretty","little","what","where"];                                 // high-frequency words (AC9E1LY14)
+// Decoy letters that are easy to mix up with the word's real letters (b/d, short vowels, c/k/s...)
+const CONFUSE={a:"eou",e:"ai",i:"ey",o:"au",u:"oa",b:"dp",d:"bp",p:"bd",m:"nw",n:"mh",c:"ks",k:"c",s:"cz",g:"j",j:"g",f:"vt",v:"fw",w:"vy",y:"wi",h:"n",t:"fl",l:"it",r:"wn",x:"ks",z:"s"};
+function pickWord(){
+  const home=S.words&&S.words.length?S.words:DEFAULT_WORDS, ch=S.challenge!==false&&Math.random()<.25, w=ch?CHALLENGE:home;
+  let x=w[rand(w.length)]; if(w.length>1&&x===S.lastWord)x=w[rand(w.length)];
+  S.lastWord=x; save(); E.challenge=ch; return x;
+}
 function startCatch(intro){
   const w=E.wild, word=pickWord(); E.word=word; E.pos=0; E.lm=0; E.busy=false;
   art($("c-art"),w); $("c-title").textContent=E.first?`Catch your first dino!`:`Catch the ${w.name}!`;
   $("egg").style.setProperty("--charge",0); $("egg").style.transform="";
   const slots=$("slots"); slots.innerHTML=""; for(let i=0;i<word.length;i++){const s=document.createElement("div");s.className="slot";slots.appendChild(s)}
-  const letters=word.split(""); const pool="abcdefghijklmnoprstuvwy".split("").filter(c=>!letters.includes(c));
-  for(let i=0;i<3&&pool.length;i++)letters.push(pool.splice(rand(pool.length),1)[0]);
-  letters.sort(()=>Math.random()-.5);
+  const letters=word.split(""), decoys=[];
+  for(const c of shuffle([...new Set(letters)]))for(const d of (CONFUSE[c]||""))if(!letters.includes(d)&&!decoys.includes(d))decoys.push(d);
+  const pool=shuffle("abcdefghijklmnoprstuvwy".split("").filter(c=>!letters.includes(c)&&!decoys.includes(c)));
+  const extra=shuffle(decoys).slice(0,3).concat(pool).slice(0,4); // 4 decoys, mostly look-alike or sound-alike letters
+  letters.push(...extra); shuffle(letters);
   const tiles=$("tiles"); tiles.innerHTML="";
   letters.forEach(c=>{const t=document.createElement("button");t.className="tile";t.textContent=c;t.dataset.c=c;t.onclick=()=>tap(t);tiles.appendChild(t)});
   show("s-catch");
-  say(`${intro} Spell... ${word}.`);
+  say(`${intro} ${E.challenge?"Challenge word! ":""}Spell... ${word}.`);
 }
 $("c-say").onclick=()=>say(E.word);
 function tap(t){
@@ -766,7 +842,9 @@ function tap(t){
     return;
   }
   E.lm++; sfx.bad(); t.classList.remove("shake"); void t.offsetWidth; t.classList.add("shake");
-  if(E.lm>=2){const g=[...document.querySelectorAll(".tile:not(.used)")].find(x=>x.dataset.c===need); if(g)g.classList.add("glow"); say(`Listen... ${E.word}.`);}
+  // The right tile only glows after 3 wrong taps; after 2 he hears the word again.
+  if(E.lm>=3){const g=[...document.querySelectorAll(".tile:not(.used)")].find(x=>x.dataset.c===need); if(g)g.classList.add("glow"); say(`Listen... ${E.word}.`);}
+  else if(E.lm===2) say(`Listen... ${E.word}.`);
   else say("Try again!");
 }
 async function throwEgg(){
@@ -840,8 +918,10 @@ function syncMath(){
   for(let i=1;i<LEVELS.length;i++){const b=document.createElement("button");b.innerHTML=`${LEVELS[i].name}<small style="display:block;font-weight:400;opacity:.75">${LEVELS[i].code}</small>`;
     b.setAttribute("aria-pressed",String(S.mathLvl===i));b.onclick=()=>{S.mathLvl=i;S.streak=0;S.stuck=0;save();syncMath()};box.appendChild(b)}
   document.querySelectorAll("#p-hits button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.h===S.hits)));
+  document.querySelectorAll("#p-chal button").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.c==="1")===(S.challenge!==false))));
 }
 document.querySelectorAll("#p-hits button").forEach(b=>b.onclick=()=>{S.hits=+b.dataset.h;save();syncMath()});
+document.querySelectorAll("#p-chal button").forEach(b=>b.onclick=()=>{S.challenge=b.dataset.c==="1";save();syncMath()});
 $("p-reset").onclick=()=>{$("p-reset-yes").hidden=false};
 $("p-reset-yes").onclick=()=>{S.owned={};S.last=null;S.streak=0;S.stuck=0;save();$("p-reset-yes").hidden=true;$("p-reset").textContent="Progress reset";};
 

@@ -6,7 +6,7 @@ Learning game for my son: Pokémon-Go-style dinosaur catching. Maths battles wea
 - game/index.html: the whole game (one HTML file, no build step). Open it in a browser to run it.
 - game/dinos/NN_name.jpg: game art (512px). Ids match the SPECIES list in index.html.
 - game/dinos/NN_name_attack.webp: attack pose for each dino (swapped in during the battle lunge). Full-size originals are assets/dinos/NN_name_attack.jpeg.
-- 16_amargasaurus: its Gemini art faced left, so the game copies (normal + attack) are mirrored to face right like the others. Mirror again if you regenerate them from assets/.
+- All game art must face RIGHT (his dino is drawn as-is on the left; the wild dino is flipped). Mirrored because the Gemini art faced left: 16_amargasaurus (normal + attack), 08_pachycephalosaurus (normal only). Mirror again if you regenerate them from assets/, and check the facing of every new dino.
 - game/dinos/NN_name.webp: the same art cut out of its white background. This is what the game loads. Make it with `python3 tools/cutout.py` (needs Pillow + numpy).
 - assets/dinos/NN_name.jpeg: full-size originals from Gemini. assets/style-reference/style-sheet.jpeg: the style all dinos copy.
 - assets/dino_prompts.md: the 40 dinos with types and image prompts. Dinos 01–19 have art; 20–40 still to generate.
