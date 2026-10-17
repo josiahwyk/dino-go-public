@@ -313,8 +313,10 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
         <div class="assign" id="p-assign"></div>
       </div>
       <div class="panel">
+        <h3>Saving</h3>
+        <p class="status" id="p-sync">Checking…</p>
         <h3>Start over</h3>
-        <p>Deletes every caught dino and level on this device. Pictures and words stay.</p>
+        <p>Deletes every caught dino and level (on every synced device). Pictures and words stay.</p>
         <button class="plain danger" id="p-reset">Reset progress</button>
         <button class="plain danger" id="p-reset-yes" hidden>Yes, delete all progress</button>
       </div>
@@ -393,7 +395,7 @@ const DEFAULT_WORDS=["come","there","should","could","said","they","was","here"]
 let S={owned:{},words:DEFAULT_WORDS.slice(),mathLvl:3,hits:6,streak:0,stuck:0,last:null,lastWord:null};
 try{const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw));}catch(e){}
 if(!(S.mathLvl>=1&&S.mathLvl<=6))S.mathLvl=3; if(![4,6,8].includes(S.hits))S.hits=6; delete S.mathMax;
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){S.u=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){} cloudPush();}
 const lvl=o=>1+Math.floor((o.xp||0)/3);
 const rand=n=>Math.floor(Math.random()*n);
 const pick=a=>a[rand(a.length)];
@@ -877,10 +879,10 @@ function caught(){
   say(isNew?`You caught a ${w.say}! ${w.fun}`:`Another ${w.say}! Your ${w.say} got stronger!`);
 }
 $("k-again").onclick=()=>startEncounter(); $("k-book").onclick=openBook;
-$("find").onclick=()=>startEncounter(); $("to-book").onclick=openBook;
+$("find").onclick=()=>startEncounter(); $("to-book").onclick=()=>openBook();
 
 /* ---------- Dino book + stats ---------- */
-function openBook(){
+function openBook(quiet){
   const b=$("book"); b.innerHTML=""; let n=0;
   SPECIES.forEach(sp=>{
     const o=S.owned[sp.id], btn=document.createElement("button"), a=document.createElement("div"); a.className="art";
@@ -888,7 +890,7 @@ function openBook(){
     else {btn.className="empty"; a.textContent="?"; btn.append(a); btn.insertAdjacentHTML("beforeend",`<span>No. ${sp.n}</span>`); btn.onclick=()=>say("Not caught yet. Keep looking!");}
     b.appendChild(btn);
   });
-  $("b-count").textContent=`${n}/40`; show("s-book"); say(n?`You have ${n} dinos! Tap one to see it.`:"No dinos yet. Go find one!");
+  $("b-count").textContent=`${n}/40`; show("s-book"); if(quiet!==true)say(n?`You have ${n} dinos! Tap one to see it.`:"No dinos yet. Go find one!");
 }
 let sheetSp=null;
 function openSheet(id){
@@ -912,7 +914,7 @@ gear.addEventListener("pointerdown",()=>{holdT=setTimeout(openParent,1200)});
 gear.onclick=()=>{$("h-hint").textContent="Grown-ups: press and hold ⚙️ for 1 second"};
 function openParent(){
   $("p-words").value=(S.words||[]).join(", "); $("p-words-status").textContent="";
-  syncMath(); renderAssign(); show("s-parent");
+  syncMath(); renderAssign(); syncNote(cloudMsg); show("s-parent");
 }
 $("p-save-words").onclick=()=>{
   const w=[...new Set($("p-words").value.toLowerCase().split(/[\s,;]+/).filter(x=>/^[a-z]+$/.test(x)))].slice(0,30);
@@ -929,7 +931,7 @@ function syncMath(){
 document.querySelectorAll("#p-hits button").forEach(b=>b.onclick=()=>{S.hits=+b.dataset.h;save();syncMath()});
 document.querySelectorAll("#p-chal button").forEach(b=>b.onclick=()=>{S.challenge=b.dataset.c==="1";save();syncMath()});
 $("p-reset").onclick=()=>{$("p-reset-yes").hidden=false};
-$("p-reset-yes").onclick=()=>{S.owned={};S.last=null;S.streak=0;S.stuck=0;save();$("p-reset-yes").hidden=true;$("p-reset").textContent="Progress reset";};
+$("p-reset-yes").onclick=()=>{S.owned={};S.reset=Date.now();S.last=null;S.streak=0;S.stuck=0;save();$("p-reset-yes").hidden=true;$("p-reset").textContent="Progress reset";};
 
 async function shrink(file){
   const url=URL.createObjectURL(file);
@@ -994,6 +996,60 @@ function renderAssign(){
     d.append(a,sel); box.appendChild(d);
   });
 }
+
+/* ---------- Cloud save (claude.ai account, syncs iPad <-> iPhone) ---------- */
+// Device save (localStorage) stays as the offline copy. When signed in, the same
+// state lives in this account's private db doc; both sides are merged so
+// dinos caught on either device are kept.
+let cloudRef=null, cloudBusy=false, cloudAgain=false, cloudMsg="Saved on this device only.";
+function syncNote(m){cloudMsg=m; const el=$("p-sync"); if(el)el.textContent=m;}
+function mergeSaves(a,b){
+  const newer=(a.u||0)>=(b.u||0)?a:b, older=newer===a?b:a, reset=Math.max(a.reset||0,b.reset||0);
+  const out=JSON.parse(JSON.stringify(newer)); out.reset=reset||undefined; out.owned={};
+  new Set([...Object.keys(a.owned||{}),...Object.keys(b.owned||{})]).forEach(id=>{
+    const x=(newer.owned||{})[id], y=(older.owned||{})[id];
+    if(x&&y)out.owned[id]={xp:Math.max(x.xp||0,y.xp||0),wins:Math.max(x.wins||0,y.wins||0),caught:Math.max(x.caught||1,y.caught||1),t:Math.max(x.t||0,y.t||0)};
+    else{const o=x||y; if(x||(o.t||0)>reset)out.owned[id]=JSON.parse(JSON.stringify(o));}
+  });
+  return out;
+}
+async function cloudPush(){
+  if(!cloudRef)return; if(cloudBusy){cloudAgain=true;return}
+  cloudBusy=true;
+  try{await cloudRef.set({s:JSON.parse(JSON.stringify(S)),u:S.u||0}); syncNote("Synced to your claude.ai account ✓");}
+  catch(e){ if(e&&e.code==="invalid_argument"||e&&e.code==="revoked"){cloudRef=null; syncNote("Saved on this device only (this account can't sync here).");}
+    else syncNote("Saved on this device. Will sync when back online."); }
+  cloudBusy=false; if(cloudAgain){cloudAgain=false; cloudPush();}
+}
+function refreshScreen(){
+  const vis=[...document.querySelectorAll(".screen")].find(x=>!x.hidden); if(!vis)return;
+  if(vis.id==="s-home")goHome(); else if(vis.id==="s-book")openBook(true);
+  else if(vis.id==="s-parent"){$("p-words").value=(S.words||[]).join(", "); syncMath();}
+  // battle/catch screens pick it up on the way home
+}
+(async()=>{
+  try{
+    if(!window.claude||!claude.use)return;
+    const [cdb,user]=await Promise.all([claude.use("db"),claude.use("user")]);
+    const uid=user&&await user.id();
+    if(!cdb||!uid){syncNote("Saved on this device only. Open while signed in to claude.ai to sync devices.");return}
+    const ref=cdb.doc("data/users/"+uid+"/dinogo");
+    ref.onSnapshot(snap=>{
+      if(snap.metadata.hasPendingWrites)return;
+      const r=snap.exists&&snap.data()&&snap.data().s;
+      if(!cloudRef){cloudRef=ref;}
+      if(!r){if(Object.keys(S.owned).length||S.u){save()} else syncNote("Synced to your claude.ai account ✓"); return}
+      if((r.u||0)===(S.u||0)){syncNote("Synced to your claude.ai account ✓");return}
+      const m=mergeSaves(S,r), changed=JSON.stringify(m)!==JSON.stringify(S);
+      S=Object.assign(S,m); if(!m.reset)delete S.reset;
+      try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+      if(changed)refreshScreen();
+      // push back if this device had something the cloud copy didn't
+      if(JSON.stringify(m.owned)!==JSON.stringify(r.owned||{})||(S.u||0)>(r.u||0)){S.u=Math.max(S.u||0,r.u||0)+1;cloudPush()}
+      else syncNote("Synced to your claude.ai account ✓");
+    },e=>{cloudRef=null; syncNote("Saved on this device only (sync paused). Reopen the game to retry.");});
+  }catch(e){syncNote("Saved on this device only.")}
+})();
 
 /* ---------- Boot ---------- */
 (async()=>{await loadImgs(); goHome();})();
