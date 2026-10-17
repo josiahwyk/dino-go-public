@@ -24,3 +24,5 @@ Battle questions follow the Australian Curriculum v9, Year 1 (number + algebra s
 - Battles: right answer = his dino hits; wrong answer = his attack misses and the wild dino hits back. 3 right first time in a row charges a shield that blocks the next hit. His dino's health is its dino-book Health stat; it faints after roughly 5-6 wrong answers in one fight and the wild dino runs away (chosen by Josiah, 2026-10-16; this replaced "he never loses").
 - Dino facts in SPECIES haven't been checked against a source yet.
 - Later scope: printed track cards (fill-in-the-blank words), NFC, evolution, raids, Cantonese.
+- Idea (2026-10-17): an "explore" screen before encounters, like Pokémon: he walks a little avatar around illustrated habitats (forest, swamp, beach, volcano) and rustling bushes / footprints trigger a dino matched to that habitat. Josiah liked the feel of a 2.5D pixel RPG he saw (top-down map, wandering, boss fights). No real GPS.
+- Test every layout change at iPhone size (about 428x660 visible inside the claude.ai viewer) as well as iPad.
