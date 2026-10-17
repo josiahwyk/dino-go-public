@@ -25,6 +25,8 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
 button:focus-visible,select:focus-visible,textarea:focus-visible{outline:4px solid var(--lava);outline-offset:3px}
 #app{max-width:980px;margin:0 auto;height:100%;display:flex;flex-direction:column}
 .screen{flex:1;display:flex;flex-direction:column;gap:16px;min-height:0}
+/* Battle and catch never squash their parts (squashed parts overlapped on short phone screens); the page scrolls instead. */
+#s-battle>*,#s-catch>*{flex-shrink:0}
 h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
 h1{font-size:clamp(3rem,10vw,5.5rem);font-weight:800;color:var(--leaf);letter-spacing:-.01em}
 h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
@@ -210,7 +212,10 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
 .assign div{display:flex;flex-direction:column;gap:6px;border:2px solid #1E2B1F1a;border-radius:14px;padding:6px}
 .assign select{font:inherit;font-size:.95rem;padding:4px;border-radius:8px;background:#fff;color:var(--ink);max-width:100%}
 .status{font-weight:700;color:var(--leaf)}
-@media (max-width:560px){.stats{grid-template-columns:repeat(3,1fr)} .choices button{min-height:68px;font-size:2rem} .tile{width:66px;height:66px;font-size:2.4rem} .slot{width:50px;height:64px;font-size:2.2rem} .tf{grid-template-columns:repeat(5,18px);grid-auto-rows:18px} .rod{height:100px}}
+@media (max-width:560px){.stats{grid-template-columns:repeat(3,1fr)}
+  #s-battle{gap:10px} .arena{gap:8px} .spot{max-width:min(300px,22vh)} .plate{padding:6px 10px;font-size:1rem}
+  .choices{flex-wrap:nowrap;gap:8px} .choices button{flex:1 1 0;min-width:0;min-height:60px;font-size:1.7rem;border-radius:18px} .choices .shp{width:40px;height:40px}
+  .strip b{min-width:48px;height:50px;font-size:1.5rem;padding:0 6px} .q .icon-btn{width:48px;height:48px;font-size:1.3rem} .tile{width:66px;height:66px;font-size:2.4rem} .slot{width:50px;height:64px;font-size:2.2rem} .tf{grid-template-columns:repeat(5,18px);grid-auto-rows:18px} .rod{height:100px}}
 @media (prefers-reduced-motion:reduce){.egg-hero,.glow,.mystery,.fighter .art img,.spot.shielded::after{animation:none}}
 </style>
 
