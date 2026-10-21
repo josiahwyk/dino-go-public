@@ -2,6 +2,14 @@
 
 Learning game for my son: Pokémon-Go-style dinosaur catching. Maths battles weaken wild dinos; spelling catches them; a dino book shows stats and facts.
 
+## REMINDER: before this repo is ever made public
+The repo (github.com/josiahwyk/dino-go) is PRIVATE and contains personal info. If Josiah ever wants to make it public (or share it), stop and remind him to remove or genericise first:
+- His son's age and details: this file (CLAUDE.md), BACKLOG.md, assets/dino_prompts.md (age details are in CLAUDE.local.md, which is not committed).
+- Names: "Josiah" in CLAUDE.md and BACKLOG.md.
+- The live game link in this file (claude.ai artifact, shared with anyone who has the link): decide whether it should stay public.
+- Git history: every earlier commit keeps the old text and the author email (josiahwyk@gmail.com). Deleting lines from the files is not enough. Either start a fresh public repo with a clean first commit, or rewrite history, before changing visibility.
+- Root Gemini_Generated_Image*.jpeg originals and the Gemini art: check he is happy to publish them.
+
 ## Files
 - game/index.html: the whole game (one HTML file, no build step). Open it in a browser to run it.
 - game/dinos/NN_name.jpg: game art (512px). Ids match the SPECIES list in index.html.
@@ -30,6 +38,7 @@ pickWild() only picks dinos he hasn't caught that have art. When he owns every o
 - Designed for a young child: every instruction spoken aloud (speechSynthesis), big buttons, difficulty adapts.
 - Battles: right answer = his dino hits; wrong answer = his attack misses and the wild dino hits back. 3 right first time in a row charges a shield that blocks the next hit. His dino's health is its dino-book Health stat; it faints after roughly 5-6 wrong answers in one fight and the wild dino runs away (chosen by Josiah, 2026-10-16; this replaced "he never loses").
 - Dino facts in SPECIES haven't been checked against a source yet.
+- BACKLOG.md holds the open ideas and fixes (fighting engagement, levelling perks, explore screen, art still to make). Read it before planning a new feature and tick items off when they ship.
 - Later scope: printed track cards (fill-in-the-blank words), NFC, evolution, raids, Cantonese.
 - Idea (2026-10-17): an "explore" screen before encounters, like Pokémon: he walks a little avatar around illustrated habitats (forest, swamp, beach, volcano) and rustling bushes / footprints trigger a dino matched to that habitat. Josiah liked the feel of a 2.5D pixel RPG he saw (top-down map, wandering, boss fights). No real GPS.
 - Test every layout change at iPhone size (about 428x660 visible inside the claude.ai viewer) as well as iPad.
