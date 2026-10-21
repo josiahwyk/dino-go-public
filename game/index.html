@@ -108,6 +108,76 @@ h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
 .spot.shielded::after{content:"";position:absolute;inset:4% 8%;border-radius:50%;border:5px solid #7CC3FFbb;box-shadow:0 0 18px #7CC3FF,inset 0 0 18px #7CC3FF66;animation:shieldPulse 1.6s ease-in-out infinite;pointer-events:none}
 @keyframes shieldPulse{50%{opacity:.55;scale:1.04}}
 
+/* Growth: level badge, glow (L5) and golden aura (L10) on a dino's picture */
+.art{isolation:isolate}
+.lvbadge{position:absolute;left:2%;bottom:4%;z-index:2;min-width:2.3em;height:1.9em;padding:0 .6em;border-radius:999px;display:grid;place-items:center;background:var(--ac,var(--leaf));color:#fff;
+  font-family:var(--display);font-weight:800;font-size:.85rem;line-height:1;box-shadow:0 0 0 3px #fff,0 4px 0 3px #0002;white-space:nowrap}
+.lvbadge.gold{background:linear-gradient(135deg,#F7C948,#E08A1E);color:#4A2C00}
+.art.aura5::before,.art.aura10::before{content:"";position:absolute;inset:2%;border-radius:50%;z-index:-1;pointer-events:none;
+  background:radial-gradient(closest-side,var(--ac,#FFD23F) 0,transparent 100%);opacity:.8;animation:auraPulse 2.4s ease-in-out infinite}
+.art.aura10::before{background:radial-gradient(closest-side,#FFF6C2 0 28%,#FFC93C99 58%,transparent 100%);opacity:.95}
+.art.aura10::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;animation:twinkle 1.7s ease-in-out infinite;
+  background:radial-gradient(circle at 16% 24%,#fff 0 3px,transparent 4px),radial-gradient(circle at 84% 30%,#fff 0 4px,transparent 5px),radial-gradient(circle at 74% 84%,#FFE066 0 4px,transparent 5px),radial-gradient(circle at 24% 76%,#fff 0 3px,transparent 4px)}
+@keyframes auraPulse{50%{opacity:.4;scale:1.07}}
+@keyframes twinkle{50%{opacity:.15}}
+.ttl{display:block;font-size:.8rem;line-height:1;color:var(--lava-dk);letter-spacing:.02em}
+.ttl.t10{color:#B07A00}
+
+/* Move menu */
+.moves{display:flex;flex-direction:column;gap:8px;width:100%;max-width:560px;margin:0 auto}
+.moves-hd{display:flex;align-items:center;justify-content:center;gap:12px}
+.moves-hd h3{font-size:clamp(1.4rem,5vw,1.9rem);color:var(--leaf)}
+.moves-hd .icon-btn{width:48px;height:48px;font-size:1.3rem}
+.mv{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;min-height:68px;border:0;border-left:14px solid var(--c);border-radius:22px;background:#fff;padding:8px 16px 8px 12px;
+  box-shadow:0 6px 0 var(--line);text-align:left;font-family:var(--display);font-weight:800;width:100%}
+.mv:active{transform:translateY(4px);box-shadow:0 2px 0 var(--line)}
+.mv .mi{font-size:1.8rem;line-height:1}
+.mv .mn{display:block;font-size:clamp(1.3rem,5vw,1.8rem);line-height:1.05}
+.mv small{display:block;font-family:var(--body);font-weight:700;color:var(--muted);font-size:.85rem;margin-top:2px}
+.mv .st{font-size:1.5rem;color:#E8A800;letter-spacing:1px;white-space:nowrap}
+.mv.locked{opacity:.5;pointer-events:none;box-shadow:none;border-left-color:#9AA394;background:#ffffffaa}
+.mv.locked .st{color:#9AA394;font-size:1.1rem}
+
+/* Combo + shield meter, wild wind-up */
+.pips{flex-wrap:wrap;column-gap:10px;row-gap:2px}
+.pips .sh,.pips .cb{display:inline-flex;align-items:center;gap:4px}
+.pips .cb{color:#C9961F;font-size:1.05rem;letter-spacing:0;gap:1px;line-height:1}
+.pips .cb i{width:auto;height:auto;border-radius:0;background:none;box-shadow:none;font-style:normal;color:#D8D2BE;transition:color .2s,transform .2s}
+.pips .cb i.on{color:#F2A900;transform:scale(1.15)}
+.pips .cb.hot{animation:warnPulse .7s ease-in-out infinite}
+.warn{font-family:var(--display);font-weight:800;font-size:.95rem;line-height:1.1;color:#C9361F;animation:warnPulse 1s ease-in-out infinite}
+.warn.ok{color:var(--leaf);animation:none}
+@keyframes warnPulse{50%{opacity:.55}}
+.art.winding{animation:windUp 1.3s ease-out forwards,windHold 1.1s 1.3s ease-in-out infinite}
+@keyframes windUp{0%{filter:drop-shadow(0 0 0 var(--wc));translate:0 0}8%{translate:-5px 0}16%{translate:5px 0}24%{translate:-4px 0}32%{translate:4px 0}42%{translate:-3px 0}52%{translate:3px 0}62%,100%{translate:0 0}
+  100%{filter:drop-shadow(0 0 12px var(--wc)) drop-shadow(0 0 26px var(--wc))}}
+@keyframes windHold{0%,100%{filter:drop-shadow(0 0 12px var(--wc)) drop-shadow(0 0 26px var(--wc))}50%{filter:drop-shadow(0 0 20px var(--wc)) drop-shadow(0 0 40px var(--wc))}}
+
+/* Move effects (coloured by the attacker's type) */
+.ring{border:6px solid var(--c);border-radius:50%;box-shadow:0 0 14px var(--c),inset 0 0 14px var(--c)}
+.slash{width:14px;height:150px;margin:-75px 0 0 -7px;background:linear-gradient(#fff,var(--c));clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.leaf{width:20px;height:11px;margin:-5px 0 0 -10px;background:var(--c);border-radius:0 100% 0 100%}
+.drop{width:12px;height:16px;margin:-8px 0 0 -6px;background:var(--c);border-radius:50% 50% 50% 50%/65% 65% 35% 35%}
+.gust{width:110px;height:110px;margin:-55px 0 0 -55px;border:8px solid transparent;border-top-color:var(--c);border-right-color:#ffffffaa;border-radius:50%}
+.speed{width:90px;height:6px;margin:-3px 0 0 -45px;border-radius:3px;background:linear-gradient(90deg,transparent,var(--c))}
+.flash{position:fixed;inset:0;z-index:9;pointer-events:none;background:#fff;opacity:0}
+.dmg.huge{font-size:5.6rem}
+.dmg.big{font-size:4.6rem}
+.callout.super{font-size:clamp(1.3rem,5.5vw,2.2rem);background:#FFF3B0;border-color:#E08A1E;white-space:normal;text-align:center;line-height:1.05;width:max-content;max-width:min(330px,84vw)}
+
+/* Level-up / evolution celebration */
+.cele{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto;
+  background:radial-gradient(circle at 50% 35%,#FFF6C2,#CDEBF5 70%)}
+.cele-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;max-width:520px;width:100%}
+.cele .art{width:min(280px,44vh)}
+.cele h2{color:var(--lava-dk)}
+.ce-title{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,6vw,2.4rem);line-height:1.05}
+.ce-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-family:var(--display);font-weight:800;font-size:1.25rem}
+.ce-list li{background:#fff;border-radius:16px;padding:6px 16px;box-shadow:0 3px 0 var(--line)}
+.cele-card>*{position:relative;z-index:1}
+.cele-card>.conf{position:absolute;z-index:0;left:0;right:0;top:-10px;height:0;pointer-events:none}
+.conf i{position:absolute;top:0;width:12px;height:18px;border-radius:3px}
+
 /* Maths question */
 .q{display:flex;align-items:center;justify-content:center;gap:14px}
 .qbox{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
@@ -234,8 +304,9 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
 @media (max-width:560px){.stats{grid-template-columns:repeat(3,1fr)}
   #s-battle{gap:10px} .arena{gap:8px} .spot{max-width:min(300px,22vh)} .plate{padding:6px 10px;font-size:1rem}
   .choices{flex-wrap:nowrap;gap:8px} .choices button{flex:1 1 0;min-width:0;min-height:60px;font-size:1.7rem;border-radius:18px} .choices .shp{width:40px;height:40px}
+  .mv{min-height:54px;gap:8px;padding:4px 10px 4px 8px} .moves-hd .icon-btn{width:42px;height:42px;font-size:1.1rem} .moves-hd h3{font-size:1.35rem} .mv .mi{font-size:1.5rem} .mv .st{font-size:1.2rem} .moves{gap:6px} .lvbadge{font-size:.75rem} .cele .art{width:min(220px,34vh)}
   .strip b{min-width:48px;height:50px;font-size:1.5rem;padding:0 6px} .q .icon-btn{width:48px;height:48px;font-size:1.3rem} .tile{width:66px;height:66px;font-size:2.4rem} .slot{width:50px;height:64px;font-size:2.2rem} .tf{grid-template-columns:repeat(5,18px);grid-auto-rows:18px} .rod{height:100px} .flat{width:28px;height:28px} .pie{width:100px;height:100px} .pie.rect{width:150px;height:68px} .choices .pie{width:52px;height:52px} .choices .pie.rect{width:68px;height:34px}}
-@media (prefers-reduced-motion:reduce){.egg-hero,.glow,.mystery,.fighter .art img,.spot.shielded::after{animation:none}}
+@media (prefers-reduced-motion:reduce){.egg-hero,.glow,.mystery,.fighter .art img,.spot.shielded::after,.art.aura5::before,.art.aura10::before,.art.aura10::after,.art.winding,.warn,.pips .cb.hot{animation:none}.art.winding{filter:drop-shadow(0 0 14px var(--wc))}}
 </style>
 
 <div id="app">
@@ -263,13 +334,17 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
     <div class="topbar"><button class="icon-btn" data-home aria-label="Home">🏠</button><h2 class="headline" id="b-title" style="flex:1"></h2><span style="width:60px"></span></div>
     <div class="arena" id="arena">
       <div class="fighter"><div class="spot"><div class="art" id="b-me"></div></div><div class="plate"><span class="nm" id="b-me-name"></span><div class="hp" id="b-me-hp"><b></b><i></i></div><small id="b-me-lv"></small><div class="pips" id="b-pips"></div></div></div>
-      <div class="fighter"><div class="spot"><div class="art flip" id="b-wild"></div></div><div class="plate"><span class="nm" id="b-wild-name"></span><div class="hp" id="b-hp"><b></b><i></i></div><small id="b-hp-num"></small></div></div>
+      <div class="fighter"><div class="spot"><div class="art flip" id="b-wild"></div></div><div class="plate"><span class="nm" id="b-wild-name"></span><div class="hp" id="b-hp"><b></b><i></i></div><small id="b-hp-num"></small><div class="warn" id="b-warn" hidden aria-live="polite"></div></div></div>
     </div>
-    <div class="q">
+    <div class="q" id="q-row">
       <button class="icon-btn" id="b-say" aria-label="Say the question again">🔊</button>
       <div class="qbox" id="qbox" aria-live="polite"></div>
     </div>
     <div class="choices" id="choices"></div>
+    <div class="moves" id="moves" hidden>
+      <div class="moves-hd"><button class="icon-btn" id="m-say" aria-label="Hear the moves again">🔊</button><h3>Pick a move!</h3></div>
+      <div id="m-list" style="display:flex;flex-direction:column;gap:inherit"></div>
+    </div>
   </section>
 
   <section id="s-catch" class="screen" hidden>
@@ -347,6 +422,18 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
       </div>
     </div>
   </section>
+
+  <div class="flash" id="flash" hidden></div>
+  <div class="cele" id="cele" hidden role="dialog" aria-modal="true" aria-labelledby="ce-head">
+    <div class="cele-card">
+      <div class="conf" id="conf"></div>
+      <h2 id="ce-head"></h2>
+      <div class="art" id="ce-art"></div>
+      <div class="ce-title" id="ce-title"></div>
+      <ul class="ce-list" id="ce-list"></ul>
+      <button class="big" id="ce-ok">Yay!</button>
+    </div>
+  </div>
 
   <div class="sheet-bg" id="sheet-bg" hidden>
     <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-name">
@@ -452,7 +539,7 @@ function preloadAtk(id){const a=atkSrc(id);if(!a||ATK_OK.has(id))return;const i=
 function art(el,sp){
   el.innerHTML="";
   const s=src(sp.id);
-  const ph=()=>{el.innerHTML=`<div class="ph" style="--c:var(--t-${sp.type})"><span class="e">${TYPES[sp.type].e}</span><span class="n">${sp.name}</span></div>`};
+  const ph=()=>{[...el.children].forEach(c=>{if(c.tagName==="IMG"||c.classList.contains("ph"))c.remove()}); el.insertAdjacentHTML("afterbegin",`<div class="ph" style="--c:var(--t-${sp.type})"><span class="e">${TYPES[sp.type].e}</span><span class="n">${sp.name}</span></div>`)};
   if(!s)return ph();
   const i=new Image(); i.alt=sp.name; i.decoding="async"; i.onerror=ph; if(IMG[sp.id]&&JPG.has(sp.id))i.className="jpg"; i.src=s; el.appendChild(i);
 }
@@ -467,6 +554,10 @@ function tone(freqs,dur=.12,type="triangle",gap=.09){try{AC=AC||new (window.Audi
 function noise(dur,freq,to,vol=.35,q=.9){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t0=AC.currentTime,n=Math.floor(AC.sampleRate*dur),buf=AC.createBuffer(1,n,AC.sampleRate),d=buf.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=buf;f.type="bandpass";f.Q.value=q;f.frequency.setValueAtTime(freq,t0);if(to)f.frequency.exponentialRampToValueAtTime(to,t0+dur);g.gain.value=vol;s.connect(f).connect(g).connect(AC.destination);s.start(t0)}catch(e){}}
 const sfx={good:()=>tone([660,880]),bad:()=>tone([220,180],.18,"square"),win:()=>tone([523,659,784,1046],.18),catch:()=>tone([784,988,1175,1568],.2),
   whoosh:()=>noise(.28,500,2600,.25),hit:()=>{noise(.22,160,60,.7,.7);tone([110,60],.2,"sine",.03)},block:()=>tone([880,660],.1,"triangle",.05)};
+function sweep(f0,f1,dur,type="sawtooth",vol=.2){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t0=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f0,t0);o.frequency.exponentialRampToValueAtTime(f1,t0+dur);
+  g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(vol,t0+dur*.15);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.connect(g).connect(AC.destination);o.start(t0);o.stop(t0+dur+.02)}catch(e){}}
+Object.assign(sfx,{growl:()=>{sweep(150,70,.5,"sawtooth",.1);noise(.4,300,120,.12)},stop:()=>tone([520,780,1040],.1,"triangle",.07),charge:()=>sweep(120,900,.7,"sawtooth",.1),
+  roar:()=>{sweep(180,50,.9,"sawtooth",.26);noise(.8,500,90,.5,.6)},combo:n=>tone([523+n*50,659+n*50],.1,"triangle",.07),yay:()=>tone([523,659,784,1046,1318],.16,"triangle",.1)});
 document.addEventListener("pointerdown",()=>{try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume()}catch(e){}},{once:true});
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
@@ -480,6 +571,7 @@ function show(id){document.querySelectorAll(".screen").forEach(s=>s.hidden=s.id!
 document.querySelectorAll("[data-home]").forEach(b=>b.onclick=()=>{try{speechSynthesis.cancel()}catch(e){} goHome()});
 
 function goHome(){
+  BG++; $("cele").hidden=true;
   const team=$("h-team"); team.innerHTML="";
   // Up to 4 dinos he hasn't caught yet, as "?" shadows. Tapping one finds that dino.
   const hiding=shuffle(SPECIES.filter(s=>hasArt(s.id)&&!S.owned[s.id])).slice(0,4);
@@ -495,11 +587,63 @@ function goHome(){
   if(!hiding.length){
     const ids=Object.keys(S.owned).sort((a,b)=>(S.owned[b].t||0)-(S.owned[a].t||0)).slice(0,4);
     if(!ids.length)team.innerHTML='<div class="egg-hero" aria-hidden="true"></div>';
-    ids.forEach(id=>{const d=document.createElement("div");d.className="art";art(d,BY[id]);team.appendChild(d)});
+    ids.forEach(id=>{const d=document.createElement("div");d.className="art";art(d,BY[id]);decorate(d,id);team.appendChild(d)});
   }
   $("h-count").textContent=`${Object.keys(S.owned).length}/40`;
   show("s-home");
 }
+
+/* ---------- Levels, moves and growth (everything here is worked out from the saved xp, nothing extra is saved) ---------- */
+// Level perks: L1 basic move, L3 second move + "Brave", L4 shield after 2, L5 special move + "Mighty" + glow, L8 free shield each fight, L10 "Legendary" + golden aura.
+const MOVE_NAMES={ // [basic, second, special]; dinos not listed use their type's set in MOVE_DEFAULT
+  "01_triceratops":["Horn poke","Horn charge","Triple horn storm"],"02_stegosaurus":["Tail flick","Spike swing","Thagomizer smash"],
+  "03_brachiosaurus":["Neck bonk","Big stomp","Sky-high slam"],"04_ankylosaurus":["Club tap","Club swing","Mega club smash"],
+  "05_parasaurolophus":["Crest toot","Echo honk","Thunder honk"],"06_diplodocus":["Tail tap","Tail whip","Thunder whip"],
+  "07_iguanodon":["Thumb jab","Thumb spike","Spike storm"],"08_pachycephalosaurus":["Head bonk","Dome bash","Mega headbutt"],
+  "09_styracosaurus":["Spike poke","Spike charge","Crown crash"],"10_argentinosaurus":["Foot tap","Giant stomp","Earth shaker"],
+  "11_protoceratops":["Beak nip","Frill bash","Desert dash"],"12_kentrosaurus":["Back spike","Tail spikes","Spike spin"],
+  "13_edmontosaurus":["Quick nip","Stampede","Herd rush"],"14_corythosaurus":["Crest bump","Echo call","Helmet crash"],
+  "15_therizinosaurus":["Claw swipe","Long slash","Claw storm"],"16_amargasaurus":["Spine poke","Spine whip","Spine storm"],
+  "17_psittacosaurus":["Parrot peck","Beak snap","Feather dash"],"18_maiasaura":["Gentle bump","Mama stomp","Mighty mama roar"],
+  "19_muttaburrasaurus":["Nose bump","Outback charge","Mighty bash"],"20_minmi":["Armour bump","Spiny roll","Armour spin"],
+  "21_trex":["Quick bite","Crunchy chomp","Mega chomp"],"22_velociraptor":["Claw scratch","Pounce","Raptor frenzy"],
+  "23_spinosaurus":["Fin flick","Water snap","Sail slam"],"24_allosaurus":["Quick bite","Claw rake","Hunter pounce"],
+  "25_carnotaurus":["Horn poke","Bull charge","Horn storm"]};
+const MOVE_DEFAULT={plant:["Tail swipe","Head bump","Big stomp"],meat:["Quick bite","Claw slash","Mega chomp"],sea:["Splash","Tail slap","Wave crash"],fly:["Wing flap","Dive bomb","Wing gust"]};
+const movesOf=sp=>MOVE_NAMES[sp.id]||MOVE_DEFAULT[sp.type];
+// Slot 0 basic, 1 second, 2 special. dq: how much harder than his maths level the question is. power: share of the wild dino's remaining health
+// (see hitDamage). The number of right answers to win never changes, whichever moves he picks.
+const MOVE_SLOTS=[
+  {need:1,power:1,  dq:-1,stars:1,tag:"Easy question",  icon:"⚡",style:"nip",   size:1},
+  {need:3,power:1.6,dq:0, stars:2,tag:"Medium question",icon:"💥",style:"charge",size:1.25},
+  {need:5,power:2.4,dq:1, stars:3,tag:"Hard question",  icon:"🌟",style:"jump",  size:1.6}];
+const FIN_POWER=3.4;
+const finNeed=()=>Math.min(5,S.hits); // right answers in a row for the finisher (4 on Short battles so it can still happen)
+const slotsOf=o=>MOVE_SLOTS.map((m,i)=>i).filter(i=>lvl(o)>=MOVE_SLOTS[i].need);
+const titleFor=L=>L>=10?"Legendary":L>=5?"Mighty":L>=3?"Brave":"";
+const titleOf=o=>titleFor(lvl(o));
+const fullName=(sp,o)=>{const t=o?titleOf(o):"";return t?`${t} ${sp.name}`:sp.name};
+const fullSay=(sp,o)=>{const t=o?titleOf(o):"";return t?`${t} ${sp.say}`:sp.say};
+const shieldNeed=o=>lvl(o)>=4?2:3;
+const startsShielded=o=>lvl(o)>=8;
+// New things a level gives him: returned as spoken/written lines. title = the name changes (evolution celebration).
+function perks(sp,o,L){
+  const m=movesOf(sp), out=[], t={3:"Brave",5:"Mighty",10:"Legendary"}[L];
+  if(L===3)out.push(`New move: ${m[1]}`); if(L===5)out.push(`New move: ${m[2]}`);
+  if(L===4)out.push("Your shield charges after 2 right answers"); if(L===8)out.push("Every fight starts with a shield");
+  if(L===5)out.push("It glows now"); if(L===10)out.push("A golden glow");
+  return {title:t,lines:out};
+}
+const NEXT_PERK=[[3,"a second move"],[4,"a faster shield"],[5,"a special move and a glow"],[8,"a free shield each fight"],[10,"a golden glow"]];
+// Level badge and glow on a dino's picture (call after art())
+function decorate(el,id,badge=true,atLevel){
+  el.classList.remove("aura5","aura10"); el.querySelectorAll(".lvbadge").forEach(b=>b.remove());
+  const o=S.owned[id]; if(!o)return; const L=atLevel||lvl(o);
+  el.style.setProperty("--ac",TCOL[BY[id].type]);
+  if(L>=10)el.classList.add("aura10"); else if(L>=5)el.classList.add("aura5");
+  if(badge){const b=document.createElement("span");b.className="lvbadge"+(L>=10?" gold":"");b.textContent="Lv "+L;b.setAttribute("aria-label","Level "+L);el.appendChild(b)}
+}
+const nameHtml=(sp,o)=>{const t=titleOf(o);return (t?`<span class="ttl${lvl(o)>=10?" t10":""}">${t}</span>`:"")+sp.name};
 
 /* ---------- Encounter ---------- */
 let E={};
@@ -520,8 +664,8 @@ function startEncounter(chosen){
   $("p-title").textContent=`${E.rematch?"Rematch! ":""}A wild ${wild.name}! Who will battle?`;
   const g=$("pick-grid"); g.innerHTML="";
   owned.sort((a,b)=>lvl(S.owned[b])-lvl(S.owned[a])).forEach(id=>{
-    const sp=BY[id],b=document.createElement("button"),a=document.createElement("div");a.className="art";art(a,sp);
-    b.append(a);b.insertAdjacentHTML("beforeend",`<span>${sp.name}</span><small>Level ${lvl(S.owned[id])}</small>`);
+    const sp=BY[id],o=S.owned[id],b=document.createElement("button"),a=document.createElement("div");a.className="art";art(a,sp);decorate(a,id);
+    b.append(a);b.insertAdjacentHTML("beforeend",`<span>${fullName(sp,o)}</span><small>Level ${lvl(o)} · ${slotsOf(o).length} ${slotsOf(o).length===1?"move":"moves"}</small>`);
     b.onclick=()=>startBattle(id,"");g.appendChild(b);
   });
   show("s-pick"); say(intro+" Who will battle?");
@@ -880,62 +1024,142 @@ const QUESTIONS={
   11:[groupsY2,arrayQ,repAdd,shareY2,bagsY2,fracShaded,fracPick,fracOf],
   12:[coinsTotal,changeNote,changeCents,twoItems,spendLeft,eachCost,storyY2],
 };
-function makeQ(){
-  // 1 in 5 questions reviews an easier level: any earlier level up to Year 1's end, then only the 3 levels just below
-  const L=S.mathLvl, lv=(L>1&&Math.random()<.2)?between(L>6?L-3:1,L-1):L; let q,g=0;
+function makeQ(fixed){
+  // With one move the question is at his level, and 1 in 5 reviews an easier level: any earlier level up to Year 1's end, then only the 3 levels just below.
+  // With a move menu (fixed given) the move decides the level instead.
+  const L=S.mathLvl, lv=fixed||((L>1&&Math.random()<.2)?between(L>6?L-3:1,L-1):L); let q,g=0;
   do{q=pick(QUESTIONS[lv])();g++}while(E.q&&q.say===E.q.say&&g<6);
   q.lvl=lv; return q;
 }
 
 /* ---------- Battle effects ---------- */
-const MOVES={plant:["Tail swipe!","Big stomp!","Head bump!"],meat:["Chomp!","Claw slash!","Mighty roar!"],sea:["Splash attack!","Tail slap!"],fly:["Dive bomb!","Wing gust!"]};
 const TCOL={plant:"#3E9B4F",meat:"#D9443A",sea:"#2F7FD1",fly:"#8A55C9"};
-const fig=box=>box.firstElementChild||box; // the picture (or placeholder card) inside an .art box
+const fig=box=>box.firstElementChild&&!box.firstElementChild.classList.contains("lvbadge")?box.firstElementChild:box.querySelector("img,.ph")||box; // the picture (or placeholder card) inside an .art box
 function center(el){const a=$("arena").getBoundingClientRect(),r=el.getBoundingClientRect();return {x:r.left-a.left+r.width/2,y:r.top-a.top+r.height/2,h:r.height}}
 function fx(cls,x,y,html=""){const d=document.createElement("div");d.className="fx "+cls;d.style.left=x+"px";d.style.top=y+"px";d.innerHTML=html;$("arena").appendChild(d);return d}
 const pop=(d,k,o)=>anim(d,k,o).then(()=>d.remove());
 const settle=el=>{try{el.getAnimations().forEach(a=>{if(!a.animationName)a.cancel()})}catch(e){}};
 const gap=()=>($("b-wild").getBoundingClientRect().left-$("b-me").getBoundingClientRect().left);
-function callout(text,box,col,dy=-.55){
-  const c=center(box),d=fx("callout",c.x,c.y+c.h*dy,text); d.style.setProperty("--c",col);
+function callout(text,box,col,dy=-.55,cls=""){
+  const c=center(box),d=fx("callout "+cls,c.x,c.y+c.h*dy,text); d.style.setProperty("--c",col);
   return pop(d,[{transform:"translate(-50%,-50%) scale(.4)",opacity:0},{transform:"translate(-50%,-50%) scale(1.12)",opacity:1,offset:.12},{transform:"translate(-50%,-50%) scale(1)",opacity:1,offset:.25},{transform:"translate(-50%,-65%)",opacity:1,offset:.8},{transform:"translate(-50%,-85%)",opacity:0}],{duration:1400});
 }
-function shake(){anim($("arena"),[{translate:"0 0"},{translate:"-8px 5px"},{translate:"7px -4px"},{translate:"-4px 2px"},{translate:"0 0"}],{duration:300})}
-function impact(box,col,dmg,dir=1){ // dir: which way the target gets knocked (1 = right)
-  const c=center(box),t=fig(box);
+function shake(a=1){anim($("arena"),[{translate:"0 0"},{translate:`${-8*a}px ${5*a}px`},{translate:`${7*a}px ${-4*a}px`},{translate:`${-4*a}px ${2*a}px`},{translate:"0 0"}],{duration:300+60*a})}
+function screenFlash(col,peak,ms){const f=$("flash");f.hidden=false;f.style.background=col;return anim(f,[{opacity:0},{opacity:peak,offset:.2},{opacity:0}],{duration:ms}).then(()=>{f.hidden=true})}
+// Impact on the target: burst, sparks, damage number, flash, knock-back, plus an effect that fits the attacker's type. size: 1 small, 1.25 medium, 1.6 special, 2 finisher.
+function impact(box,col,dmg,dir=1,o={}){ // dir: which way the target gets knocked (1 = right)
+  const c=center(box),t=fig(box),sz=o.size||1;
   const b=fx("burst",c.x,c.y); b.style.setProperty("--c",col);
-  pop(b,[{transform:"scale(.2) rotate(0deg)",opacity:1},{transform:"scale(1.1) rotate(20deg)",opacity:1,offset:.4},{transform:"scale(1.4) rotate(35deg)",opacity:0}],{duration:460,easing:"ease-out"});
-  for(let i=0;i<12;i++){const s=fx("spark",c.x,c.y),a=Math.random()*Math.PI*2,r=70+Math.random()*90; s.style.setProperty("--c",i%3?"#FFD23F":col);
+  pop(b,[{transform:"scale(.2) rotate(0deg)",opacity:1},{transform:`scale(${1.1*sz}) rotate(20deg)`,opacity:1,offset:.4},{transform:`scale(${1.4*sz}) rotate(35deg)`,opacity:0}],{duration:460,easing:"ease-out"});
+  for(let i=0;i<Math.round(12*sz);i++){const s=fx("spark",c.x,c.y),a=Math.random()*Math.PI*2,r=(70+Math.random()*90)*Math.min(sz,1.5); s.style.setProperty("--c",i%3?"#FFD23F":col);
     pop(s,[{transform:"translate(0,0) scale(1)",opacity:1},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r}px) scale(.2)`,opacity:0}],{duration:500+rand(250),easing:"cubic-bezier(.15,.7,.3,1)"})}
-  pop(fx("dmg",c.x,c.y-c.h*.15,"−"+dmg),[{transform:"translate(-50%,-50%) scale(.3)",opacity:0},{transform:"translate(-50%,-85%) scale(1.3)",opacity:1,offset:.18},{transform:"translate(-50%,-100%) scale(1)",opacity:1,offset:.65},{transform:"translate(-50%,-160%) scale(.9)",opacity:0}],{duration:1250,easing:"ease-out"});
+  const ts=o.txt||sz;
+  pop(fx("dmg"+(ts>=2?" huge":ts>=1.5?" big":""),c.x,c.y-c.h*.15,"−"+dmg),[{transform:"translate(-50%,-50%) scale(.3)",opacity:0},{transform:"translate(-50%,-85%) scale(1.3)",opacity:1,offset:.18},{transform:"translate(-50%,-100%) scale(1)",opacity:1,offset:.65},{transform:"translate(-50%,-160%) scale(.9)",opacity:0}],{duration:1250,easing:"ease-out"});
   anim(t,[{filter:"brightness(1)"},{filter:"brightness(1.9) saturate(.4)"},{filter:"brightness(1)"},{filter:"brightness(1.9) saturate(.4)"},{filter:"brightness(1)"}],{duration:340});
-  anim(t,[{translate:"0 0",rotate:"0deg"},{translate:`${28*dir}px -8px`,rotate:`${7*dir}deg`},{translate:`${-8*dir}px 0`,rotate:`${-3*dir}deg`},{translate:"0 0",rotate:"0deg"}],{duration:440,easing:"ease-out"});
-  shake();
+  anim(t,[{translate:"0 0",rotate:"0deg"},{translate:`${28*dir*Math.min(sz,1.6)}px -8px`,rotate:`${7*dir}deg`},{translate:`${-8*dir}px 0`,rotate:`${-3*dir}deg`},{translate:"0 0",rotate:"0deg"}],{duration:440,easing:"ease-out"});
+  shake(sz>=1.6?1.8:sz>=1.25?1.3:1);
+  if(o.type)moveFx(o.type,box,col,sz);
 }
+// Type effects, drawn with CSS only: plant = leaves and a ground ring, meat = slash marks, sea = splash, fly = wind swirls
+function moveFx(type,box,col,sz){
+  const c=center(box);
+  const ring=(color,w,y=.4,dur=620)=>{const r=fx("ring",c.x,c.y+c.h*y);r.style.setProperty("--c",color);r.style.width=w+"px";r.style.height=w*.32+"px";r.style.margin=`${-w*.16}px 0 0 ${-w/2}px`;
+    pop(r,[{transform:"scale(.15)",opacity:.95},{transform:"scale(1)",opacity:0}],{duration:dur,easing:"ease-out"})};
+  if(type==="plant"){
+    ring(col,170*sz); if(sz>=1.25)ring("#FFE066",110*sz,.4,800);
+    for(let i=0;i<Math.round(6+4*sz);i++){const l=fx("leaf",c.x,c.y+c.h*.2),a=-Math.PI*(.1+Math.random()*.8),r=(60+Math.random()*80)*Math.min(sz,1.5);l.style.setProperty("--c",i%2?col:"#8BD36A");
+      pop(l,[{transform:"translate(0,0) rotate(0deg)",opacity:1},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r}px) rotate(${rand(360)}deg)`,opacity:1,offset:.6},{transform:`translate(${Math.cos(a)*r*1.1}px,${Math.sin(a)*r+50}px) rotate(${rand(720)}deg)`,opacity:0}],{duration:900,easing:"ease-out"})}
+  }else if(type==="meat"){
+    const n=sz>=1.6?4:3;
+    for(let i=0;i<n;i++){const sl=fx("slash",c.x+(i-(n-1)/2)*28,c.y);sl.style.setProperty("--c",col);sl.style.height=150*Math.min(sz,1.5)+"px";sl.style.marginTop=-75*Math.min(sz,1.5)+"px";
+      pop(sl,[{transform:"rotate(28deg) scaleY(0)",opacity:1},{transform:"rotate(28deg) scaleY(1)",opacity:1,offset:.35},{transform:"rotate(28deg) scaleY(1)",opacity:0}],{duration:520,delay:i*90,easing:"ease-out",fill:"backwards"})}
+  }else if(type==="sea"){
+    ring("#7CC3FF",180*sz); ring(col,120*sz,.4,820);
+    for(let i=0;i<Math.round(8+5*sz);i++){const d=fx("drop",c.x,c.y+c.h*.1),dx=(Math.random()-.5)*150*Math.min(sz,1.5),h=60+Math.random()*90;d.style.setProperty("--c",i%2?"#BFE3FF":col);
+      pop(d,[{transform:"translate(0,0)",opacity:1},{transform:`translate(${dx*.6}px,${-h}px)`,opacity:1,offset:.45},{transform:`translate(${dx}px,${40}px)`,opacity:0}],{duration:800,easing:"cubic-bezier(.3,.6,.5,1)"})}
+  }else{
+    for(let i=0;i<Math.round(2+sz);i++){const g=fx("gust",c.x,c.y);g.style.setProperty("--c",col);
+      pop(g,[{transform:"scale(.3) rotate(0deg)",opacity:1},{transform:`scale(${1+i*.35}) rotate(${300+i*60}deg)`,opacity:0}],{duration:600+i*120,delay:i*70,easing:"ease-out",fill:"backwards"})}
+    for(let i=0;i<6;i++){const l=fx("leaf",c.x,c.y),a=Math.random()*Math.PI*2,r=60+Math.random()*60;l.style.setProperty("--c","#fff");
+      pop(l,[{transform:"translate(0,0) rotate(0deg)",opacity:1},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r}px) rotate(${rand(540)}deg)`,opacity:0}],{duration:700,easing:"ease-out"})}
+  }
+}
+function speedLines(box,dir,col){const c=center(box);for(let i=0;i<4;i++){const l=fx("speed",c.x-dir*c.h*.45,c.y+(i-1.5)*c.h*.16);l.style.setProperty("--c",col);
+  pop(l,[{transform:`translateX(0) scaleX(${dir})`,opacity:.9},{transform:`translateX(${dir*60}px) scaleX(${dir*1.6})`,opacity:0}],{duration:380,delay:i*30,fill:"backwards"})}}
 
-async function lunge(box,dir,dist,id){ // dir 1 = to the right
-  const t=fig(box),back=`${-24*dir}px 6px`,hit=`${dist*dir}px -10px`;
-  const pose=t.tagName==="IMG"&&ATK_OK.has(id)&&atkSrc(id), still=t.src;
+// style: "nip" quick short jab, "charge" run-up and ram, "jump" crouch, leap with a spin, slam. zoom grows the picture during the slam (finisher).
+async function lunge(box,dir,dist,id,style="charge",zoom=1){
+  const t=fig(box),pose=t.tagName==="IMG"&&ATK_OK.has(id)&&atkSrc(id), still=t.src, col=TCOL[BY[id].type];
   if(pose)t.src=pose;
-  await anim(t,[{translate:"0 0",rotate:"0deg"},{translate:back,rotate:`${-6*dir}deg`}],{duration:210,easing:"ease-out",fill:"forwards"});
-  sfx.whoosh();
-  await anim(t,[{translate:back,rotate:`${-6*dir}deg`},{translate:hit,rotate:`${8*dir}deg`}],{duration:160,easing:"cubic-bezier(.5,0,1,.5)",fill:"forwards"});
-  return ()=>anim(t,[{translate:hit,rotate:`${8*dir}deg`},{translate:"0 0",rotate:"0deg"}],{duration:420,easing:"cubic-bezier(.3,1.4,.5,1)",fill:"forwards"}).then(()=>{settle(t);if(pose)t.src=still});
+  const hit=`${dist*dir}px -10px`; let endRot, endScale="1 1";
+  if(style==="jump"){
+    const b=`${-20*dir}px 10px`;
+    await anim(t,[{translate:"0 0",scale:"1 1"},{translate:b,scale:"1.1 .84"}],{duration:260,easing:"ease-out",fill:"forwards"});
+    sfx.whoosh();
+    endScale=`${zoom} ${zoom}`; endRot=`${360*dir}deg`;
+    await anim(t,[{translate:b,rotate:"0deg",scale:"1.1 .84"},{translate:`${dist*dir*.5}px -120px`,rotate:`${180*dir}deg`,scale:"1 1",offset:.5},{translate:hit,rotate:endRot,scale:endScale}],{duration:430,easing:"ease-in-out",fill:"forwards"});
+  }else{
+    const nip=style==="nip",back=`${-(nip?14:24)*dir}px 6px`; endRot=`${(nip?5:8)*dir}deg`;
+    if(!nip)speedLines(box,dir,col);
+    await anim(t,[{translate:"0 0",rotate:"0deg"},{translate:back,rotate:`${-6*dir}deg`}],{duration:nip?150:210,easing:"ease-out",fill:"forwards"});
+    sfx.whoosh();
+    await anim(t,[{translate:back,rotate:`${-6*dir}deg`},{translate:hit,rotate:endRot}],{duration:nip?110:160,easing:"cubic-bezier(.5,0,1,.5)",fill:"forwards"});
+  }
+  const toRot=style==="jump"?endRot:"0deg"; // a full spin ends where it started, so don't unwind it
+  return ()=>anim(t,[{translate:hit,rotate:endRot,scale:endScale},{translate:"0 0",rotate:toRot,scale:"1 1"}],{duration:420,easing:"cubic-bezier(.3,1.4,.5,1)",fill:"forwards"}).then(()=>{settle(t);if(pose)t.src=still});
 }
-async function attack(move){
-  const col=TCOL[BY[E.me].type];
-  callout(move,$("b-me"),col);
-  const back=await lunge($("b-me"),1,gap()*.55,E.me);
-  const dmg=E.dmg[E.turn]||1; E.turn++;
-  E.hp=E.turn>=E.dmg.length?0:Math.max(1,E.hp-dmg);
-  impact($("b-wild"),col,dmg); sfx.hit(); hpBar();
+// How much of the wild dino's remaining health a hit takes. With k hits left a move of power p takes p/(p+1.6*(k-1)) of what is left (the other
+// hits are assumed to be a middling move), so a bigger move shows a bigger number now, but the fight always ends on exactly the S.hits-th right answer
+// (never early, never an extra one): every hit leaves at least 1 health for each hit still to come, and the last hit takes the rest.
+// The finisher always takes at least 55% of what is left, so its number is big however many big moves came first.
+function hitDamage(p,fin){
+  const k=S.hits-E.turn,H=E.hp; if(k<=1)return H;
+  let d=Math.round(H*p/(p+1.6*(k-1))); if(fin)d=Math.max(d,Math.round(H*.55));
+  return Math.max(1,Math.min(d,H-(k-1)));
+}
+async function attack(m){
+  const sp=BY[E.me],col=TCOL[sp.type],sl=MOVE_SLOTS[m.slot];
+  const dmg=hitDamage(sl.power*(1+.1*Math.max(0,E.combo-1)));
+  callout(m.name+"!",$("b-me"),col);
+  const back=await lunge($("b-me"),1,gap()*(m.slot===0?.45:.6),E.me,sl.style);
+  E.turn++; E.hp=E.turn>=S.hits?0:E.hp-dmg;
+  impact($("b-wild"),col,dmg,1,{type:sp.type,size:sl.size}); sfx.hit(); hpBar();
   await back();
 }
-// The wild dino hits back after a wrong answer. A charged shield blocks it. Returns true if blocked.
+// The finisher (5 right in a row): charge-up glow, screen flash, zoomed leap in the attack pose, roar, double shockwave, huge number.
+async function superAttack(m){
+  const sp=BY[E.me],col=TCOL[sp.type],t=fig($("b-me"));
+  const dmg=hitDamage(FIN_POWER*(1+.1*(E.combo-1)),true);
+  callout("⭐ "+m.name+"! ⭐",$("arena"),"#E08A1E",-.5,"super"); sfx.charge();
+  const glow=`brightness(1.7) saturate(1.3) drop-shadow(0 0 16px ${col}) drop-shadow(0 0 30px #FFD23F)`;
+  await anim(t,[{filter:"brightness(1)",translate:"0 0"},{filter:glow,translate:"-4px 0",offset:.25},{filter:glow,translate:"4px 0",offset:.5},{filter:glow,translate:"-4px 0",offset:.75},{filter:glow,translate:"0 0"}],{duration:700,fill:"forwards"});
+  screenFlash(col,.5,360);
+  const back=await lunge($("b-me"),1,gap()*.6,E.me,"jump",1.35);
+  E.turn++; E.hp=E.turn>=S.hits?0:E.hp-dmg;
+  screenFlash("#fff",.9,520); sfx.roar(); sfx.hit();
+  impact($("b-wild"),col,dmg,1,{type:sp.type,size:2});
+  const w=center($("b-wild")); for(const [i,sz] of [[0,150],[1,230]]){const r=fx("ring",w.x,w.y+w.h*.4);r.style.setProperty("--c",i?"#FFD23F":col);r.style.width=sz*1.4+"px";r.style.height=sz*.45+"px";r.style.margin=`${-sz*.22}px 0 0 ${-sz*.7}px`;
+    pop(r,[{transform:"scale(.15)",opacity:1},{transform:"scale(1.4)",opacity:0}],{duration:760,delay:i*140,easing:"ease-out",fill:"backwards"})}
+  setTimeout(()=>shake(1.6),160); hpBar();
+  await back(); try{t.getAnimations().forEach(a=>{if(!a.animationName)a.cancel()})}catch(e){}
+}
+// The wild dino winds up an attack (glow grows, then holds; there is no countdown). A right answer interrupts it, a wrong one lets it land.
+function windUp(){
+  const w=E.wild; E.windSlot=rand(3); E.wind=movesOf(w)[E.windSlot];
+  const el=$("b-wild"); el.style.setProperty("--wc",TCOL[w.type]); el.classList.remove("winding"); void el.offsetWidth; el.classList.add("winding");
+  const wr=$("b-warn"); wr.hidden=false; wr.className="warn"; wr.textContent=`⚠ Winding up ${E.wind}!`;
+  sfx.growl(); callout("⚠ Winding up!",el,TCOL[w.type],-.55);
+}
+function stopWind(stopped){
+  $("b-wild").classList.remove("winding"); const wr=$("b-warn");
+  if(stopped){wr.hidden=false;wr.className="warn ok";wr.textContent="✓ Stopped it!"; sfx.stop(); callout("Stopped it!",$("b-wild"),"#3E9B4F",-.4)}
+  else wr.hidden=true;
+}
+// The wild dino's wind-up lands after a wrong answer. A charged shield blocks it. Returns true if blocked.
 async function counter(){
-  const col=TCOL[E.wild.type];
-  callout(pick(MOVES[E.wild.type]),$("b-wild"),col);
-  const back=await lunge($("b-wild"),-1,gap()*.5,E.wild.id);
+  const w=E.wild,col=TCOL[w.type],sl=MOVE_SLOTS[E.windSlot];
+  callout(E.wind+"!",$("b-wild"),col);
+  const back=await lunge($("b-wild"),-1,gap()*(E.windSlot===0?.4:.5),w.id,sl.style);
   const blocked=E.shield;
   if(blocked){
     E.shield=false; const c=center($("b-me")); sfx.block();
@@ -943,7 +1167,7 @@ async function counter(){
     callout("Blocked!",$("b-me"),"#2F7FD1",-.1);
     anim(fig($("b-me")),[{translate:"0 0"},{translate:"-12px 0"},{translate:"0 0"}],{duration:320});
   } else {
-    E.myHp=Math.max(0,E.myHp-E.wildDmg); impact($("b-me"),col,E.wildDmg,-1); sfx.hit();
+    E.myHp=Math.max(0,E.myHp-E.wildDmg); impact($("b-me"),col,E.wildDmg,-1,{type:w.type,size:Math.min(sl.size,1.25),txt:1}); sfx.hit();
   }
   hpBar(); await back(); return blocked;
 }
@@ -954,6 +1178,7 @@ function dizzy(box){
 // His dino runs out of health: it flops over, the wild dino runs off, back to the home screen.
 async function faint(){
   const me=BY[E.me],w=E.wild;
+  stopWind(false);
   say(`Oh no! Your ${me.say} is too tired to keep going, and the wild ${w.say} ran away! Let's rest and find another dino.`);
   dizzy($("b-me"));
   await anim(fig($("b-me")),[{rotate:"0deg",translate:"0 0",opacity:1},{rotate:"12deg",translate:"0 8px",offset:.3},{rotate:"-8deg",translate:"0 14px",offset:.6},{rotate:"0deg",translate:"0 22px",scale:"1 .88",opacity:.5}],{duration:1300,fill:"forwards"});
@@ -975,76 +1200,156 @@ async function knockout(){
   await anim(fig($("b-wild")),[{rotate:"0deg",translate:"0 0",opacity:1},{rotate:"-12deg",translate:"0 6px",offset:.3},{rotate:"10deg",translate:"0 10px",offset:.6},{rotate:"0deg",translate:"0 20px",scale:"1 .9",opacity:.5}],{duration:1300,fill:"forwards"});
 }
 
+/* ---------- Level-up celebration ---------- */
+function confetti(){
+  const box=$("conf"); box.innerHTML="";
+  for(let i=0;i<40;i++){const d=document.createElement("i");d.style.left=rand(100)+"%";d.style.background=pick(["#F2762E","#3E9B4F","#2F7FD1","#8A55C9","#FFD23F","#D9443A"]);box.appendChild(d);
+    anim(d,[{transform:"translateY(0) rotate(0deg)",opacity:1},{transform:`translateY(${innerHeight*1.1}px) rotate(${rand(720)}deg)`,opacity:.9}],{duration:1800+rand(1800),delay:rand(700),easing:"ease-in",fill:"both"})}
+}
+// Level-up with something new (L3, L4, L5, L8, L10): a full-screen celebration. At L3, L5 and L10 the title changes, so the same picture "evolves": flashes white, pulses, then is revealed with its new name and glow.
+function celebrate(id,L){
+  return new Promise(async res=>{
+    const sp=BY[id],o=S.owned[id],pk=perks(sp,o,L),oldT=titleFor(L-1),evolve=!!pk.title,cele=$("cele"),ok=$("ce-ok");
+    $("ce-head").textContent=`Level ${L}!`; art($("ce-art"),sp); decorate($("ce-art"),id,true,L-1);
+    $("ce-title").textContent=oldT?`${oldT} ${sp.name}`:sp.name; $("ce-list").innerHTML=""; ok.hidden=true; $("conf").innerHTML="";
+    cele.hidden=false; window.scrollTo(0,0); sfx.yay();
+    say(evolve?`Wow! Your ${oldT?oldT+" ":""}${sp.say} is changing!`:`Level up! Your ${sp.say} is now level ${L}!`);
+    if(evolve){
+      const t=fig($("ce-art"));
+      await anim(t,[{filter:"brightness(1)",scale:"1"},{filter:"brightness(6) saturate(0)",scale:"1.12"},{filter:"brightness(1)",scale:"1"},{filter:"brightness(6) saturate(0)",scale:"1.2"},{filter:"brightness(1)",scale:"1"},{filter:"brightness(8) saturate(0)",scale:"1.3"},{filter:"brightness(1)",scale:"1"}],{duration:2000,easing:"ease-in-out"});
+      sfx.roar();
+    }
+    decorate($("ce-art"),id,true,L); $("ce-title").textContent=fullName(sp,o);
+    $("ce-list").innerHTML=pk.lines.map(l=>`<li>${l}</li>`).join(""); confetti(); if(evolve)screenFlash("#fff",.7,500);
+    say(`${evolve?`Your ${sp.say} is now ${fullSay(sp,o)}! `:""}${pk.lines.join(". ")}. Yay!`);
+    await wait(900); ok.hidden=false;
+    ok.onclick=()=>{cele.hidden=true;$("conf").innerHTML="";try{speechSynthesis.cancel()}catch(e){} res()};
+  });
+}
+
 /* ---------- Battle (maths) ---------- */
+let BG=0; // bumped when a battle starts or he goes home, so a fight he left stops itself
 function startBattle(meId,intro){
-  E.me=meId; const me=BY[meId],w=E.wild,o=S.owned[meId];
-  // The wild dino's health (from SPECIES) is split into S.hits hits, so every battle takes the same number of right answers.
-  E.maxHp=w.hp; E.hp=E.maxHp; E.turn=0; E.q=null;
-  const n=S.hits,base=Math.floor(E.maxHp/n); E.dmg=rep(n,base); for(let i=0;i<E.maxHp-base*n;i++)E.dmg[i]++;
-  for(let i=0;i<n;i++){const a=rand(n),b=rand(n);if(E.dmg[a]>2){E.dmg[a]--;E.dmg[b]++}}
-  shuffle(E.dmg);
+  BG++; E.me=meId; const me=BY[meId],w=E.wild,o=S.owned[meId];
+  // The wild dino's health (from SPECIES) is taken off by his hits. Every battle takes exactly S.hits right answers (see hitDamage).
+  E.maxHp=w.hp; E.hp=E.maxHp; E.turn=0; E.q=null; E.combo=0; E.round=0; E.phase="";
   // His dino's health is its dino-book Health stat. Each wrong answer costs about a sixth of it
   // (a bit more against strong wild dinos), so it faints after roughly 5-6 wrong answers in one fight.
   E.myMax=me.hp+(lvl(o)-1)*2; E.myHp=E.myMax; E.wildDmg=Math.max(2,Math.round(E.myMax*(.13+.01*w.atk)));
-  E.shieldN=0; E.shield=false;
-  art($("b-me"),me); art($("b-wild"),w);
+  E.shieldN=0; E.shield=startsShielded(o);
+  art($("b-me"),me); decorate($("b-me"),meId); art($("b-wild"),w); $("b-wild").classList.remove("winding"); $("b-warn").hidden=true;
   preloadAtk(me.id); preloadAtk(w.id); // so the pose swap doesn't flicker
-  $("b-me-name").textContent=me.name;
+  $("b-me-name").innerHTML=nameHtml(me,o);
   $("b-wild-name").textContent=w.name; $("b-title").textContent=`${E.rematch?"Rematch! ":""}Battle the wild ${w.name}!`;
-  hpBar(); show("s-battle"); newQ();
+  $("moves").hidden=true; $("q-row").hidden=false; $("choices").hidden=false;
+  hpBar(); show("s-battle");
   anim(fig($("b-me")),[{translate:"-120% 0",opacity:0},{translate:"0 0",opacity:1}],{duration:550,easing:"cubic-bezier(.2,.8,.3,1.15)"});
   anim(fig($("b-wild")),[{translate:"120% 0",opacity:0},{translate:"0 0",opacity:1}],{duration:550,delay:150,easing:"cubic-bezier(.2,.8,.3,1.15)"});
-  say(`${intro} Your ${me.say} is ready! Get it right to attack. ${E.q.say}`);
+  if(lvl(o)>=5){ // stronger dinos arrive with a flourish
+    const gen=BG; setTimeout(()=>{if(gen!==BG)return; const c=center($("b-me")); sfx.whoosh();
+      const r=fx("ring",c.x,c.y+c.h*.4);r.style.setProperty("--c",lvl(o)>=10?"#FFC93C":TCOL[me.type]);r.style.width="220px";r.style.height="70px";r.style.margin="-35px 0 0 -110px";
+      pop(r,[{transform:"scale(.2)",opacity:1},{transform:"scale(1.3)",opacity:0}],{duration:700,easing:"ease-out"});
+      for(let i=0;i<14;i++){const s=fx("spark",c.x,c.y+c.h*.3),a=-Math.PI*Math.random(),d=60+Math.random()*90;s.style.setProperty("--c",i%2?"#FFD23F":TCOL[me.type]);
+        pop(s,[{transform:"translate(0,0)",opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px) scale(.3)`,opacity:0}],{duration:800,easing:"ease-out"})}
+    },600);
+  }
+  say(`${intro} Your ${fullSay(me,o)} is ready!${E.shield?" It starts with a shield!":""} Get it right to attack.`);
+  beginRound();
 }
 function setBar(id,hp,max){const p=hp/max,bar=$(id); bar.querySelector("i").style.width=bar.querySelector("b").style.width=(p*100)+"%"; bar.classList.toggle("low",p<.35);}
 function hpBar(){
+  const o=S.owned[E.me],need=shieldNeed(o),fn=finNeed();
   setBar("b-hp",E.hp,E.maxHp); $("b-hp-num").textContent=`Health ${E.hp}`;
-  setBar("b-me-hp",E.myHp,E.myMax); $("b-me-lv").textContent=`Level ${lvl(S.owned[E.me])} · Health ${E.myHp}`;
-  const n=E.shield?3:E.shieldN, p=$("b-pips");
-  p.innerHTML=(E.shield?"Shield ready":"Shield")+[0,1,2].map(i=>`<i class="${i<n?"on":""}"></i>`).join("");
+  setBar("b-me-hp",E.myHp,E.myMax); $("b-me-lv").textContent=`Level ${lvl(o)} · Health ${E.myHp}`;
+  const n=E.shield?need:E.shieldN, p=$("b-pips");
+  p.innerHTML=`<span class="sh" role="img" aria-label="${E.shield?"Shield ready":`Shield: ${n} of ${need}`}">🛡️${E.shield?"Ready":""}${Array.from({length:need},(_,i)=>`<i class="${i<n?"on":""}"></i>`).join("")}</span>`+
+    `<span class="cb${E.combo>0&&E.combo>=fn-1?" hot":""}" role="img" aria-label="Combo ${E.combo} of ${fn}">${Array.from({length:fn},(_,i)=>`<i class="${i<E.combo?"on":""}">★</i>`).join("")}</span>`;
   p.classList.toggle("ready",E.shield); $("b-me").parentElement.classList.toggle("shielded",E.shield);
 }
-function newQ(){
-  E.q=makeQ(); E.miss=0; E.busy=false;
+// A round: the wild dino winds up, he picks a move (if he has more than one), then answers the question that move asks.
+function beginRound(){
+  E.busy=false; E.miss=0; E.round++;
+  const slots=slotsOf(S.owned[E.me]), first=E.round===1;
+  windUp();
+  const warn=`${E.wild.say} is winding up ${E.wind}!${first?" Get it right to stop it!":""}`;
+  if(slots.length<2){chooseMove(slots[0],warn);return}
+  showMenu(slots,`${warn} Pick a move!${first?" A bigger move asks a harder question, but it hits harder.":""}`);
+}
+function showMenu(slots,spoken){
+  E.phase="menu"; E.menuSay=spoken; const mv=movesOf(BY[E.me]),col=TCOL[BY[E.me].type];
+  $("q-row").hidden=true; $("choices").hidden=true; $("moves").hidden=false;
+  const list=$("m-list"); list.innerHTML="";
+  MOVE_SLOTS.forEach((m,i)=>{
+    const b=document.createElement("button"),ok=slots.includes(i); b.className="mv"+(ok?"":" locked"); b.style.setProperty("--c",col);
+    b.innerHTML=`<span class="mi">${ok?m.icon:"🔒"}</span><span><span class="mn">${mv[i]}</span><small>${ok?m.tag:"Unlocks at level "+m.need}</small></span><span class="st" aria-hidden="true">${"★".repeat(m.stars)}</span>`;
+    if(ok){b.setAttribute("aria-label",`${mv[i]}. ${m.tag}. Power ${m.stars} of 3.`);b.onclick=()=>pickMove(i)} else {b.disabled=true;b.setAttribute("aria-label",`${mv[i]}, locked until level ${m.need}`)}
+    list.appendChild(b);
+  });
+  say(spoken,true);
+}
+function pickMove(i){if(E.phase!=="menu")return; chooseMove(i)}
+function chooseMove(i,preface){
+  E.phase="q"; E.slot=i; E.busy=false;
+  const multi=slotsOf(S.owned[E.me]).length>1;
+  E.q=makeQ(multi?Math.max(1,Math.min(MAXL,S.mathLvl+MOVE_SLOTS[i].dq)):0);
+  $("moves").hidden=true; $("q-row").hidden=false; $("choices").hidden=false;
+  showQ();
+  if(preface)say(`${preface} ${E.q.say}`,true); else say(`${movesOf(BY[E.me])[i]}! ${E.q.say}`);
+}
+function showQ(){
   $("qbox").innerHTML=E.q.html;
   const box=$("choices"); box.innerHTML="";
   E.q.choices.forEach(v=>{const k=document.createElement("button");k.innerHTML=E.q.label?E.q.label(v):v;k.dataset.v=v;
     k.setAttribute("aria-label",E.q.sayAns?E.q.sayAns(v):String(v));k.onclick=()=>answer(v,k);box.appendChild(k)});
 }
 $("b-say").onclick=()=>{if(E.q)say(E.q.say)};
+$("m-say").onclick=()=>say(E.menuSay||"Pick a move!");
 async function answer(v,btn){
-  if(E.busy)return; const q=E.q;
+  if(E.busy||E.phase!=="q")return; const q=E.q,gen=BG,me=BY[E.me],o=S.owned[E.me];
   if(v!==q.ans){
-    // Wrong: his attack misses and the wild dino hits back (unless his shield is charged).
-    E.busy=true; E.miss++; E.shieldN=0; sfx.bad(); btn.classList.add("nope"); hpBar();
+    // Wrong: his attack misses and the wild dino's wind-up lands (unless his shield is charged). The combo and shield pips start again.
+    E.busy=true; E.miss++; E.shieldN=0; E.combo=0; sfx.bad(); btn.classList.add("nope"); hpBar();
     say("Missed! Look out!"); dodge();
-    await wait(650);
-    const blocked=await counter();
+    await wait(650); if(gen!==BG)return;
+    stopWind(false);
+    const blocked=await counter(); if(gen!==BG)return;
     if(E.myHp<=0){await faint(); return;}
     if(E.miss>=2){const g=[...$("choices").children].find(b=>b.dataset.v===String(q.ans)); if(g)g.classList.add("glow");}
-    E.busy=false;
+    windUp(); E.busy=false;
     say(`${blocked?"Blocked! Your shield saved you.":"Ouch!"} Try again. ${q.say}`); return;
   }
   E.busy=true;
-  // Right first time charges the shield; 3 in a row makes it ready.
+  const first=E.miss===0;
+  // Right first time: the combo grows and the shield charges (2 pips from level 4, otherwise 3).
   let shieldUp=false;
-  if(E.miss===0&&!E.shield){E.shieldN++; if(E.shieldN>=3){E.shield=true;E.shieldN=0;shieldUp=true}}
-  // adapt difficulty, counting only questions at his current level (not the review ones)
+  if(first){E.combo++; if(!E.shield){E.shieldN++; if(E.shieldN>=shieldNeed(o)){E.shield=true;E.shieldN=0;shieldUp=true}}}
+  const fin=first&&E.combo>=finNeed();
+  // adapt difficulty. Questions at his current level count as before. A harder question (from a bigger move) right first time also counts
+  // toward moving up, and a wrong answer on it never counts toward "stuck"; easier questions don't count at all.
   if(q.lvl===S.mathLvl){
     if(E.miss===0){S.streak++; S.stuck=0; if(S.streak>=5&&S.mathLvl<MAXL){S.mathLvl++;S.streak=0}}
     else {S.streak=0; if(E.miss>=2){S.stuck++; if(S.stuck>=2&&S.mathLvl>1){S.mathLvl--;S.stuck=0}}}
     save();
+  } else if(q.lvl>S.mathLvl&&first){
+    S.streak++; S.stuck=0; if(S.streak>=5&&S.mathLvl<MAXL){S.mathLvl++;S.streak=0} save();
   }
-  const move=pick(MOVES[BY[E.me].type]);
-  say(`${q.sayAns?q.sayAns(v):v}! ${move}${shieldUp?" Shield ready!":""}`);
-  await attack(move);
+  const mv=movesOf(me),m={name:fin?`SUPER ${mv[2].toUpperCase()}`:mv[E.slot],slot:E.slot,fin};
+  stopWind(true); hpBar();
+  say(`${q.sayAns?q.sayAns(v):v}! ${fin?"Super move! ":""}${m.name}!${shieldUp?" Shield ready!":""}`);
+  if(E.combo>=3&&!fin){sfx.combo(E.combo); callout(`Combo ×${E.combo}!`,$("b-me"),"#F2762E",-.95)}
+  await (fin?superAttack(m):attack(m)); if(gen!==BG)return;
+  if(fin){E.combo=0; hpBar();}
   if(shieldUp&&E.hp>0){sfx.block(); callout("Shield ready!",$("b-me"),"#2F7FD1",-.1); await wait(700);}
-  if(E.hp>0){await wait(300); newQ(); say(E.q.say,true); return;}
+  if(E.hp>0){await wait(300); if(gen!==BG)return; beginRound(); return;}
   // win
-  const o=S.owned[E.me], before=lvl(o); o.wins=(o.wins||0)+1; o.xp=(o.xp||0)+1; save(); sfx.win();
-  const up=lvl(o)>before;
-  say(`You won! ${up?`Level up! Your ${BY[E.me].say} is now level ${lvl(o)}! `:""}Now spell the word to catch the ${E.wild.say}!`);
-  await knockout();
+  const w=E.wild, before=lvl(o); o.wins=(o.wins||0)+1; o.xp=(o.xp||0)+1; save(); sfx.win();
+  const L=lvl(o), up=L>before, pk=up?perks(me,o,L):{lines:[]}, big=up&&pk.lines.length>0;
+  decorate($("b-me"),E.me); $("b-me-name").innerHTML=nameHtml(me,o);
+  if(big)say("You won!");
+  else say(`You won! ${up?`Level up! Your ${me.say} is now level ${L}! `:""}Now spell the word to catch the ${w.say}!`);
+  await knockout(); if(gen!==BG)return;
+  if(big){await celebrate(E.me,L); startCatch(`Now spell the word to catch the ${w.say}!`); return}
+  if(up){callout(`Level ${L}!`,$("b-me"),"#F2762E",-.5); sfx.yay();}
   await wait(up?2200:1400);
   startCatch("");
 }
@@ -1136,14 +1441,17 @@ async function throwEgg(){
   caught();
 }
 function caught(){
-  const w=E.wild; const o=S.owned[w.id]; const isNew=!o;
+  const w=E.wild; const o=S.owned[w.id]; const isNew=!o, before=o?lvl(o):1;
   if(isNew)S.owned[w.id]={xp:0,wins:0,caught:1,t:Date.now()}; else {o.caught=(o.caught||1)+1; o.xp=(o.xp||0)+1; o.t=Date.now();}
   save();
   $("k-title").textContent=isNew?`You caught a ${w.name}!`:`Another ${w.name}!`;
-  $("k-new").hidden=!isNew; art($("k-art"),w); pill($("k-type"),w);
+  $("k-new").hidden=!isNew; art($("k-art"),w); decorate($("k-art"),w.id); pill($("k-type"),w);
   $("k-fact").textContent=isNew?w.fun:`Your ${w.name} got stronger! It's now level ${lvl(S.owned[w.id])}.`;
   show("s-caught");
   say(isNew?`You caught a ${w.say}! ${w.fun}`:`Another ${w.say}! Your ${w.say} got stronger!`);
+  // a duplicate can level it up too: celebrate new moves, shields and titles here as well
+  const L=isNew?1:lvl(S.owned[w.id]);
+  if(L>before&&perks(w,S.owned[w.id],L).lines.length)setTimeout(async()=>{if(!$("s-caught").hidden){await celebrate(w.id,L); decorate($("k-art"),w.id)}},2600);
 }
 $("k-again").onclick=()=>startEncounter(); $("k-book").onclick=openBook;
 $("find").onclick=()=>startEncounter(); $("to-book").onclick=()=>openBook();
@@ -1153,7 +1461,7 @@ function openBook(quiet){
   const b=$("book"); b.innerHTML=""; let n=0;
   SPECIES.forEach(sp=>{
     const o=S.owned[sp.id], btn=document.createElement("button"), a=document.createElement("div"); a.className="art";
-    if(o){n++; art(a,sp); btn.append(a); btn.insertAdjacentHTML("beforeend",`<span>${sp.name}</span>`); btn.onclick=()=>openSheet(sp.id);}
+    if(o){n++; art(a,sp); decorate(a,sp.id); btn.append(a); btn.insertAdjacentHTML("beforeend",`<span>${sp.name}</span>`); btn.onclick=()=>openSheet(sp.id);}
     else {btn.className="empty"; a.textContent="?"; btn.append(a); btn.insertAdjacentHTML("beforeend",`<span>No. ${sp.n}</span>`); btn.onclick=()=>say("Not caught yet. Keep looking!");}
     b.appendChild(btn);
   });
@@ -1162,13 +1470,14 @@ function openBook(quiet){
 let sheetSp=null;
 function openSheet(id){
   const sp=BY[id], o=S.owned[id], L=lvl(o); sheetSp=sp;
-  art($("sh-art"),sp); $("sh-name").textContent=sp.name; pill($("sh-type"),sp);
+  art($("sh-art"),sp); decorate($("sh-art"),id); $("sh-name").textContent=fullName(sp,o); pill($("sh-type"),sp);
   const st=[["Level",L],["Health",sp.hp+(L-1)*2],["Attack",sp.atk+(L-1)],["Wins",o.wins||0],["Caught",o.caught||1]];
   $("sh-stats").innerHTML=st.map(([k,v])=>`<div class="stat"><b>${v}</b><small>${k}</small></div>`).join("");
-  $("sh-facts").innerHTML=[["Size",sp.len],["Ate",sp.food],["Lived",sp.when],["Found in",sp.where],["Fun fact",sp.fun]].map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join("");
+  const mv=movesOf(sp),nx=NEXT_PERK.find(([n])=>n>L);
+  $("sh-facts").innerHTML=[["Moves",MOVE_SLOTS.map((m,i)=>L>=m.need?mv[i]:`🔒 Level ${m.need}`).join(" · ")],["Shield",`Charges after ${shieldNeed(o)} right answers${startsShielded(o)?", and every fight starts with one":""}`],...(nx?[["Next",`Level ${nx[0]}: ${nx[1]}`]]:[]),["Size",sp.len],["Ate",sp.food],["Lived",sp.when],["Found in",sp.where],["Fun fact",sp.fun]].map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join("");
   $("sheet-bg").hidden=false; readSheet();
 }
-function readSheet(){const sp=sheetSp,o=S.owned[sp.id];say(`${sp.say}. A ${TYPES[sp.type].label}. Level ${lvl(o)}. ${sp.len}. It lived ${sp.when}. ${sp.fun}`)}
+function readSheet(){const sp=sheetSp,o=S.owned[sp.id];say(`${fullSay(sp,o)}. A ${TYPES[sp.type].label}. Level ${lvl(o)}. ${sp.len}. It lived ${sp.when}. ${sp.fun}`)}
 $("sh-say").onclick=readSheet;
 $("sh-close").onclick=()=>{$("sheet-bg").hidden=true;try{speechSynthesis.cancel()}catch(e){}};
 $("sheet-bg").onclick=e=>{if(e.target.id==="sheet-bg")$("sh-close").onclick()};
