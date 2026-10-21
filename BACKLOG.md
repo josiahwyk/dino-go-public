@@ -38,7 +38,7 @@ Optional art, for later, after he has played the first slice (batch these into o
 - [ ] **Habitat backgrounds** (forest, swamp, beach, volcano; about 4 images) for A4. Probably the biggest visual upgrade, and they double as the explore-screen maps (C1).
 - [ ] **Hurt or faint pose** (optional; the tilt-and-fade animation covers it now).
 
-Already outstanding and more important: art for dinos 20 and 28-40 (item in section D), since it limits how many dinos he can catch.
+Already outstanding and more important: art for dinos 35-40 (item in section D), since it limits how many dinos he can catch.
 
 ## E. Follow-ups from chat 05 (check after he has played)
 - [ ] Watch him use the move menu: does he pick the biggest move every time, or always the easy one? Always-easy keeps his maths level from rising (only his-level and harder questions count). Tune the powers/offsets in MOVE_SLOTS if so.
@@ -55,7 +55,7 @@ Already outstanding and more important: art for dinos 20 and 28-40 (item in sect
 - [ ] **C6. Cantonese.**
 
 ## D. Content and fixes
-- [ ] Art for dinos 20 and 28-40 (01-19 and 21-27 have pictures; prompts in assets/dino_prompts.md).
+- [ ] Art for dinos 35-40 (01-34 have pictures; prompts in assets/dino_prompts.md).
 - [ ] 15 Therizinosaurus attack pose is front-on (he didn't ask to redo it).
 - [ ] Dino facts in SPECIES haven't been checked against a source.
 - [ ] Check on his iPad: Year 2 fraction shapes and cent coins (shipped 2026-10-22, untested on the real device).
@@ -65,5 +65,5 @@ Already outstanding and more important: art for dinos 20 and 28-40 (item in sect
 - 2026-10-22 (chat 05): A1 move menu, A2 combo + finisher, A3 wild wind-up, B1 moves unlock at L1/3/5, B2 shield perks (L4 two right answers, L8 free shield), B4 level badge, titles (Brave L3, Mighty L5, Legendary L10), glow at L5 and golden aura at L10, evolution celebration at L3/5/10 (L4 and L8 get a shorter overlay). No new art. Design in DESIGN-05.md.
 - 2026-10-22 (chat 04): 12 maths levels (7-12 = Year 2, AC9M2), "Suggest words" spelling pattern bank, no repeat fights with "Rematch!" once every dino with art is caught.
 - 2026-10-17 (chat 03): cloud save across iPad/iPhone.
-- 2026-10-22 (chat 06): art (standing + attack, all facing right) for the 7 meat-eaters 21-27 (T. rex, Velociraptor, Spinosaurus, Allosaurus, Carnotaurus, Giganotosaurus, Dilophosaurus), added to BUILTIN and published as artifact version 15.
+- 2026-10-22 (chat 06): art (standing + attack, all facing right) for the meat-eaters 21-27 (artifact v15), then Minmi 20 and meat-eaters 28-34 (artifact v16), all added to BUILTIN.
 - 2026-10-16 (chat 02): attack poses for 01-19, health bar, streak shield, faint/escape, harder Year 1 maths and spelling, phone layout fixes.
