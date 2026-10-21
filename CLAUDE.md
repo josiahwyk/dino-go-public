@@ -17,7 +17,7 @@ The repo (github.com/josiahwyk/dino-go) is PRIVATE and contains personal info. I
 - All game art must face RIGHT (his dino is drawn as-is on the left; the wild dino is flipped). Mirrored because the Gemini art faced left: 08_pachycephalosaurus (normal only) and 16_amargasaurus (attack only). Judge facing by where the head and eyes point, not the body: the normal Amargasaurus has its neck on the left but looks right, so it is NOT mirrored. Mirror again if you regenerate them from assets/, and check the facing of every new dino.
 - game/dinos/NN_name.webp: the same art cut out of its white background. This is what the game loads. Make it with `python3 tools/cutout.py` (needs Pillow + numpy).
 - assets/dinos/NN_name.jpeg: full-size originals from Gemini. assets/style-reference/style-sheet.jpeg: the style all dinos copy.
-- assets/dino_prompts.md: the 40 dinos with types and image prompts. Dinos 01–19 have art; 20–40 still to generate.
+- assets/dino_prompts.md: the 40 dinos with types and image prompts. Dinos 01–19 (plant-eaters) and 21–27 (meat-eaters, chat 06) have art, standing + attack; 20 (Minmi) and 28–40 still to generate.
 - Root Gemini_Generated_Image*.jpeg files are the original downloads. Don't delete them.
 
 ## Live version

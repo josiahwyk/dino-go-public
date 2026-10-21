@@ -499,7 +499,7 @@ const SPECIES=[
 ].map(a=>({id:a[0],n:+a[0].slice(0,2),name:a[1],type:a[2],len:a[3],food:a[4],when:a[5],where:a[6],fun:a[7],hp:a[8],atk:a[9],say:a[10]||a[1]}));
 const BY=Object.fromEntries(SPECIES.map(s=>[s.id,s]));
 // Pictures published with the game (dinos/<id>.jpg). Filled in when images are added to the artifact.
-const BUILTIN=new Set(["01_triceratops","02_stegosaurus","03_brachiosaurus","04_ankylosaurus","05_parasaurolophus","06_diplodocus","07_iguanodon","08_pachycephalosaurus","09_styracosaurus","10_argentinosaurus","11_protoceratops","12_kentrosaurus","13_edmontosaurus","14_corythosaurus","15_therizinosaurus","16_amargasaurus","17_psittacosaurus","18_maiasaura","19_muttaburrasaurus"]);
+const BUILTIN=new Set(["01_triceratops","02_stegosaurus","03_brachiosaurus","04_ankylosaurus","05_parasaurolophus","06_diplodocus","07_iguanodon","08_pachycephalosaurus","09_styracosaurus","10_argentinosaurus","11_protoceratops","12_kentrosaurus","13_edmontosaurus","14_corythosaurus","15_therizinosaurus","16_amargasaurus","17_psittacosaurus","18_maiasaura","19_muttaburrasaurus","21_trex","22_velociraptor","23_spinosaurus","24_allosaurus","25_carnotaurus","26_giganotosaurus","27_dilophosaurus"]);
 
 /* ---------- State ---------- */
 const KEY="dinogo.v1";
