@@ -17,7 +17,14 @@ Published as a claude.ai artifact (opened on his iPad): https://claude.ai/artifa
 To add a dino: put its 512px .jpg in game/dinos/, run `python3 tools/cutout.py game/dinos/NN_name.jpg`, add its id to the BUILTIN set in index.html, and publish the .webp with the page.
 
 ## Maths
-Battle questions follow the Australian Curriculum v9, Year 1 (number + algebra strands): see LEVELS and QUESTIONS in index.html. Six levels, auto-adjusting; the parent screen can set the level and battle length (4/6/8 hits).
+Battle questions follow the Australian Curriculum v9: see LEVELS and QUESTIONS in index.html. Twelve levels, auto-adjusting: 1-6 are Year 1 (AC9M1, number + algebra), 7-12 are Year 2 (AC9M2): place value to 1000, add/take away within 100, trading, skip counting, equal groups/arrays/halves-quarters-eighths, money and change. The parent screen can set the level and battle length (4/6/8 hits). MAXL is the top level; older saves hold 1-6 and still mean the same thing. Review questions come from any earlier level up to level 6, then only the 3 levels below.
+Year 2 generators use mix() for the 4 tap choices (answer + the slip a child most often makes). Fraction answers are strings like "1/4" (drawn by fracLabel / fracSvg).
+
+## Spelling
+Homework words come from the parent screen (S.words). PATTERNS is a built-in word bank (Year 1 and Year 2 spelling patterns) behind the "Suggest words" button: it fills the words box with ~8 words, never ones in CHALLENGE, and nothing saves until Save words. "Challenge words" is a separate setting (S.challenge) that mixes CHALLENGE words into ~1 catch in 4.
+
+## Wild dinos
+pickWild() only picks dinos he hasn't caught that have art. When he owns every one with art, repeats come back and are labelled "Rematch!" (E.rematch, nothing is saved for it).
 
 ## Rules
 - Designed for a young child: every instruction spoken aloud (speechSynthesis), big buttons, difficulty adapts.

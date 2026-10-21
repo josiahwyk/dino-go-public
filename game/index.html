@@ -140,6 +140,20 @@ h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
 .shp.square{border-radius:6px;background:var(--t-sea)}
 .shp.tri{background:var(--t-plant);clip-path:polygon(50% 4%,98% 96%,2% 96%)}
 .shp.star{background:#E8B300;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+/* Year 2 pictures: hundreds flats, arrays, fraction shapes, cent coins */
+.flat{width:34px;height:34px;border-radius:5px;background:repeating-linear-gradient(90deg,#6FA8E8 0 6px,#4F86CC 6px 7px);box-shadow:0 2px 0 var(--line)}
+.ghost{opacity:.22}
+.arr{display:grid;gap:5px;padding:8px;border:3px solid var(--leaf);border-radius:18px;background:#ffffffaa}
+.arr i{width:20px;height:20px;border-radius:50%;background:var(--t-meat);display:block}
+.pie{display:block;width:120px;height:120px}
+.pie.rect{width:170px;height:76px}
+.choices .pie{width:68px;height:68px} .choices .pie.rect{width:92px;height:42px}
+.fr{display:inline-flex;flex-direction:column;align-items:center;line-height:1}
+.fr i{font-style:normal;padding:0 10px}
+.fr i:first-child{border-bottom:.09em solid currentColor;padding-bottom:.06em}
+.fr i:last-child{padding-top:.06em}
+.coin.silver{background:radial-gradient(circle at 35% 30%,#fff,#CBD1D8 70%,#9BA4AE);color:#34404B}
+.note.twenty{background:linear-gradient(135deg,#F9BFAE,#EA8570);color:#6E2316}
 .choices{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;max-width:760px;width:100%;margin:0 auto}
 .choices button{flex:1 1 130px;max-width:180px;min-height:84px;border:0;border-radius:22px;background:#fff;font-family:var(--display);font-weight:800;font-size:2.4rem;box-shadow:0 6px 0 var(--line);display:grid;place-items:center}
 .choices button:active{transform:translateY(4px);box-shadow:0 2px 0 var(--line)}
@@ -212,10 +226,15 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
 .assign div{display:flex;flex-direction:column;gap:6px;border:2px solid #1E2B1F1a;border-radius:14px;padding:6px}
 .assign select{font:inherit;font-size:.95rem;padding:4px;border-radius:8px;background:#fff;color:var(--ink);max-width:100%}
 .status{font-weight:700;color:var(--leaf)}
+.suggest{background:#EEF6E6;border:2px dashed var(--leaf);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.suggest h4{margin:0;font-family:var(--display);font-size:1.15rem}
+.srow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.srow select{font:inherit;font-size:1rem;padding:8px;border-radius:10px;border:2px solid var(--leaf);background:#fff;color:var(--ink);flex:1 1 220px;min-width:0}
+.lvlhead{flex-basis:100%;font-family:var(--display);font-weight:800;font-size:1.1rem;color:var(--leaf);margin-top:4px}
 @media (max-width:560px){.stats{grid-template-columns:repeat(3,1fr)}
   #s-battle{gap:10px} .arena{gap:8px} .spot{max-width:min(300px,22vh)} .plate{padding:6px 10px;font-size:1rem}
   .choices{flex-wrap:nowrap;gap:8px} .choices button{flex:1 1 0;min-width:0;min-height:60px;font-size:1.7rem;border-radius:18px} .choices .shp{width:40px;height:40px}
-  .strip b{min-width:48px;height:50px;font-size:1.5rem;padding:0 6px} .q .icon-btn{width:48px;height:48px;font-size:1.3rem} .tile{width:66px;height:66px;font-size:2.4rem} .slot{width:50px;height:64px;font-size:2.2rem} .tf{grid-template-columns:repeat(5,18px);grid-auto-rows:18px} .rod{height:100px}}
+  .strip b{min-width:48px;height:50px;font-size:1.5rem;padding:0 6px} .q .icon-btn{width:48px;height:48px;font-size:1.3rem} .tile{width:66px;height:66px;font-size:2.4rem} .slot{width:50px;height:64px;font-size:2.2rem} .tf{grid-template-columns:repeat(5,18px);grid-auto-rows:18px} .rod{height:100px} .flat{width:28px;height:28px} .pie{width:100px;height:100px} .pie.rect{width:150px;height:68px} .choices .pie{width:52px;height:52px} .choices .pie.rect{width:68px;height:34px}}
 @media (prefers-reduced-motion:reduce){.egg-hero,.glow,.mystery,.fighter .art img,.spot.shielded::after{animation:none}}
 </style>
 
@@ -286,14 +305,20 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
         <h3>This week's spelling words</h3>
         <p>Type the words from the homework book, separated by spaces or commas. He spells one to catch each dino.</p>
         <textarea id="p-words" aria-label="Spelling words"></textarea>
+        <div class="suggest">
+          <h4>Need ideas? Suggest words</h4>
+          <p>Pick a spelling pattern, then tap Suggest words. It replaces the box above with about 8 words from a built-in list (no internet needed). Change them if you like, then tap Save words. Tap Suggest again for a different set.</p>
+          <div class="srow"><select id="p-pattern" aria-label="Spelling pattern"></select><button class="plain" id="p-suggest">Suggest words</button></div>
+          <span class="status" id="p-sug-status"></span>
+        </div>
         <button class="plain" id="p-save-words">Save words</button>
         <span class="status" id="p-words-status"></span>
-        <p>Challenge words: about 1 catch in 4 uses a Year 1 word instead (blends like "frog", long vowels like "rain", word families like "played", two-syllable words like "rabbit").</p>
+        <p><b>Challenge words are a separate setting.</b> Suggest words only fills in this week's list. Challenge words are Year 1 extras the game mixes in by itself: about 1 catch in 4 uses one instead of a word from your list (blends like "frog", long vowels like "rain", word families like "played", two-syllable words like "rabbit"). Suggest words never offers those.</p>
         <div class="seg" id="p-chal"><button data-c="1" aria-pressed="false">Challenge words on</button><button data-c="0" aria-pressed="false">Homework words only</button></div>
       </div>
       <div class="panel">
         <h3>Maths in battles</h3>
-        <p>Questions follow the Australian Curriculum (v9) for Year 1. It moves up a level by itself after 5 right first time in a row, and back down if he's stuck twice. About 1 in 3 questions reviews an easier level.</p>
+        <p>Questions follow the Australian Curriculum (v9). Levels 1–6 are Year 1 and levels 7–12 are Year 2. It moves up a level by itself after 5 right first time in a row, and back down if he's stuck twice. About 1 in 5 questions reviews an easier level.</p>
         <div class="seg" id="p-math"></div>
       </div>
       <div class="panel">
@@ -392,9 +417,10 @@ const BUILTIN=new Set(["01_triceratops","02_stegosaurus","03_brachiosaurus","04_
 /* ---------- State ---------- */
 const KEY="dinogo.v1";
 const DEFAULT_WORDS=["come","there","should","could","said","they","was","here"];
+const MAXL=12; // highest maths level: 1-6 are Year 1, 7-12 are Year 2 (older saves only ever hold 1-6, which still mean the same thing)
 let S={owned:{},words:DEFAULT_WORDS.slice(),mathLvl:3,hits:6,streak:0,stuck:0,last:null,lastWord:null};
 try{const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw));}catch(e){}
-if(!(S.mathLvl>=1&&S.mathLvl<=6))S.mathLvl=3; if(![4,6,8].includes(S.hits))S.hits=6; delete S.mathMax;
+if(!(S.mathLvl>=1&&S.mathLvl<=MAXL))S.mathLvl=3; if(![4,6,8].includes(S.hits))S.hits=6; delete S.mathMax;
 function save(){S.u=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){} cloudPush();}
 const lvl=o=>1+Math.floor((o.xp||0)/3);
 const rand=n=>Math.floor(Math.random()*n);
@@ -457,7 +483,8 @@ function goHome(){
   const team=$("h-team"); team.innerHTML="";
   // Up to 4 dinos he hasn't caught yet, as "?" shadows. Tapping one finds that dino.
   const hiding=shuffle(SPECIES.filter(s=>hasArt(s.id)&&!S.owned[s.id])).slice(0,4);
-  $("h-tease").hidden=!hiding.length;
+  $("h-tease").textContent=hiding.length?"Who's hiding? Tap one!":"You found them all! Tap Find for a Rematch!";
+  $("h-tease").hidden=!hiding.length&&!Object.keys(S.owned).length;
   hiding.forEach((sp,i)=>{
     const b=document.createElement("button"),a=document.createElement("div");
     b.className="mystery"; b.style.animationDelay=(-i*.65)+"s"; b.setAttribute("aria-label","Mystery dino");
@@ -476,20 +503,21 @@ function goHome(){
 
 /* ---------- Encounter ---------- */
 let E={};
+// Wild dinos are only ones he hasn't caught yet. Once he has every dino that has art, repeats are allowed again (shown as "Rematch!").
 function pickWild(){
   let pool=SPECIES.filter(s=>hasArt(s.id)); if(!pool.length)pool=SPECIES;
   const fresh=pool.filter(s=>!S.owned[s.id]);
-  const from=(fresh.length&&Math.random()<.7)?fresh:pool;
-  let w=from[rand(from.length)]; if(from.length>1&&w.id===S.lastWild)w=from[rand(from.length)];
+  const from=fresh.length?fresh:pool;
+  let w=from[rand(from.length)]; if(from.length>1&&w.id===S.lastWild)w=pick(from.filter(s=>s.id!==S.lastWild));
   S.lastWild=w.id; return w;
 }
 function startEncounter(chosen){
-  const wild=chosen||pickWild(); S.lastWild=wild.id; E={wild};
+  const wild=chosen||pickWild(); S.lastWild=wild.id; E={wild,rematch:!!S.owned[wild.id]};
   const owned=Object.keys(S.owned);
-  const intro=`A wild ${wild.say} appeared!`;
+  const intro=`${E.rematch?"Rematch! ":""}A wild ${wild.say} appeared!`;
   if(!owned.length){E.first=true; startCatch(intro+" Catch your very first dino!"); return;}
   if(owned.length===1){startBattle(owned[0],intro); return;}
-  $("p-title").textContent=`A wild ${wild.name}! Who will battle?`;
+  $("p-title").textContent=`${E.rematch?"Rematch! ":""}A wild ${wild.name}! Who will battle?`;
   const g=$("pick-grid"); g.innerHTML="";
   owned.sort((a,b)=>lvl(S.owned[b])-lvl(S.owned[a])).forEach(id=>{
     const sp=BY[id],b=document.createElement("button"),a=document.createElement("div");a.className="art";art(a,sp);
@@ -507,7 +535,14 @@ const LEVELS=[null,
   {name:"3. Add and take away to 20",code:"AC9M1N02, AC9M1N04"},
   {name:"4. Numbers to 120, tens and ones",code:"AC9M1N01, AC9M1N02"},
   {name:"5. Skip counting, coins, groups, patterns",code:"AC9M1A01, AC9M1A02, AC9M1N03, AC9M1N06"},
-  {name:"6. Story problems, money, sharing",code:"AC9M1N05, AC9M1N06"}];
+  {name:"6. Story problems, money, sharing",code:"AC9M1N05, AC9M1N06"},
+  // Year 2 (levels 7-12)
+  {name:"7. Place value to 1000",code:"AC9M2N01, AC9M2N02"},
+  {name:"8. Add and take away within 100",code:"AC9M2N04"},
+  {name:"9. Add and take away with trading (regrouping)",code:"AC9M2N04"},
+  {name:"10. Skip counting and number patterns",code:"AC9M2A01, AC9M2N05"},
+  {name:"11. Equal groups, arrays, halves and quarters",code:"AC9M2N05, AC9M2N03, AC9M2M02"},
+  {name:"12. Money, change and story problems",code:"AC9M2N06, AC9M2N04"}];
 const SHAPES={circle:"circle",square:"square",tri:"triangle",star:"star"};
 const shape=k=>`<i class="shp ${k}"></i>`;
 const eq=t=>`<div class="eq">${t}</div>`, words=t=>`<div class="eq words">${t}</div>`;
@@ -627,6 +662,204 @@ function bus(){const a=between(4,12),off=between(1,a-1),on=between(1,8),t=`${a} 
 function bags(){const k=pick([2,3,4,5]),b=between(2,5),n=k*b;
   return {html:`<div class="row-vis">${'<i class="berry"></i>'.repeat(n)}</div>`+words(`${n} berries in bags of ${k}`),say:`${n} berries go into bags of ${k}. How many bags do you need?`,ans:b,choices:nums(b,[1,2],1)};}
 
+/* ---------- Maths questions: Australian Curriculum v9, Year 2 (levels 7-12) ---------- */
+// mix() builds the tap choices: the answer, the slip a child is most likely to make (extras[0], always used if valid),
+// other likely slips (random), then near numbers. Always up to 4 choices, sorted.
+function mix(ans,extras=[],spread=[1,2],min=0,max=Infinity){
+  const ok=v=>Number.isInteger(v)&&v>=min&&v<=max&&v!==ans, s=new Set([ans]), ex=extras.filter(ok);
+  if(ex.length)s.add(ex[0]);
+  shuffle(ex.slice(1)).forEach(v=>{if(s.size<4)s.add(v)});
+  for(let g=0;s.size<4&&g<200;g++){const v=ans+pick(spread)*(Math.random()<.5?-1:1); if(v>=min&&v<=max)s.add(v)}
+  return [...s].sort((a,b)=>a-b);
+}
+// Base-ten pictures: rods = tens (green), cubes = ones (orange); alt = the second number in yellow; gt/gu fade the tens/ones being taken away
+const bt=(n,o={})=>{const t=Math.floor(n/10),u=n%10,r=o.alt?"rod stack":"rod",c=o.alt?"cube gold":"cube",gt=o.gt||0,gu=o.gu||0;
+  return `<div class="base">${Array.from({length:t},(_,i)=>`<i class="${r}${i>=t-gt?" ghost":""}"></i>`).join("")}${u?`<div class="cubes">${Array.from({length:u},(_,i)=>`<i class="${c}${i>=u-gu?" ghost":""}"></i>`).join("")}</div>`:""}</div>`};
+const pv=(h,t,o)=>`<div class="base">${'<i class="flat"></i>'.repeat(h)}${'<i class="rod"></i>'.repeat(t)}${o?`<div class="cubes">${'<i class="cube"></i>'.repeat(o)}</div>`:""}</div>`;
+const pair=(a,b)=>`<div class="row-vis">${bt(a)}${bt(b,{alt:true})}</div>`;
+const $L={label:v=>"$"+v,sayAns:v=>`${v} ${plural(v,"dollar","dollars")}`}, cL={label:v=>v+"c",sayAns:v=>`${v} cents`};
+
+// Level 7: place value to 1000 (AC9M2N01, AC9M2N02)
+// Likely slips when writing a 3-digit number: digits swapped, a zero dropped, a ten out.
+const numChoices=(h,t,o)=>{const n=h*100+t*10+o;return mix(n,[h*100+o*10+t,+(`${h}${t||""}${o||""}`),n+10,n-10,n+100],[1,10],1,999)};
+function pvBlocks(){
+  const h=between(1,5),t=between(0,9),o=between(0,9),w=`${h} ${plural(h,"hundred","hundreds")}, ${t} ${plural(t,"ten","tens")} and ${o} ${plural(o,"one","ones")}`;
+  return {html:pv(h,t,o)+words(w),say:`${w}. What number is that?`,ans:h*100+t*10+o,choices:numChoices(h,t,o)};
+}
+function digitValue(){
+  let ds; do{ds=[between(1,9),between(1,9),between(1,9)]}while(new Set(ds).size<3); // distinct digits so "the 5" is clear
+  const p=rand(3),d=ds[p],n=ds[0]*100+ds[1]*10+ds[2],hi=x=>`<span style="color:var(--lava)">${x}</span>`;
+  return {html:eq(ds.map((x,i)=>i===p?hi(x):x).join(""))+words(`What is the ${hi(d)} worth?`),say:`In ${n}, what is the ${d} worth?`,ans:d*10**(2-p),choices:[d,d*10,d*100]};
+}
+function partition(){
+  const h=between(1,9),t=between(0,9);let o=between(0,9); if(!t&&!o)o=between(1,9);
+  const parts=[h*100,t*10,o].filter(x=>x);
+  return {html:eq(parts.join(" + ")+" = ?"),say:`${parts.join(" plus ")}. What number is that?`,ans:h*100+t*10+o,choices:numChoices(h,t,o)};
+}
+function partMissing(){
+  const h=between(1,9),t=between(1,9),o=between(1,9),n=h*100+t*10+o,k=rand(3),parts=[h*100,t*10,o],ans=parts[k];
+  const extras=[[h,h*10,ans+100],[t,t*100,ans+10],[o*10,o+1,o-1]][k];
+  return {html:eq(`${n} = ${parts.map((p,i)=>i===k?"?":p).join(" + ")}`),say:`${n} equals ${parts.map((p,i)=>i===k?"what":p).join(" plus ")}. What is the missing part?`,ans,choices:mix(ans,extras,[1,10],1,999)};
+}
+function moreLess(){
+  const step=Math.random()<.6?10:100,up=Math.random()<.5,s=up?1:-1,n=up?between(100,1000-step):between(100+step,999),ans=n+s*step;
+  const extras=step===10?[n+100*s,n+s,n-10*s]:[n+10*s,n+s,n-100*s];
+  return {html:strip(up?[n,"?"]:["?",n])+words(`${step} ${up?"more":"less"}`),say:`What is ${step} ${up?"more":"less"} than ${n}?`,ans,choices:mix(ans,extras,[1,10,100],0,1000)};
+}
+function biggerSmaller(){
+  const big=Math.random()<.5,a=between(100,999);let b; do{b=Math.random()<.7?Math.floor(a/100)*100+rand(100):between(100,999)}while(b===a);
+  return {html:words(`Which number is ${big?"bigger":"smaller"}?`),say:`Which number is ${big?"bigger":"smaller"}, ${a} or ${b}?`,ans:big?Math.max(a,b):Math.min(a,b),choices:[a,b]};
+}
+function howManyTens(){
+  const n=between(10,99)*10;
+  return {html:eq(String(n))+words("How many tens?"),say:`How many tens are in ${n}?`,ans:n/10,choices:mix(n/10,[Math.floor(n/100),(n/10)%10,n/10+10],[1,2],1)};
+}
+
+// Level 8: add and take away within 100, no trading (AC9M2N04)
+function addPlain(){
+  const k=pick(["tens","ones","both"]);let t1,o1,t2,o2;
+  if(k==="tens"){t1=between(1,8);o1=rand(10);t2=between(1,9-t1);o2=0}
+  else if(k==="ones"){t1=between(1,9);o1=between(0,8);t2=0;o2=between(1,9-o1)}
+  else{t1=between(1,8);o1=between(0,8);t2=between(1,9-t1);o2=between(1,9-o1)}
+  const a=t1*10+o1,b=t2*10+o2,ans=a+b;
+  return {html:eq(`${a} + ${b} = ?`)+pair(a,b),say:`${a} plus ${b}?`,ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2,10],1,99)};
+}
+function subPlain(){
+  const k=pick(["tens","ones","both"]);let t1,o1,t2,o2;
+  if(k==="tens"){t1=between(2,9);o1=rand(10);t2=between(1,t1-1);o2=0}
+  else if(k==="ones"){t1=between(1,9);o1=between(1,9);t2=0;o2=between(1,o1)}
+  else{t1=between(2,9);o1=between(1,9);t2=between(1,t1-1);o2=between(1,o1)}
+  const a=t1*10+o1,b=t2*10+o2,ans=a-b;
+  return {html:eq(`${a} − ${b} = ?`)+`<div class="row-vis">${bt(a,{gt:t2,gu:o2})}</div>`,say:`${a} take away ${b}?`,ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2,10],1,99)};
+}
+function tensTo100(){
+  const k=between(1,9),a=k*10,ans=100-a,take=Math.random()<.4,rods=`<div class="base">${Array.from({length:10},(_,i)=>`<i class="rod${i>=k?" ghost":""}"></i>`).join("")}</div>`;
+  return take?{html:eq(`100 − ${a} = ?`)+rods,say:`100 take away ${a}?`,ans,choices:mix(ans,[ans+10,ans-10,ans+20,ans-20],[10],10,90)}
+    :{html:eq(`${a} + ? = 100`)+rods,say:`${a} and how many more make 100?`,ans,choices:mix(ans,[ans+10,ans-10,ans+20,ans-20],[10],10,90)};
+}
+
+// Level 9: trading / regrouping within 100 (AC9M2N04)
+function addTrade(){
+  const o1=between(2,9),o2=between(10-o1,9),t2=between(0,6),t1=between(1,8-t2),a=t1*10+o1,b=t2*10+o2,ans=a+b; // ones make 10 or more, total stays under 100
+  return {html:eq(`${a} + ${b} = ?`)+pair(a,b),say:`${a} plus ${b}?`,ans,choices:mix(ans,[ans-10,ans+10,ans+1,ans-1],[1,2],1,99)}; // ans-10 = forgot to trade
+}
+function subTrade(){
+  const t1=between(2,9),o1=between(0,7),t2=between(0,t1-1),o2=between(o1+1,9),a=t1*10+o1,b=t2*10+o2,ans=a-b;
+  const slip=(t1-t2)*10+(o2-o1); // took the smaller ones from the larger
+  return {html:eq(`${a} − ${b} = ?`)+`<div class="row-vis">${bt(a)}</div>`,say:`${a} take away ${b}?`,ans,choices:mix(ans,[slip,ans+10,ans+1,ans-1],[1,2],1,99)};
+}
+function bridgeTen(){
+  const extra=Math.random()<.5?0:between(1,2),t=between(1,extra?7:8),o=between(1,9),a=t*10+o,target=(t+1+extra)*10,ans=target-a;
+  return {html:eq(`${a} + ? = ${target}`)+bt(a),say:`${a} and how many more make ${target}?`,ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2],1)};
+}
+
+// Level 10: skip counting by 2s, 3s, 5s, 10s and additive patterns (AC9M2A01, AC9M2N05)
+function skipY2(){
+  const step=pick([2,3,5,10]),down=Math.random()<.3,off=Math.random()<.25?between(1,step-1):0;
+  const start=down?step*between(5,10)+off:step*rand(8)+off,seq=[0,1,2,3,4].map(i=>start+(down?-i:i)*step);
+  const hide=Math.random()<.6?4:between(1,3),ans=seq[hide],dir=down?"back":"on";
+  return {html:strip(seq.map((v,i)=>i===hide?"?":v))+words(`Count ${dir} by ${step}s`),
+    say:`Count ${dir} by ${step}s. ${seq.map((v,i)=>i===hide?"what":v).join(", ")}?`,ans,choices:mix(ans,[ans+step,ans-step,ans+1,ans-1],[1,2])};
+}
+function stepGuess(){
+  const step=pick([2,3,5,10]),down=Math.random()<.25,off=Math.random()<.2?between(1,step-1):0;
+  const start=down?step*between(5,9)+off:step*rand(6)+off,seq=[0,1,2,3].map(i=>start+(down?-i:i)*step),w=down?"down":"up";
+  return {html:strip(seq)+words(`How much does it go ${w} each time?`),say:`The numbers go ${seq.join(", ")}. How much does it go ${w} each time?`,ans:step,choices:[2,3,5,10]};
+}
+function growing(){
+  const step=between(1,3),a=between(1,5),seq=[a,a+step,a+2*step],ans=a+3*step;
+  const tile=n=>`<div class="grp" style="grid-template-columns:repeat(${Math.min(n,4)},16px)">${"<i></i>".repeat(n)}</div>`;
+  return {html:`<div class="row-vis">${seq.map(tile).join("")}<div class="strip"><b class="ask">?</b></div></div>`+words("How many dots come next?"),
+    say:`The groups have ${seq.join(", ")} dots. How many dots come next?`,ans,choices:mix(ans,[ans+1,ans-1,ans+step,ans-step],[1,2],1)};
+}
+
+// Level 11: equal groups, arrays, sharing, halves, quarters and eighths (AC9M2N05, AC9M2N03, AC9M2M02)
+function groupsY2(){
+  const k=pick([2,3,4,5,10]),g=between(2,k===10?4:6),grp=`<div class="grp" style="grid-template-columns:repeat(${Math.min(k,5)},16px)">${"<i></i>".repeat(k)}</div>`;
+  return {html:`<div class="row-vis">${grp.repeat(g)}</div>`+words(`${g} groups of ${k}`),say:`${g} groups of ${k}. How many altogether?`,ans:g*k,choices:mix(g*k,[g*k+k,g*k-k,g+k],[1,2],1)};
+}
+function arrayQ(){
+  const r=between(2,5),c=between(2,5);
+  return {html:`<div class="arr" style="grid-template-columns:repeat(${c},20px)">${"<i></i>".repeat(r*c)}</div>`+words(`${r} rows of ${c}`),say:`${r} rows of ${c}. How many dots altogether?`,ans:r*c,choices:mix(r*c,[r+c,r*c+c,r*c-c],[1,2],1)};
+}
+function repAdd(){
+  const k=pick([2,3,4,5]),g=between(3,5),grp=`<div class="grp" style="grid-template-columns:repeat(${Math.min(k,5)},16px)">${"<i></i>".repeat(k)}</div>`;
+  return {html:eq(Array(g).fill(k).join(" + ")+" = ?")+`<div class="row-vis">${grp.repeat(g)}</div>`,say:`${Array(g).fill(k).join(" plus ")}. How many altogether?`,ans:g*k,choices:mix(g*k,[g*k+k,g*k-k,g+k],[1,2],1)};
+}
+function shareY2(){
+  const d=between(2,5),each=between(2,6),n=d*each,s=src(E.me);
+  const dino=s?`<img class="mini" src="${s}" alt="">`:'<span style="font-size:2.4rem">🦕</span>';
+  return {html:`<div class="row-vis">${'<i class="berry"></i>'.repeat(n)}</div><div class="row-vis">${dino.repeat(d)}</div>`+words(`${n} berries shared by ${d} dinos`),
+    say:`${n} berries, shared equally between ${d} dinos. How many berries does each dino get?`,ans:each,choices:mix(each,[each+1,each-1,d,n-d],[1,2],1)};
+}
+function bagsY2(){
+  const k=pick([2,3,4,5,10]),b=between(2,k===10?4:6),n=k*b;
+  return {html:`<div class="row-vis">${'<i class="berry"></i>'.repeat(n)}</div>`+words(`${n} berries in bags of ${k}`),say:`${n} berries go into bags of ${k}. How many bags do you need?`,ans:b,choices:mix(b,[k,b+1,b-1],[1,2],1)};
+}
+const FRN={2:"half",4:"quarter",8:"eighth"}, FRS={"1/2":"one half","1/4":"one quarter","1/8":"one eighth"};
+const fracLabel=k=>`<span class="fr"><i>1</i><i>${k.slice(2)}</i></span>`;
+// A shape split into equal parts with part number `on` shaded
+function fracSvg(kind,parts,on=0){
+  const st='stroke="#1E2B1F" stroke-width="3" stroke-linejoin="round"',fill=i=>i===on?"#F2762E":"#fff";
+  if(kind==="rect"){const w=160/parts;return `<svg class="pie rect" viewBox="-3 -3 166 76" aria-hidden="true">${Array.from({length:parts},(_,i)=>`<rect x="${i*w}" y="0" width="${w}" height="70" fill="${fill(i)}" ${st}/>`).join("")}</svg>`}
+  const c=60,r=56,pt=a=>`${(c+r*Math.cos(a)).toFixed(2)} ${(c+r*Math.sin(a)).toFixed(2)}`;
+  return `<svg class="pie" viewBox="0 0 120 120" aria-hidden="true">${Array.from({length:parts},(_,i)=>{const a=-Math.PI/2+i*2*Math.PI/parts,b=a+2*Math.PI/parts;
+    return `<path d="M${c} ${c}L${pt(a)}A${r} ${r} 0 0 1 ${pt(b)}Z" fill="${fill(i)}" ${st}/>`}).join("")}</svg>`;
+}
+function fracShaded(){
+  const parts=pick([2,4,8]),kind=pick(["pie","rect"]);
+  return {html:`<div class="row-vis">${fracSvg(kind,parts,rand(parts))}</div>`+words("What fraction is shaded?"),say:"What fraction of the shape is shaded?",ans:"1/"+parts,choices:shuffle(["1/2","1/4","1/8"]),label:fracLabel,sayAns:k=>FRS[k]};
+}
+function fracPick(){
+  const parts=pick([2,4,8]),kind=pick(["pie","rect"]);
+  return {html:words(`Tap the shape with <b>one ${FRN[parts]}</b> shaded`),say:`Tap the shape with one ${FRN[parts]} shaded.`,ans:"1/"+parts,choices:shuffle(["1/2","1/4","1/8"]),label:k=>fracSvg(kind,+k.slice(2),0),sayAns:k=>FRS[k]};
+}
+function fracOf(){
+  const parts=pick([2,2,4,8]),each=parts===8?between(1,3):parts===4?between(2,5):between(2,8),n=parts*each,w=parts===2?"half":parts===4?"a quarter":"an eighth";
+  const grp=`<div class="grp" style="grid-template-columns:repeat(${Math.min(each,4)},16px)">${"<i></i>".repeat(each)}</div>`;
+  return {html:`<div class="row-vis">${grp.repeat(parts)}</div>`+words(`${w[0].toUpperCase()+w.slice(1)} of ${n} = ?`),say:`${n} berries in ${parts} equal groups. What is ${w} of ${n}?`,ans:each,choices:mix(each,[each+1,each-1,parts,n-each],[1,2],1)};
+}
+
+// Level 12: money, change and story problems (AC9M2N06, AC9M2N04)
+function coinsTotal(){
+  let cs; do{cs=[];let t=0;for(let i=between(3,5);i>0;i--){const v=pick([50,20,10,5]);if(t+v<100){cs.push(v);t+=v}}}while(cs.length<3);
+  cs.sort((a,b)=>b-a); const ans=cs.reduce((a,b)=>a+b,0);
+  return {html:`<div class="row-vis">${cs.map(v=>`<span class="coin silver">${v}c</span>`).join("")}</div>`+words("How many cents?"),say:"Count the coins. How many cents altogether?",ans,choices:mix(ans,[ans+5,ans-5,ans+10,ans-10],[5,10],5,95),...cL};
+}
+function changeNote(){
+  const a=pick([5,10,20]),b=a===5?between(1,4):a===10?between(1,9):between(2,19),ans=a-b,t=`You pay with a $${a} note. A toy costs $${b}. How much change do you get?`;
+  return {html:words(t)+`<div class="row-vis"><span class="note ${{5:"five",10:"ten",20:"twenty"}[a]}">$${a}</span></div>`,say:t,ans,choices:mix(ans,[b,ans+1,ans-1],[1,2],1,a),...$L};
+}
+function changeCents(){
+  const pay=pick([50,100]),p=5*between(1,pay===50?9:19),ans=pay-p,t=`You pay with ${pay===50?"a 50 cent coin":"a $1 coin"}. A sticker costs ${p} cents. How much change do you get?`;
+  return {html:words(t)+`<div class="row-vis"><span class="coin${pay===50?" silver":""}">${pay===50?"50c":"$1"}</span></div>`,say:t,ans,choices:mix(ans,[ans+5,ans-5,ans+10,ans-10],[5,10],5,pay-5),...cL};
+}
+function twoItems(){
+  const big=Math.random()<.5,a=big?between(11,45):between(2,9),b=big?between(11,45):between(2,9),ans=a+b,t=`A toy costs $${a} and a book costs $${b}. How much altogether?`;
+  return {html:words(t),say:t,ans,choices:mix(ans,big?[ans-10,ans+10,ans+1,ans-1]:[ans+1,ans-1,a,b],[1,2],1),...$L};
+}
+function spendLeft(){
+  const h=pick([20,30,50,100]),s=between(6,h-3),ans=h-s,t=`You have $${h}. You spend $${s}. How much money is left?`;
+  return {html:words(t),say:t,ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2],1),...$L};
+}
+function eachCost(){
+  const g=between(2,5),p=pick([2,5,10]),thing=pick(["eggs","stickers","toys","cards"]),t=`${g} ${thing} cost $${p} each. How much for all ${g}?`;
+  const one=p===2?'<span class="coin">$2</span>':`<span class="note ${p===5?"five":"ten"}">$${p}</span>`;
+  return {html:words(t)+`<div class="row-vis">${one.repeat(g)}</div>`,say:t,ans:g*p,choices:mix(g*p,[g+p,g*p+p,g*p-p],[1,2],1),...$L};
+}
+function storyY2(){
+  const me=E.me?BY[E.me].name:"dino",wild=E.wild?E.wild.name:"dino";
+  const take=(t)=>({html:words(t),say:t});
+  return pick([
+    ()=>{const o1=between(2,9),o2=between(10-o1,9),a=between(2,5)*10+o1,b=between(1,3)*10+o2,ans=a+b,t=`There are ${a} eggs in the nest. Then ${b} more eggs are laid. How many eggs are there now?`;
+      return {...take(t),ans,choices:mix(ans,[ans-10,ans+10,ans+1,ans-1],[1,2],1,99)}},
+    ()=>{const t1=between(4,9),o1=between(0,6),t2=between(1,t1-2),o2=between(o1+1,9),a=t1*10+o1,b=t2*10+o2,ans=a-b,t=`Your ${me} collected ${a} leaves. It gave ${b} leaves to the wild ${wild}. How many leaves does your ${me} have left?`;
+      return {...take(t),ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2],1,99)}},
+    ()=>{const t1=between(4,9),o1=between(0,6),t2=between(1,t1-2),o2=between(o1+1,9),a=t1*10+o1,b=t2*10+o2,ans=a-b,t=`Your ${me} has ${a} points. The wild ${wild} has ${b} points. How many more points does your ${me} have?`;
+      return {...take(t),ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2],1,99)}},
+  ])();
+}
+
 const QUESTIONS={
   1:[()=>{const a=between(1,9);return add(a,between(1,10-a))}],
   2:[makeTen,()=>missingPart(10),()=>{const a=between(3,10);return sub(a,between(1,a-1))}],
@@ -639,9 +872,17 @@ const QUESTIONS={
   4:[tensOnes,tensOnesOther,nextTo,tenMore,bigger,lookAlike],
   5:[skip,groups,pattern,longPattern,countMoney,coinStacks,equalGroups],
   6:[share,story,money,moneyAdd,bus,bags],
+  // Year 2
+  7:[pvBlocks,pvBlocks,digitValue,partition,partMissing,moreLess,biggerSmaller,howManyTens],
+  8:[addPlain,subPlain,addPlain,subPlain,tensTo100],
+  9:[addTrade,subTrade,addTrade,subTrade,bridgeTen],
+  10:[skipY2,skipY2,stepGuess,growing],
+  11:[groupsY2,arrayQ,repAdd,shareY2,bagsY2,fracShaded,fracPick,fracOf],
+  12:[coinsTotal,changeNote,changeCents,twoItems,spendLeft,eachCost,storyY2],
 };
 function makeQ(){
-  const L=S.mathLvl, lv=(L>1&&Math.random()<.2)?between(1,L-1):L; let q,g=0;
+  // 1 in 5 questions reviews an easier level: any earlier level up to Year 1's end, then only the 3 levels just below
+  const L=S.mathLvl, lv=(L>1&&Math.random()<.2)?between(L>6?L-3:1,L-1):L; let q,g=0;
   do{q=pick(QUESTIONS[lv])();g++}while(E.q&&q.say===E.q.say&&g<6);
   q.lvl=lv; return q;
 }
@@ -749,7 +990,7 @@ function startBattle(meId,intro){
   art($("b-me"),me); art($("b-wild"),w);
   preloadAtk(me.id); preloadAtk(w.id); // so the pose swap doesn't flicker
   $("b-me-name").textContent=me.name;
-  $("b-wild-name").textContent=w.name; $("b-title").textContent=`Battle the wild ${w.name}!`;
+  $("b-wild-name").textContent=w.name; $("b-title").textContent=`${E.rematch?"Rematch! ":""}Battle the wild ${w.name}!`;
   hpBar(); show("s-battle"); newQ();
   anim(fig($("b-me")),[{translate:"-120% 0",opacity:0},{translate:"0 0",opacity:1}],{duration:550,easing:"cubic-bezier(.2,.8,.3,1.15)"});
   anim(fig($("b-wild")),[{translate:"120% 0",opacity:0},{translate:"0 0",opacity:1}],{duration:550,delay:150,easing:"cubic-bezier(.2,.8,.3,1.15)"});
@@ -790,7 +1031,7 @@ async function answer(v,btn){
   if(E.miss===0&&!E.shield){E.shieldN++; if(E.shieldN>=3){E.shield=true;E.shieldN=0;shieldUp=true}}
   // adapt difficulty, counting only questions at his current level (not the review ones)
   if(q.lvl===S.mathLvl){
-    if(E.miss===0){S.streak++; S.stuck=0; if(S.streak>=5&&S.mathLvl<6){S.mathLvl++;S.streak=0}}
+    if(E.miss===0){S.streak++; S.stuck=0; if(S.streak>=5&&S.mathLvl<MAXL){S.mathLvl++;S.streak=0}}
     else {S.streak=0; if(E.miss>=2){S.stuck++; if(S.stuck>=2&&S.mathLvl>1){S.mathLvl--;S.stuck=0}}}
     save();
   }
@@ -816,6 +1057,32 @@ const CHALLENGE=[
   "plays","played","playing","jumped","helped","looking",                         // word families (AC9E1LY15)
   "rabbit","sunset","picnic","dinner","garden","robot",                            // two-syllable words (AC9E1LY13)
   "one","have","pretty","little","what","where"];                                 // high-frequency words (AC9E1LY14)
+// Built-in word bank for the grown-up "Suggest words" button (no internet or AI). Words are lowercase letters only (that is all Save accepts).
+// "a/b" entries are homophone pairs and are always suggested together. Words in CHALLENGE are never suggested.
+const PATTERNS=[
+  {y:1,name:"Short vowels (cat, sit, hop)",w:"cat sit hop bug red pig dog sun hen mud cup net bag lip pot web jam tin rug map fan leg bed hug"},
+  {y:1,name:"Digraphs: sh, ch, th, wh (fish, chin, this)",w:"ship shop shed fish dish chat chop chin much such rich thin thick this that with whip when which shell chick thank path bath wish then"},
+  {y:1,name:"Blends at the start (frog, step, clap)",w:"frog flag swim step stop black clap drum grab plum snap slip crab drip flat skip spot trip twin clock glad brick plan sled stem flip grin"},
+  {y:1,name:"Blends at the end (hand, nest, jump)",w:"hand lamp nest milk jump tent desk gift camp belt sand pond lost went fast list dust bend rest"},
+  {y:1,name:"Long vowels: magic e (make, bike, hope)",w:"make game name late bike five nine kite hope bone rope nose cube tube huge cute lake wave like hole joke rule time cake home ride"},
+  {y:1,name:"Long vowels: ai, ay, ee, ea, oa (rain, play, keep, boat)",w:"tail wait sail train day say stay tray feet tree seed sleep green eat sea read team leaf road coat goat soap toast rain play keep boat"},
+  {y:1,name:"Endings -ed and -ing (jumped, looking)",w:"walked picked asked wanted jumping helping walking picking asking painted kicked pulled called talking singing camping lifted melted rested resting jumped helped looking played playing plays"},
+  {y:1,name:"Plurals: -s and -es (cats, boxes, dishes)",w:"cats dogs hats cups pigs books trees birds boxes dishes foxes buses kisses wishes brushes glasses lunches"},
+  {y:1,name:"Two-syllable and compound words (rabbit, sunset)",w:"pancake cupcake bedroom rainbow raincoat outside inside cannot into upon seaside someone window finger summer winter pocket basket happy funny jumper tiger lemon magic number spider yellow kitten button puppet ladder monster rabbit sunset picnic dinner garden robot"},
+  {y:1,name:"Tricky everyday words (said, was, they)",w:"some said was were are you your come there here they put push pull full give live love does who why one have little what where pretty"},
+  {y:2,name:"Long vowels: igh, ow, ue, ew (night, snow, blue, flew)",w:"night light right high fight bright flight tonight snow grow show blow slow blue glue true clue flew grew new chew threw knew"},
+  {y:2,name:"Endings -ed and -ing that change the word (hopped, making)",w:"hopped hopping stopped running swimming sitting clapped skipped planned grabbed making baking hiking riding hoped baked liked smiled chased danced shining taking coming having writing giving dropping"},
+  {y:2,name:"Vowel pairs: ou, ow, oi, oy (house, down, coin, boy)",w:"house mouse cloud found sound round loud out down brown town crown clown owl boil coin soil join oil boy toy enjoy royal"},
+  {y:2,name:"Vowel pairs: oo, aw, au (moon, book, paw, sauce)",w:"moon food cool school spoon book look good wood foot paw saw draw yawn claw lawn sauce cause haunt"},
+  {y:2,name:"Bossy r: ar, or, er, ir, ur (car, fork, bird, turn)",w:"car star farm park dark yard shark storm horse corn fork sport born her fern term sister bird girl shirt first third turn burn hurt nurse purple fur"},
+  {y:2,name:"Soft c and g (city, race, giant, page)",w:"city race face nice mice rice ice price place space circle cent fence dance pencil giant gentle page cage huge gem stage orange change magic"},
+  {y:2,name:"Silent letters: kn, wr, gn, mb (knee, write, lamb)",w:"knee knock knot knife know write wrong wrap wrist wren gnat gnome lamb comb thumb climb crumb limb"},
+  {y:2,name:"Endings: -ck, -tch, -dge (duck, catch, badge)",w:"duck neck sock pack kick back deck luck catch match patch watch witch ditch pitch fetch badge edge fudge bridge judge hedge ridge lodge"},
+  {y:2,name:"Word endings: -ful, -less, -ly, -er, -est (helpful, slowly)",w:"helpful careful playful painful useful thankful hopeful helpless careless homeless hopeless endless quickly slowly softly kindly sadly loudly quietly faster slower taller smaller tallest"},
+  {y:2,name:"Plurals: -ies, -ves and odd ones (babies, wolves, feet)",w:"babies puppies ponies flies cities stories berries wolves leaves knives shelves children mice feet teeth geese men women"},
+  {y:2,name:"Words that sound the same (see/sea, two/too)",w:"their/there to/too/two see/sea no/know blue/blew here/hear night/knight sun/son bear/bare tail/tale meet/meat road/rode wait/weight fair/fare pair/pear flour/flower hour/our write/right whole/hole sail/sale"},
+  {y:2,name:"Tricky Year 2 words (because, friend, people)",w:"because friend people would again thought through other water before always every first after been many any only even never along around laugh another school country enough"},
+].map(p=>({...p,list:p.w.split(" ")}));
 // Decoy letters that are easy to mix up with the word's real letters (b/d, short vowels, c/k/s...)
 const CONFUSE={a:"eou",e:"ai",i:"ey",o:"au",u:"oa",b:"dp",d:"bp",p:"bd",m:"nw",n:"mh",c:"ks",k:"c",s:"cz",g:"j",j:"g",f:"vt",v:"fw",w:"vy",y:"wi",h:"n",t:"fl",l:"it",r:"wn",x:"ks",z:"s"};
 function pickWord(){
@@ -825,7 +1092,7 @@ function pickWord(){
 }
 function startCatch(intro){
   const w=E.wild, word=pickWord(); E.word=word; E.pos=0; E.lm=0; E.busy=false;
-  art($("c-art"),w); $("c-title").textContent=E.first?`Catch your first dino!`:`Catch the ${w.name}!`;
+  art($("c-art"),w); $("c-title").textContent=E.first?`Catch your first dino!`:`${E.rematch?"Rematch! ":""}Catch the ${w.name}!`;
   $("egg").style.setProperty("--charge",0); $("egg").style.transform="";
   const slots=$("slots"); slots.innerHTML=""; for(let i=0;i<word.length;i++){const s=document.createElement("div");s.className="slot";slots.appendChild(s)}
   const letters=word.split(""), decoys=[];
@@ -912,8 +1179,22 @@ const gear=$("gear");
 gear.addEventListener("pointerdown",()=>{holdT=setTimeout(openParent,1200)});
 ["pointerup","pointerleave","pointercancel"].forEach(ev=>gear.addEventListener(ev,()=>clearTimeout(holdT)));
 gear.onclick=()=>{$("h-hint").textContent="Grown-ups: press and hold ⚙️ for 1 second"};
+[1,2].forEach(y=>{
+  const g=document.createElement("optgroup"); g.label=`Year ${y} patterns`;
+  PATTERNS.forEach((p,i)=>{if(p.y!==y)return; const o=document.createElement("option"); o.value=i; o.textContent=p.name; g.appendChild(o)});
+  $("p-pattern").appendChild(g);
+});
+// Fills the words box (not saved until he taps Save words) with about 8 words for the chosen pattern, never ones from the Challenge list.
+$("p-suggest").onclick=()=>{
+  const p=PATTERNS[+$("p-pattern").value], skip=new Set(CHALLENGE), out=[];
+  for(const it of shuffle(p.list.filter(x=>!x.split("/").some(w=>skip.has(w))))){
+    const ws=it.split("/"); if(out.length+ws.length<=8)out.push(...ws); if(out.length>=8)break;
+  }
+  $("p-words").value=out.join(", "); $("p-words-status").textContent="";
+  $("p-sug-status").textContent=`Filled the box with ${out.length} words (${p.name.split(" (")[0]}). Not saved yet: change any you like, then tap Save words.`;
+};
 function openParent(){
-  $("p-words").value=(S.words||[]).join(", "); $("p-words-status").textContent="";
+  $("p-words").value=(S.words||[]).join(", "); $("p-words-status").textContent=""; $("p-sug-status").textContent="";
   syncMath(); renderAssign(); syncNote(cloudMsg); show("s-parent");
 }
 $("p-save-words").onclick=()=>{
@@ -923,7 +1204,9 @@ $("p-save-words").onclick=()=>{
 };
 function syncMath(){
   const box=$("p-math"); box.innerHTML="";
-  for(let i=1;i<LEVELS.length;i++){const b=document.createElement("button");b.innerHTML=`${LEVELS[i].name}<small style="display:block;font-weight:400;opacity:.75">${LEVELS[i].code}</small>`;
+  for(let i=1;i<LEVELS.length;i++){
+    if(i===1||i===7){const h=document.createElement("div");h.className="lvlhead";h.textContent=i===1?"Year 1":"Year 2";box.appendChild(h)}
+    const b=document.createElement("button");b.innerHTML=`${LEVELS[i].name}<small style="display:block;font-weight:400;opacity:.75">${LEVELS[i].code}</small>`;
     b.setAttribute("aria-pressed",String(S.mathLvl===i));b.onclick=()=>{S.mathLvl=i;S.streak=0;S.stuck=0;save();syncMath()};box.appendChild(b)}
   document.querySelectorAll("#p-hits button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.h===S.hits)));
   document.querySelectorAll("#p-chal button").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.c==="1")===(S.challenge!==false))));
