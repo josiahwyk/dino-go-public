@@ -32,8 +32,8 @@ Budget: Josiah's leftover Pro tokens, usually 5-10% of the week on the last day 
 
 ## Milestone 1: Walk around (not published yet)
 
-- [ ] **1. Empty world screen.** Create `game/overworld.js` with an `openWorld()` function. Add `<section id="s-world" class="screen" hidden>` holding a `<canvas>` and a back button, a `<script src="overworld.js">` tag, and an "Explore!" button on the home screen that calls `openWorld()`. The canvas fills the screen area. *Done when:* tapping Explore shows a blank coloured canvas and Back returns home.
-- [ ] **2. Map as text.** One 20x15 map as an array of strings (`G` grass, `T` tall grass, `R` tree, `W` water, `P` path, `F` flowers). Draw each tile as a flat coloured square, 16px tiles scaled up. *Done when:* you can see the map layout in plain colours.
+- [x] **1. Empty world screen.** Create `game/overworld.js` with an `openWorld()` function. Add `<section id="s-world" class="screen" hidden>` holding a `<canvas>` and a back button, a `<script src="overworld.js">` tag, and an "Explore!" button on the home screen that calls `openWorld()`. The canvas fills the screen area. *Done when:* tapping Explore shows a blank coloured canvas and Back returns home.
+- [x] **2. Map as text.** One 20x15 map as an array of strings (`G` grass, `T` tall grass, `R` tree, `W` water, `P` path, `F` flowers). Draw each tile as a flat coloured square, 16px tiles scaled up. *Done when:* you can see the map layout in plain colours.
 - [ ] **3. Tile art in code** (Opus). Draw each tile type once into a small offscreen canvas in a Game Boy-ish pixel style: grass texture, tall-grass tufts, a round tree, water with a ripple line, path pebbles, flowers. Use `imageSmoothingEnabled=false` so it stays crisp. *Done when:* the map looks like a little pixel world, not coloured squares.
 - [ ] **4. The explorer.** A small code-drawn kid sprite (hat, backpack) facing 4 directions, 2-frame walk. Placed on a path tile. *Done when:* he stands on the map facing down.
 - [ ] **5. Walking.** Big on-screen D-pad (4 buttons, thumb-sized) plus arrow keys for testing. Moves one tile at a time with a short slide, blocked by trees and water. *Done when:* he walks around and can't walk through trees or water.
@@ -66,3 +66,4 @@ One line per session, so we learn how big a step can be. Check usage at claude.a
 
 | Date | Step | Model | % of week used | Notes |
 |------|------|-------|----------------|-------|
+| 2026-10-22 | 1 + 2 | Opus | ? (not measured) | Done together in one chat. Map fits the screen at a whole-number scale, so it's a bit small on iPhone until step 6's camera. The Explore button is hidden until overworld.js loads, so publishing index.html alone never shows a broken button. |
