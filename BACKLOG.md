@@ -12,7 +12,7 @@ Suggested first slice: A1 + A2 + A3 together. No new art needed.
 - [x] **A1. Choose the attack.** Before each question he picks from 2-3 moves, e.g. "Quick bite" (easy question, small hit) vs "Mega stomp" (harder question, big hit). Gives a real decision, and makes maths difficulty adaptive and visible (he opts into harder questions). Move names and damage can come from dino type and attack stat (MOVES in index.html).
 - [x] **A2. Combos and a finisher.** Streak counter, hits get bigger as it climbs. At 5 in a row a super move: zoom, screen flash, bigger roar, big damage number, using the existing attack-pose art. Ties into the shield (3 in a row).
 - [x] **A3. The wild dino acts.** Telegraphed warning ("T. rex is winding up a Chomp!", shake + growing glow). Anticipation only, NO countdown timer (stressful at 5). Right answer interrupts the move, wrong answer lets it land. Per-type attack effects (splash, dive-bomb...).
-- [ ] **A4. A world that changes.** Arena background by habitat (forest, swamp, beach, volcano; shares art with the explore screen, item C1), simple music loop, dino-specific roars, wild dino reactions (wince, stagger, scared when low).
+- [ ] **A4. A world that changes.** ~~Arena background by habitat~~ done 2026-10-22 (chat 08, code-drawn scenes, see CLAUDE.md "Background scenes"). Still open: simple music loop, dino-specific roars, wild dino reactions (wince, stagger, scared when low).
 - [ ] **A5. A payoff for fighting.** XP bar filling after a win and a proper level-up moment; berries earned from streaks that he can spend to heal mid-fight (gives a recovery other than fainting); later a boss dino needing two phases or two of his dinos (see C3 raids).
 - [ ] **A6. A quick skill moment.** Occasional tap-the-moving-target bar for bonus damage, to break up the answer-tap rhythm.
 - [ ] **A7. Research first.** Watch him play ~10 minutes without helping. Note when he gets bored (guess: the repeated lunge) and what he cheers at; use it to order A1-A6.
@@ -35,7 +35,7 @@ No new art is needed for A1-A3 and B1-B4. Every dino already has a normal and an
 
 Optional art, for later, after he has played the first slice (batch these into one Gemini session, since downloads need a yes each session):
 - [ ] **Special-move pose per dino** (19 images, same job as the attack poses) for the level-5 finisher. Without it the finisher reuses the attack pose with a zoom, flash and glow.
-- [ ] **Habitat backgrounds** (forest, swamp, beach, volcano; about 4 images) for A4. Probably the biggest visual upgrade, and they double as the explore-screen maps (C1).
+- [ ] **Habitat backgrounds** (optional now): code-drawn scenes shipped 2026-10-22 (chat 08), so Gemini paintings would only be an upgrade. They could replace the SVG scenes later.
 - [ ] **Hurt or faint pose** (optional; the tilt-and-fade animation covers it now).
 
 All 40 dinos now have art (done 2026-10-22).
@@ -63,6 +63,7 @@ All 40 dinos now have art (done 2026-10-22).
 - [ ] Decide whether to add 3/4 (Year 2 names only halves, quarters, eighths, so left out).
 
 ## Done
+- 2026-10-22 (chat 08, artifact v20, commit 48998fc): background scenes drawn in code behind home, battle and catch (7 habitats: jungle, plains, swamp, beach, volcano, canyon, cliffs; battles pick one that suits the wild dino's type). Cloud-sync fixes: a win is no longer lost if a sync lands mid-attack, and two open devices no longer push saves back and forth forever (saves compared by content, not key order). Built in the chat 07 code review but left unpublished until chat 08.
 - 2026-10-22 (chat 05): A1 move menu, A2 combo + finisher, A3 wild wind-up, B1 moves unlock at L1/3/5, B2 shield perks (L4 two right answers, L8 free shield), B4 level badge, titles (Brave L3, Mighty L5, Legendary L10), glow at L5 and golden aura at L10, evolution celebration at L3/5/10 (L4 and L8 get a shorter overlay). No new art. Design in DESIGN-05.md.
 - 2026-10-22 (chat 04): 12 maths levels (7-12 = Year 2, AC9M2), "Suggest words" spelling pattern bank, no repeat fights with "Rematch!" once every dino with art is caught.
 - 2026-10-17 (chat 03): cloud save across iPad/iPhone.

@@ -24,6 +24,9 @@ The repo (github.com/josiahwyk/dino-go) is PRIVATE and contains personal info. I
 Published as a claude.ai artifact (opened on his iPad): https://claude.ai/artifact/Te5KgkGw2tJm9iyCkh8PDM
 To add a dino: put its 512px .jpg in game/dinos/, run `python3 tools/cutout.py game/dinos/NN_name.jpg`, add its id to the BUILTIN set in index.html, and publish the .webp with the page.
 
+## Background scenes
+drawScene() in index.html draws an SVG scene behind home, battle and catch (no art files, nothing saved). SCENES holds 7 habitats (colours kept light so text stays readable), SCENE_FOR picks battle scenes by the wild dino's type (plant: jungle/plains/swamp, meat: volcano/canyon/jungle, sea: beach/swamp, fly: cliffs/beach/canyon), PROPS draws palms, ferns, rocks and so on. setScene() is called in goHome() (any scene) and startEncounter() (by type), never the same scene twice in a row; a seed keeps the picture the same on resize/rotate. The book and grown-up screens keep the plain gradient.
+
 ## Maths
 Battle questions follow the Australian Curriculum v9: see LEVELS and QUESTIONS in index.html. Twelve levels, auto-adjusting: 1-6 are Year 1 (AC9M1, number + algebra), 7-12 are Year 2 (AC9M2): place value to 1000, add/take away within 100, trading, skip counting, equal groups/arrays/halves-quarters-eighths, money and change. The parent screen can set the level and battle length (4/6/8 hits). MAXL is the top level; older saves hold 1-6 and still mean the same thing. Review questions come from any earlier level up to level 6, then only the 3 levels below.
 Year 2 generators use mix() for the 4 tap choices (answer + the slip a child most often makes). Fraction answers are strings like "1/4" (drawn by fracLabel / fracSvg).
