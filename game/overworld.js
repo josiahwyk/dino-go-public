@@ -124,10 +124,12 @@ function spriteImg(px,flip){
   px.forEach((row,y)=>[...row].forEach((ch,x)=>{if(HERO_PAL[ch]){g.fillStyle=HERO_PAL[ch];g.fillRect(flip?TILE-1-x:x,y,1,1)}}));
   return c;
 }
-const HERO={down:HERO_PX.down.map(f=>spriteImg(f)),up:HERO_PX.up.map(f=>spriteImg(f)),
+// Down and up get a 3rd frame: the step mirrored, so his feet take turns.
+const HERO={down:[...HERO_PX.down.map(f=>spriteImg(f)),spriteImg(HERO_PX.down[1],true)],
+  up:[...HERO_PX.up.map(f=>spriteImg(f)),spriteImg(HERO_PX.up[1],true)],
   right:HERO_PX.right.map(f=>spriteImg(f)),left:HERO_PX.right.map(f=>spriteImg(f,true))};
-// Where he is (in tiles), which way he faces, and which walk frame. Step 5 moves him.
-const hero={x:9,y:12,dir:"down",frame:0};
+// x,y = the tile he's on (or walking to); px,py = where he's drawn while sliding between tiles.
+const hero={x:9,y:12,px:9,py:12,dir:"down",frame:0};
 
 /* ---------- Drawing ---------- */
 const cv=$("w-canvas"), ctx=cv.getContext("2d");
@@ -141,19 +143,53 @@ function fit(){
   cv.style.width=cv.width/dpr+"px"; cv.style.height=cv.height/dpr+"px";
   draw();
 }
-// Only called on resize for now (rule 9): the map is one ready-made picture, just scaled up, with him on top.
+// Called on resize and while he's sliding, not every frame (rule 9): the map is one ready-made picture, scaled up, with him on top.
 function draw(){
   ctx.imageSmoothingEnabled=false;
   ctx.setTransform(1,0,0,1,0,0);
   ctx.drawImage(WORLD,0,0,cv.width,cv.height);
-  const s=cv.width/WORLD.width, X=hero.x*TILE, Y=hero.y*TILE;
+  const s=cv.width/WORLD.width, X=Math.round(hero.px*TILE), Y=Math.round(hero.py*TILE);
   ctx.setTransform(s,0,0,s,0,0);
   ctx.fillStyle="rgba(0,0,0,.2)"; ctx.fillRect(X+4,Y+14,8,2); ctx.fillRect(X+3,Y+15,10,1);   // soft shadow under his feet
   ctx.drawImage(HERO[hero.dir][hero.frame],X,Y);
 }
 
+/* ---------- Walking ----------
+   One tile per step with a short slide. Holding a D-pad button (or arrow key) keeps him walking. Trees and water block him; he still turns to face them. */
+const STEP_MS=180, SOLID=new Set(["R","W"]);
+const DIRS={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
+let held=null, queued=null, moving=false, steps=0;   // queued: a quick tap made mid-slide, done next so taps never get lost
+function tryStep(dir){
+  if(moving){queued=dir;return}
+  hero.dir=dir; hero.frame=0;
+  const [dx,dy]=DIRS[dir], sx=hero.x, sy=hero.y;
+  if(SOLID.has(tileAt(sx+dx,sy+dy))){draw();return}
+  moving=true; hero.x+=dx; hero.y+=dy; steps++;
+  const walk=(dir==="up"||dir==="down")&&steps%2?2:1, t0=performance.now();
+  (function slide(now){
+    const k=Math.min(1,(now-t0)/STEP_MS);
+    hero.px=sx+dx*k; hero.py=sy+dy*k; hero.frame=k>.2&&k<.85?walk:0;
+    draw();
+    if(k<1)return requestAnimationFrame(slide);
+    moving=false;
+    const next=held||queued; queued=null;
+    if(next)tryStep(next);
+  })(t0);
+}
+// D-pad: press = walk that way, keep holding = keep walking, let go anywhere = stop.
+for(const b of document.querySelectorAll("#w-pad [data-dir]")){
+  b.addEventListener("pointerdown",e=>{e.preventDefault();held=b.dataset.dir;b.classList.add("on");tryStep(held)});
+  b.addEventListener("contextmenu",e=>e.preventDefault());
+}
+function letGo(){held=null;for(const b of document.querySelectorAll("#w-pad .on"))b.classList.remove("on")}
+addEventListener("pointerup",letGo); addEventListener("pointercancel",letGo); addEventListener("blur",letGo);
+// Arrow keys (and WASD) for testing on a computer.
+const KEYS={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right",w:"up",s:"down",a:"left",d:"right"};
+addEventListener("keydown",e=>{const d=KEYS[e.key];if(!d)return;e.preventDefault();if(e.repeat)return;held=d;tryStep(d)});
+addEventListener("keyup",e=>{if(KEYS[e.key]===held)held=null});
+
 /* ---------- Start ---------- */
 window.addEventListener("resize",fit);
-addEventListener("pointerdown",()=>say("Let's explore!"),{once:true});
+addEventListener("pointerdown",()=>say("Let's explore! Press the arrows to walk."),{once:true});
 fit();
 })();
