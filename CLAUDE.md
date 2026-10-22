@@ -28,6 +28,8 @@ To add a dino: put its 512px .jpg in game/dinos/, run `python3 tools/cutout.py g
 Battle questions follow the Australian Curriculum v9: see LEVELS and QUESTIONS in index.html. Twelve levels, auto-adjusting: 1-6 are Year 1 (AC9M1, number + algebra), 7-12 are Year 2 (AC9M2): place value to 1000, add/take away within 100, trading, skip counting, equal groups/arrays/halves-quarters-eighths, money and change. The parent screen can set the level and battle length (4/6/8 hits). MAXL is the top level; older saves hold 1-6 and still mean the same thing. Review questions come from any earlier level up to level 6, then only the 3 levels below.
 Year 2 generators use mix() for the 4 tap choices (answer + the slip a child most often makes). Fraction answers are strings like "1/4" (drawn by fracLabel / fracSvg).
 
+Maths answer glow: after 2 wrong taps the right answer only glows if the grown-up turned on "Glow the right answer" (S.hintAnswer, off by default; the spelling tile glow after 3 wrong taps is separate and always on).
+
 ## Spelling
 Homework words come from the parent screen (S.words). PATTERNS is a built-in word bank (Year 1 and Year 2 spelling patterns) behind the "Suggest words" button: it fills the words box with ~8 words, never ones in CHALLENGE, and nothing saves until Save words. "Challenge words" is a separate setting (S.challenge) that mixes CHALLENGE words into ~1 catch in 4.
 

@@ -397,6 +397,11 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
         <div class="seg" id="p-math"></div>
       </div>
       <div class="panel">
+        <h3>Help with maths answers</h3>
+        <p>After two wrong taps on the same question, the right answer can glow so he can find it. Off by default.</p>
+        <div class="seg" id="p-hint"><button data-h="1" aria-pressed="false">Glow the right answer</button><button data-h="0" aria-pressed="false">No glow</button></div>
+      </div>
+      <div class="panel">
         <h3>Battle length</h3>
         <p>How many right answers it takes to beat a wild dino.</p>
         <div class="seg" id="p-hits">
@@ -1314,7 +1319,7 @@ async function answer(v,btn){
     stopWind(false);
     const blocked=await counter(); if(gen!==BG)return;
     if(E.myHp<=0){await faint(); return;}
-    if(E.miss>=2){const g=[...$("choices").children].find(b=>b.dataset.v===String(q.ans)); if(g)g.classList.add("glow");}
+    if(E.miss>=2&&S.hintAnswer===true){const g=[...$("choices").children].find(b=>b.dataset.v===String(q.ans)); if(g)g.classList.add("glow");}
     windUp(); E.busy=false;
     say(`${blocked?"Blocked! Your shield saved you.":"Ouch!"} Try again. ${q.say}`); return;
   }
@@ -1519,9 +1524,11 @@ function syncMath(){
     b.setAttribute("aria-pressed",String(S.mathLvl===i));b.onclick=()=>{S.mathLvl=i;S.streak=0;S.stuck=0;save();syncMath()};box.appendChild(b)}
   document.querySelectorAll("#p-hits button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.h===S.hits)));
   document.querySelectorAll("#p-chal button").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.c==="1")===(S.challenge!==false))));
+  document.querySelectorAll("#p-hint button").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.h==="1")===(S.hintAnswer===true))));
 }
 document.querySelectorAll("#p-hits button").forEach(b=>b.onclick=()=>{S.hits=+b.dataset.h;save();syncMath()});
 document.querySelectorAll("#p-chal button").forEach(b=>b.onclick=()=>{S.challenge=b.dataset.c==="1";save();syncMath()});
+document.querySelectorAll("#p-hint button").forEach(b=>b.onclick=()=>{S.hintAnswer=b.dataset.h==="1";save();syncMath()});
 $("p-reset").onclick=()=>{$("p-reset-yes").hidden=false};
 $("p-reset-yes").onclick=()=>{S.owned={};S.reset=Date.now();S.last=null;S.streak=0;S.stuck=0;save();$("p-reset-yes").hidden=true;$("p-reset").textContent="Progress reset";};
 
