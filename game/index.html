@@ -397,9 +397,9 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
         <div class="seg" id="p-math"></div>
       </div>
       <div class="panel">
-        <h3>Help with maths answers</h3>
-        <p>After two wrong taps on the same question, the right answer can glow so he can find it. Off by default.</p>
-        <div class="seg" id="p-hint"><button data-h="1" aria-pressed="false">Glow the right answer</button><button data-h="0" aria-pressed="false">No glow</button></div>
+        <h3>Glow the right answer</h3>
+        <p>After a few wrong tries, the right maths answer (after 2 wrong taps) or the right spelling letter (after 3 wrong taps) can glow so he can find it. Off by default. Spelling still says the word again either way.</p>
+        <div class="seg" id="p-hint"><button data-h="1" aria-pressed="false">Glow on</button><button data-h="0" aria-pressed="false">Glow off</button></div>
       </div>
       <div class="panel">
         <h3>Battle length</h3>
@@ -1428,7 +1428,7 @@ function tap(t){
   }
   E.lm++; sfx.bad(); t.classList.remove("shake"); void t.offsetWidth; t.classList.add("shake");
   // The right tile only glows after 3 wrong taps; after 2 he hears the word again.
-  if(E.lm>=3){const g=[...document.querySelectorAll(".tile:not(.used)")].find(x=>x.dataset.c===need); if(g)g.classList.add("glow"); say(`Listen... ${E.word}.`);}
+  if(E.lm>=3){const g=[...document.querySelectorAll(".tile:not(.used)")].find(x=>x.dataset.c===need); if(g&&S.hintAnswer===true)g.classList.add("glow"); say(`Listen... ${E.word}.`);}
   else if(E.lm===2) say(`Listen... ${E.word}.`);
   else say("Try again!");
 }
