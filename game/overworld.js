@@ -8,21 +8,36 @@ function say(text){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtter
    One letter per tile: G grass, T tall grass, R tree, W water, P path, F flowers. Every row is the same width. */
 const TILE=16;
 const MAP=[
-  "RRRRRRRRRRRRRRRRRRRR",
-  "RGGGGGGFGGGGGTTTTGGR",
-  "RGTTTGGGGGGGGTTTTGGR",
-  "RGTTTGGGPPPPPPGGGGGR",
-  "RGGGGGGGPGGGGPGGWWGR",
-  "RGGFGGGGPGGFGPGWWWWR",
-  "RGGGGPPPPGGGGPGWWWWR",
-  "RRGGGPGGGGRRGPGGWWGR",
-  "RGGGGPGTTGRRGPGGGGGR",
-  "RGTTGPGTTGGGGPPPPPGR",
-  "RGTTGPGGGGGFGGGGGPGR",
-  "RGGGGPPPPPPPPPPPPPGR",
-  "RGFGGGGGGPGGGTTTGGGR",
-  "RGGGGGGGGPGGGTTTGFGR",
-  "RRRRRRRRRPRRRRRRRRRR"];
+  "RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
+  "RGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGR",
+  "RGGTTTTGGGGGGGGGGGGGGRRRRGGGGGGGGGGFGGGR",
+  "RGGTTTTGGGGGFGGGGGGPGRRRRGGGGGGGGGGGGGGR",
+  "RGGTTTTGGGGGGGGGGGGPGRRRRGGGGWWWWWGGGGGR",
+  "RGGGGGGGGGGGGGRRGGGPGGGGGGGGWWWWWWWGGGGR",
+  "RGGGGGGGGGGGGGRRGGGPGGGGGFGWWWWWWWWGGGGR",
+  "RGGFGGGGGGGGGGGGGGGPGGGGGGGWWWWWWWWGGGGR",
+  "RGGGGGPPPPPPPPPPPPPPGGGGGGGWWWWWWWWGGGGR",
+  "RGGGGGPGGGGGGGGGGGGPGGGRRGGGWWWWWWGGGFGR",
+  "RGGGGGPGGGGGGGGGFGGPGGGRRGGGGGGGGGGGGGGR",
+  "RGGGGGPGTTTTTGGGGGGPPPPPPPPGGGTTTTTGGGGR",
+  "RGFGGGPGTTTTTGGGGGGPGGGGGGPGGGTTTTTGGGGR",
+  "RGGGGGPGTTTTTGGGGGGPGGGGGGPGGGTTTTTGGGGR",
+  "RGGGGGPGGGGGGGGGGGGPGGFGGGPGFGGGGGGGGGGR",
+  "RGGGGGPGGFGGGGGGGGGPGGGGGGPGGGGGGFGGGGGR",
+  "RGGPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPGGR",
+  "RGGGGGGGGGGGGGGGGGGPGGGGGGGGGRPGGGGGGGGR",
+  "RGGGGGGGGGGGGGTTTGGPGGGGGGGGGGPGGGGRRGGR",
+  "RGGGFGGGGRRGGGTTTGGPGGGTTTTTTGPGGGGRRGGR",
+  "RGGGGGGGGRRGGGTTTGGPGGGTTTTTTGPFGGGGGGGR",
+  "RGGGGGWWWGGGGGGGGGGPGGGTTTTTTGPGGGGGGGGR",
+  "RGGGGWWWWGGGGFGGGGGPGGGTTTTTTGPGGGGGGFGR",
+  "RGGGGWWWGGGGGGGGGGGPGGGGGGGGGGPGGGGGGGGR",
+  "RGGGGGGGGGGTTTTTGGGPPPPPPPPPPPPGGTTTTGGR",
+  "RGGGGGGGGGGTTTTTGGGPGGGGGGGGGGGGGTTTTGGR",
+  "RGGGGGGGFGGTTTTTGGGPGGGGGGRRGGGGGTTTTGGR",
+  "RGRRGGGGGGGGGGGGGGGGGGFGGGRRGGGGGTTTTGGR",
+  "RGRRGGGGGGGGGGGGGFGGGGGGGGGGGGGGGGGGGGGR",
+  "RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"];
 const COLS=MAP[0].length, ROWS=MAP.length;
 const tileAt=(x,y)=>(MAP[y]||"")[x]||"R";
 
@@ -129,29 +144,30 @@ const HERO={down:[...HERO_PX.down.map(f=>spriteImg(f)),spriteImg(HERO_PX.down[1]
   up:[...HERO_PX.up.map(f=>spriteImg(f)),spriteImg(HERO_PX.up[1],true)],
   right:HERO_PX.right.map(f=>spriteImg(f)),left:HERO_PX.right.map(f=>spriteImg(f,true))};
 // x,y = the tile he's on (or walking to); px,py = where he's drawn while sliding between tiles.
-const hero={x:9,y:12,px:9,py:12,dir:"down",frame:0};
+const hero={x:19,y:16,px:19,py:16,dir:"down",frame:0};
 
 /* ---------- Drawing ---------- */
 const cv=$("w-canvas"), ctx=cv.getContext("2d");
-// Fit the whole map in the space under the top bar, at a whole-number scale so pixels stay crisp.
+let S=1;   // device pixels per map pixel (a whole number, so pixels stay crisp)
+// The canvas fills the space above the D-pad; tiles are about 36 CSS px, so a phone sees about 10 tiles across, like a Game Boy of the map.
 function fit(){
   const box=$("w-view").getBoundingClientRect(), dpr=window.devicePixelRatio||1;
-  const w=COLS*TILE, h=ROWS*TILE;
-  let s=Math.min(box.width*dpr/w, box.height*dpr/h);
-  if(s>=1)s=Math.floor(s);
-  cv.width=Math.round(w*s); cv.height=Math.round(h*s);
-  cv.style.width=cv.width/dpr+"px"; cv.style.height=cv.height/dpr+"px";
+  cv.width=Math.round(box.width*dpr); cv.height=Math.round(box.height*dpr);
+  S=Math.max(1,Math.round(36*dpr/TILE));
   draw();
 }
-// Called on resize and while he's sliding, not every frame (rule 9): the map is one ready-made picture, scaled up, with him on top.
+// The camera keeps him in the middle, but stops at the map's edges (centres the map if the screen is bigger than it).
+function camera(centre,view,size){return size<=view?(size-view)/2:Math.min(Math.max(centre-view/2,0),size-view)}
+// Called on resize and while he's sliding, not every frame (rule 9). The map is one ready-made picture, scaled up, with him on top.
 function draw(){
-  ctx.imageSmoothingEnabled=false;
-  ctx.setTransform(1,0,0,1,0,0);
-  ctx.drawImage(WORLD,0,0,cv.width,cv.height);
-  const s=cv.width/WORLD.width, X=Math.round(hero.px*TILE), Y=Math.round(hero.py*TILE);
-  ctx.setTransform(s,0,0,s,0,0);
-  ctx.fillStyle="rgba(0,0,0,.2)"; ctx.fillRect(X+4,Y+14,8,2); ctx.fillRect(X+3,Y+15,10,1);   // soft shadow under his feet
-  ctx.drawImage(HERO[hero.dir][hero.frame],X,Y);
+  const camX=camera(hero.px*TILE+TILE/2,cv.width/S,WORLD.width), camY=camera(hero.py*TILE+TILE/2,cv.height/S,WORLD.height);
+  const ox=Math.round(-camX*S), oy=Math.round(-camY*S);
+  ctx.setTransform(1,0,0,1,0,0); ctx.imageSmoothingEnabled=false;
+  ctx.fillStyle="#24592E"; ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.drawImage(WORLD,ox,oy,WORLD.width*S,WORLD.height*S);
+  const X=ox+Math.round(hero.px*TILE*S), Y=oy+Math.round(hero.py*TILE*S);
+  ctx.fillStyle="rgba(0,0,0,.2)"; ctx.fillRect(X+4*S,Y+14*S,8*S,2*S); ctx.fillRect(X+3*S,Y+15*S,10*S,S);   // soft shadow under his feet
+  ctx.drawImage(HERO[hero.dir][hero.frame],X,Y,TILE*S,TILE*S);
 }
 
 /* ---------- Walking ----------
