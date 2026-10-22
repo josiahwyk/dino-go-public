@@ -53,6 +53,7 @@ All 40 dinos now have art (done 2026-10-22).
 - [ ] **C4. Printed track cards** (fill-in-the-blank words).
 - [ ] **C5. NFC.**
 - [ ] **C6. Cantonese.**
+- [ ] **C7. One look for both games, and a more Pokémon-like battle** (raised 2026-10-22, not urgent). Dino World's pixel map doesn't match Dino Go's rounded, illustrated style yet. Separately, Dino Go's battle doesn't feel like a Pokémon battle: the classic look (Game Boy / Switch games, not Pokémon Go) has his dino seen from behind bottom-left, the wild one facing you top-right, a name + health box for each, and a text box with the move menu along the bottom. Pokémon Go itself has no turn-based wild battle (you flick a ball at a Pokémon on the camera view). Decide later which style to aim for; changing his dino to a back view would need new art.
 
 ## D. Content and fixes
 - [x] Art for all 40 dinos (standing + attack, published as artifact v17, 2026-10-22).

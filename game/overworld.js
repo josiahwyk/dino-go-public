@@ -85,6 +85,50 @@ const WORLD=document.createElement("canvas"); WORLD.width=COLS*TILE; WORLD.heigh
   }
 })();
 
+/* ---------- The explorer ----------
+   16x16 like the tiles: 2 frames (standing, one foot forward) for down, up and right; left is right mirrored. */
+const HERO_PAL={o:"#2B2220",h:"#E04A3C",H:"#A9322A",w:"#FF9C8C",s:"#F6C69A",n:"#6B4026",c:"#3E86D6",b:"#E8A23A",B:"#B8742A",p:"#3A4766"};
+const HERO_PX={
+  down:[[
+      "................",".....oooooo.....","....ohhhhhho....","...ohhhwhhhho...",
+      "..oHHHHHHHHHHo..","...onssssssno...","...osossssoso...","...osssssssso...",
+      "....oossssoo....","...obccccccbo...","..osbccccccbso..","..ooccccccccoo..",
+      "...oppppppppo...","...oppo..oppo...","...ooo....ooo...","................"],
+    [
+      "................",".....oooooo.....","....ohhhhhho....","...ohhhwhhhho...",
+      "..oHHHHHHHHHHo..","...onssssssno...","...osossssoso...","...osssssssso...",
+      "....oossssoo....","...obccccccbo...","..osbccccccbso..","..ooccccccccoo..",
+      "...oppppppppo...","...oppo..oppo...","...ooo...oppo...",".........oooo..."]],
+  up:[[
+      "................",".....oooooo.....","....ohhhhhho....","...ohhhhhhhho...",
+      "..oHHHHHHHHHHo..","...onnnnnnnno...","...onnnnnnnno...","....onnnnnno....",
+      "...oobbbbbboo...","..osobbbbbboso..","..osoBbbbbBoso..","..oocBBBBBBcoo..",
+      "...oppppppppo...","...oppo..oppo...","...ooo....ooo...","................"],
+    [
+      "................",".....oooooo.....","....ohhhhhho....","...ohhhhhhhho...",
+      "..oHHHHHHHHHHo..","...onnnnnnnno...","...onnnnnnnno...","....onnnnnno....",
+      "...oobbbbbboo...","..osobbbbbboso..","..osoBbbbbBoso..","..oocBBBBBBcoo..",
+      "...oppppppppo...","...oppo..oppo...","...ooo...oppo...",".........oooo..."]],
+  right:[[
+      "................","....oooooo......","...ohhhhhho.....","..ohhhwhhhho....",
+      "..ohhhhhhhHHHHo.","..onnssssso.....","..onssssosso....","..onsssssso.....",
+      "...oossssoo.....","..obbocccco.....",".obbbocscco.....",".obbbocscco.....",
+      "..obbopppo......","....oppo........","....ooooo.......","................"],
+    [
+      "................","....oooooo......","...ohhhhhho.....","..ohhhwhhhho....",
+      "..ohhhhhhhHHHHo.","..onnssssso.....","..onssssosso....","..onsssssso.....",
+      "...oossssoo.....","..obbocccco.....",".obbbocscco.....",".obbbocscco.....",
+      "..obbopppo......","...opo.opo......","..ooo..ooo......","................"]]};
+function spriteImg(px,flip){
+  const c=document.createElement("canvas"); c.width=c.height=TILE; const g=c.getContext("2d");
+  px.forEach((row,y)=>[...row].forEach((ch,x)=>{if(HERO_PAL[ch]){g.fillStyle=HERO_PAL[ch];g.fillRect(flip?TILE-1-x:x,y,1,1)}}));
+  return c;
+}
+const HERO={down:HERO_PX.down.map(f=>spriteImg(f)),up:HERO_PX.up.map(f=>spriteImg(f)),
+  right:HERO_PX.right.map(f=>spriteImg(f)),left:HERO_PX.right.map(f=>spriteImg(f,true))};
+// Where he is (in tiles), which way he faces, and which walk frame. Step 5 moves him.
+const hero={x:9,y:12,dir:"down",frame:0};
+
 /* ---------- Drawing ---------- */
 const cv=$("w-canvas"), ctx=cv.getContext("2d");
 // Fit the whole map in the space under the top bar, at a whole-number scale so pixels stay crisp.
@@ -97,11 +141,15 @@ function fit(){
   cv.style.width=cv.width/dpr+"px"; cv.style.height=cv.height/dpr+"px";
   draw();
 }
-// Only called on resize for now (rule 9): the map is one ready-made picture, just scaled up.
+// Only called on resize for now (rule 9): the map is one ready-made picture, just scaled up, with him on top.
 function draw(){
   ctx.imageSmoothingEnabled=false;
   ctx.setTransform(1,0,0,1,0,0);
   ctx.drawImage(WORLD,0,0,cv.width,cv.height);
+  const s=cv.width/WORLD.width, X=hero.x*TILE, Y=hero.y*TILE;
+  ctx.setTransform(s,0,0,s,0,0);
+  ctx.fillStyle="rgba(0,0,0,.2)"; ctx.fillRect(X+4,Y+14,8,2); ctx.fillRect(X+3,Y+15,10,1);   // soft shadow under his feet
+  ctx.drawImage(HERO[hero.dir][hero.frame],X,Y);
 }
 
 /* ---------- Start ---------- */
