@@ -1,11 +1,8 @@
-/* Dino Go overworld (OVERWORLD-PLAN.md). Loaded after index.html's main script, so it can use $, show, say and goHome.
-   Kept in its own file so a session can work on it without reading index.html. */
+/* Dino World overworld (OVERWORLD-PLAN.md). Loaded by world.html. A separate game from Dino Go: it doesn't use index.html at all. */
 (()=>{
-const css=document.createElement("style");
-css.textContent=`
-.w-view{flex:1;min-height:0;display:grid;place-items:center}
-#w-canvas{display:block;border-radius:18px;box-shadow:0 6px 0 var(--line);image-rendering:pixelated;background:#7CC46A}`;
-document.head.appendChild(css);
+const $=id=>document.getElementById(id);
+// Spoken aloud for a young child. iPad only allows speech after a tap, so the first line waits for one.
+function say(text){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=.88;u.pitch=1.1;u.lang="en-AU";speechSynthesis.speak(u)}catch(e){}}
 
 /* ---------- Map ----------
    One letter per tile: G grass, T tall grass, R tree, W water, P path, F flowers. Every row is the same width. */
@@ -50,14 +47,8 @@ function draw(){
   for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){ctx.fillStyle=FLAT[tileAt(x,y)]||FLAT.G; ctx.fillRect(x*TILE,y*TILE,TILE,TILE);}
 }
 
-/* ---------- Screen ---------- */
-const visible=()=>!$("s-world").hidden;
-function openWorld(){
-  show("s-world"); fit();
-  say("Let's explore!");
-}
-window.addEventListener("resize",()=>{if(visible())fit()});
-$("explore").onclick=openWorld;
-$("explore").hidden=false; // only shown once this file has loaded
-window.openWorld=openWorld;
+/* ---------- Start ---------- */
+window.addEventListener("resize",fit);
+addEventListener("pointerdown",()=>say("Let's explore!"),{once:true});
+fit();
 })();

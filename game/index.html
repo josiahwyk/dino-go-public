@@ -322,13 +322,7 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
       <p class="tease" id="h-tease" hidden>Who's hiding? Tap one!</p>
       <button class="big" id="find">Find a dino!</button>
       <button class="big green small" id="to-book">My dinos <span id="h-count" class="count" style="color:#fff"></span></button>
-      <button class="big small" id="explore" hidden>Explore!</button>
     </div>
-  </section>
-
-  <section id="s-world" class="screen" hidden>
-    <div class="topbar"><button class="icon-btn" data-home aria-label="Home">🏠</button><h2 class="headline" style="flex:1;text-align:center">Explore</h2><span style="width:60px"></span></div>
-    <div class="w-view" id="w-view"><canvas id="w-canvas" aria-label="Map of the dino world"></canvas></div>
   </section>
 
   <section id="s-pick" class="screen" hidden>
@@ -1659,4 +1653,3 @@ function refreshScreen(){
 /* ---------- Boot ---------- */
 (async()=>{await loadImgs(); goHome();})();
 </script>
-<script src="overworld.js"></script>

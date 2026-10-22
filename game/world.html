@@ -1,0 +1,33 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dino World</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Baloo+2:wght@600;800&display=swap">
+<style>
+/* Dino World: a separate game from Dino Go (index.html). Same look and colours, its own page. World code is in overworld.js. */
+:root{
+  --sky:#CDEBF5; --leaf:#2F6B3A; --fern:#9FD08A; --ink:#1E2B1F; --line:#1E2B1F22;
+  --display:"Baloo 2","Arial Rounded MT Bold",ui-rounded,system-ui,sans-serif;
+  --body:"Andika","Comic Neue",ui-rounded,system-ui,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%;margin:0}
+*{box-sizing:border-box}
+body{background:linear-gradient(180deg,var(--sky) 0%,#E4F4E0 55%,var(--fern) 100%);background-color:var(--sky);color:var(--ink);font-family:var(--body);
+  padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));
+  -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;overflow:hidden}
+#app{max-width:980px;margin:0 auto;height:100%;display:flex;flex-direction:column;gap:12px}
+h1{font-family:var(--display);font-weight:800;color:var(--leaf);margin:0;text-align:center;font-size:clamp(1.8rem,6vw,2.6rem);line-height:1.05}
+.w-view{flex:1;min-height:0;display:grid;place-items:center}
+#w-canvas{display:block;border-radius:18px;box-shadow:0 6px 0 var(--line);image-rendering:pixelated;background:#7CC46A}
+</style>
+
+<div id="app">
+  <h1>Dino World</h1>
+  <div class="w-view" id="w-view"><canvas id="w-canvas" aria-label="Map of the dino world"></canvas></div>
+</div>
+
+<script src="overworld.js"></script>

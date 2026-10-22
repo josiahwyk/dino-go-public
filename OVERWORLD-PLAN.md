@@ -1,39 +1,33 @@
-# Overworld build plan (BACKLOG C1)
+# Dino World build plan (BACKLOG C1)
 
-Goal: a Game Boy-style top-down world before encounters. He walks a little explorer around, steps into tall grass, a bush rustles, and a battle starts with a dino that lives in that habitat. Later: four habitats, signs, a town, boss dinos with badges.
+**Dino World is its own game, separate from Dino Go** (decided 2026-10-22). It lives in the same repo so it can reuse the 40 dino pictures, but it has its own page (`game/world.html`), its own code (`game/overworld.js`), its own save, and will get its own artifact link. Dino Go (`game/index.html`) is never edited for it.
+
+Goal: a Game Boy-style top-down world. He walks a little explorer around, steps into tall grass, a bush rustles, and a dino that lives in that habitat appears. Later: four habitats, signs, a town, boss dinos with badges.
 
 Budget: Josiah's leftover Pro tokens, usually 5-10% of the week on the last day before reset. So **one step = one short session**. Steps are cut small on purpose. If a step looks too big when you start it, split it in this file first and do only the first half.
 
 ## Rules for every session (read these, they are what keeps it cheap)
 
-1. **Don't read game/index.html in full.** It is about 140KB (roughly 35-40k tokens on its own). Find what you need with `grep -n` and read only those lines. The hooks this plan needs are listed under "Hooks" below.
-2. **All overworld code goes in `game/overworld.js`**, not index.html. index.html only gets a `<script src="overworld.js">` tag, the screen's `<section>`, and the Explore button. A session should only need this file, overworld.js and a few grepped lines.
-3. **No art from Gemini.** Tiles and the explorer are drawn in code (canvas, small pixel style). That keeps it small, and an image session with downloads costs a lot more.
-4. **Publish only at milestones** (the "Publish" steps). Republishing needs a full read of the saved live copy, which is the most expensive thing in this project. Between milestones, test locally: preview `dino-go` from `.claude/launch.json` (port 8765), one screenshot at iPhone size (about 428x660) is enough. Check iPad size at milestones only.
-5. **Don't touch the cloud save.** Keep the explorer's position in localStorage (per device, wrapped in try/catch). Badges (step 17) are the only thing that needs saving across devices, and that step says how.
-6. **End every session the same way:** tick the step below, add a line to the cost log, commit (`Overworld step N: ...`). If a step is half done when tokens run out, commit it anyway with "WIP" in the message and write one line under the step saying what is left.
+1. **Don't open game/index.html.** That's Dino Go, about 140KB (roughly 35-40k tokens). Dino World doesn't need it. The only exception is step 7, which copies the dino list out of it with a script, never by reading it.
+2. **Files:** `game/world.html` is the page (small: styles, the canvas, a script tag). All game code goes in `game/overworld.js`. A session should only need this plan and those two files.
+3. **No art from Gemini.** Tiles and the explorer are drawn in code (canvas, small pixel style). Dinos reuse the existing pictures in `game/dinos/NN_name.webp`.
+4. **Publish only at milestones** (the "Publish" steps). Between milestones, test locally: preview `dino-go` from `.claude/launch.json` and open `/world.html`; one screenshot at iPhone size (about 428x660) is enough. Check iPad size at milestones only.
+5. **Own save, kept simple.** Dino World saves in localStorage under its own key (`dinoworld`), wrapped in try/catch. Never touch Dino Go's save or cloud save. Saving across his iPad and iPhone can come later if he plays it a lot.
+6. **End every session the same way:** tick the step below, add a line to the cost log, commit (`Dino World step N: ...`). If a step is half done when tokens run out, commit it anyway with "WIP" in the message and write one line under the step saying what is left.
 7. Model: **Sonnet** unless the step says Opus. Sonnet uses less of the Pro allowance.
 8. **Cap the art fix-up loop** (steps 3, 4, 12). "Keep fixing until it looks good" is where the tokens go. Before drawing, write the target in one line in this file: a limited palette (about 4 colours per tile, Game Boy Color feel) and what each tile should read as at a glance. Then at most 2 rounds of fixes per session; if it's still off, commit it as good enough and note what to improve.
-9. **Keep it light on the iPad.** Tiles are drawn once and reused (step 3). Only redraw while the explorer is moving or something is animating, not every frame, and stop drawing entirely when the world screen is hidden.
+9. **Keep it light on the iPad.** Tiles are drawn once and reused (step 3). Only redraw while the explorer is moving or something is animating, not every frame.
+10. **Designed for a young child**, same as Dino Go: every instruction spoken aloud (`say()` in overworld.js), big tap targets, no timers.
+11. **Don't commit Dino Go work you didn't make.** If `git status` shows changes in `game/index.html`, they belong to someone else: leave them alone and commit only Dino World files.
 
 ### Starting a session (paste this)
 
-> Dino Go overworld. Read OVERWORLD-PLAN.md and do the next unticked step only. Follow its session rules: don't read index.html in full, grep for the hooks. Stop after that step and commit.
-
-## Hooks in index.html (grep for these, don't read around them)
-
-- `function show(id)`: switches screens. Screens are `<section id="s-..." class="screen">`.
-- `<section id="s-home"`: the home screen, with the `#find` "Find a dino!" button.
-- `function startEncounter(chosen)`: starts a battle. It already takes a chosen dino, so the overworld can pass one in.
-- `function pickWild()`: picks the wild dino (uncaught first, "Rematch!" after all are caught). Step 11 adds a habitat filter here.
-- `function goHome()`: where battles and catches end. Step 8 sends him back to the world instead.
-- `SPECIES`: every dino has `type`: `plant` (20), `meat` (13), `sea` (4), `fly` (2).
-- `say(...)` / speechSynthesis: every instruction must be spoken aloud.
+> Dino World. Read OVERWORLD-PLAN.md and do the next unticked step only. Follow its session rules: it's a separate game from Dino Go, so don't open index.html. Stop after that step, tick it, add a cost-log line and commit.
 
 ## Milestone 1: Walk around (not published yet)
 
-- [x] **1. Empty world screen.** Create `game/overworld.js` with an `openWorld()` function. Add `<section id="s-world" class="screen" hidden>` holding a `<canvas>` and a back button, a `<script src="overworld.js">` tag, and an "Explore!" button on the home screen that calls `openWorld()`. The canvas fills the screen area. *Done when:* tapping Explore shows a blank coloured canvas and Back returns home.
-- [x] **2. Map as text.** One 20x15 map as an array of strings (`G` grass, `T` tall grass, `R` tree, `W` water, `P` path, `F` flowers). Draw each tile as a flat coloured square, 16px tiles scaled up. *Done when:* you can see the map layout in plain colours.
+- [x] **1. Empty world page.** `game/world.html` with a title and a canvas that fills the space; `game/overworld.js` holds the code. *Done when:* opening /world.html shows the canvas. (First built inside Dino Go, then moved out to its own page the same day.)
+- [x] **2. Map as text.** One 20x15 map as an array of strings (`G` grass, `T` tall grass, `R` tree, `W` water, `P` path, `F` flowers). Each tile drawn as a flat coloured square, 16px tiles scaled up. *Done when:* you can see the map layout in plain colours.
 - [ ] **3. Tile art in code** (Opus). Draw each tile type once into a small offscreen canvas in a Game Boy-ish pixel style: grass texture, tall-grass tufts, a round tree, water with a ripple line, path pebbles, flowers. Use `imageSmoothingEnabled=false` so it stays crisp. *Done when:* the map looks like a little pixel world, not coloured squares.
 - [ ] **4. The explorer.** A small code-drawn kid sprite (hat, backpack) facing 4 directions, 2-frame walk. Placed on a path tile. *Done when:* he stands on the map facing down.
 - [ ] **5. Walking.** Big on-screen D-pad (4 buttons, thumb-sized) plus arrow keys for testing. Moves one tile at a time with a short slide, blocked by trees and water. *Done when:* he walks around and can't walk through trees or water.
@@ -41,23 +35,23 @@ Budget: Josiah's leftover Pro tokens, usually 5-10% of the week on the last day 
 
 ## Milestone 2: Find dinos in the grass
 
-- [ ] **7. Rustle and encounter.** Each step into tall grass has about a 1-in-8 chance of a rustle: the tufts shake, a rustle sound, "Something's in the grass!" spoken, then `startEncounter()`. No encounter on the first 3 steps after a battle, so he isn't ambushed. *Done when:* walking in tall grass starts a normal battle.
-- [ ] **8. Back to the world** (Opus). After a battle or catch, if it started from the world, return to the world at the same spot instead of home (grep how `goHome()` is called; add a flag, don't rewrite the flow). Save the explorer's position in localStorage. *Done when:* battle, win or catch, and he's back where he was standing; reloading the page keeps his spot.
-- [ ] **9. Spoken guide.** First visit: "Walk into the tall grass to find dinos!" Speak again if he walks around for a while without touching grass. A soft step sound. *Done when:* a child who can't read yet knows what to do.
-- [ ] **10. Publish milestone 1+2** (Opus). Full read of the live copy as CLAUDE.md says, republish `index.html` plus `overworld.js` in `files`, keep the capabilities (omit `capabilities`). Check iPhone and iPad size first. Update BACKLOG and CLAUDE.md (one line under Files for overworld.js).
+- [ ] **7. Dino list.** Write a small script (in `tools/`) that pulls each dino's id, name and type out of `SPECIES` in index.html into `game/world-dinos.js` (`const DINOS=[{id,name,type},...]`). Run it, don't read index.html. Types are `plant` (20), `meat` (13), `sea` (4), `fly` (2). *Done when:* world.html loads world-dinos.js and `DINOS.length` is 40 in the console.
+- [ ] **8. Rustle and appear.** Each step into tall grass has about a 1-in-8 chance of a rustle: the tufts shake, a rustle sound, "Something's in the grass!" spoken. Then a card pops up with the dino's picture (`dinos/NN_name.webp`) and its name spoken: "A wild Triceratops!" Tap to go back to walking. No rustle in the first 3 steps after one, so he isn't ambushed. *Done when:* walking in tall grass makes dinos appear.
+- [ ] **9. Catch it** (Opus). On the dino card: one easy maths question (tap 1 of 3 big answers, spoken) to catch it. Caught dinos are saved (rule 5) and shown in a small "My dinos" list. Wrong answer: "It ran away! Try again in the grass." Decide with Josiah first whether catching should be maths, spelling or just a tap. *Done when:* he can catch a dino and it's still caught after a reload. Also save the explorer's position.
+- [ ] **10. Publish milestone 1+2.** Publish world.html as a **new** artifact (not Dino Go's link), with overworld.js and world-dinos.js in `files`, and the dino pictures copied server-side from Dino Go's artifact (`{artifact, path}` entries, nothing re-uploaded). Check iPhone and iPad size first. Add the new link to CLAUDE.md and tick C1's first part in BACKLOG.
 
 ## Milestone 3: Habitats
 
-- [ ] **11. Habitat-aware wild dinos.** Give `pickWild()` an optional habitat: `forest` → plant, `volcano` → meat, `beach` → sea, `cliffs` → fly. If that habitat has nothing uncaught, fall back to the normal pick. *Done when:* `pickWild("beach")` only gives sea reptiles (test in the console).
-- [ ] **12. Four zones** (Opus). Grow the map so it has 4 zones joined by paths: forest (green), volcano (dark rock, lava instead of water), beach (sand, sea), cliffs (grey rock, high ledges). Each zone gets its own tile colours from the step 3 drawing code (palette swap, not new tiles). Tall grass in each zone passes its habitat to `startEncounter`. *Done when:* grass on the beach gives sea reptiles, grass in the volcano gives meat-eaters.
+- [ ] **11. Habitat-aware dinos.** The picker takes a habitat: `forest` → plant, `volcano` → meat, `beach` → sea, `cliffs` → fly. Uncaught dinos first; if that habitat has none left, any dino from it. *Done when:* the beach only gives sea reptiles (test in the console).
+- [ ] **12. Four zones** (Opus). Grow the map so it has 4 zones joined by paths: forest (green), volcano (dark rock, lava instead of water), beach (sand, sea), cliffs (grey rock, high ledges). Each zone gets its own tile colours from the step 3 drawing code (palette swap, not new tiles). *Done when:* grass on the beach gives sea reptiles, grass in the volcano gives meat-eaters.
 - [ ] **13. Signs.** A sign at each zone entrance. Walking into it opens a Game Boy-style text box at the bottom ("Volcano. Watch out for meat-eaters!"), spoken aloud, tap to close. *Done when:* all 4 signs talk.
-- [ ] **14. Publish milestone 3.** Same as step 10.
+- [ ] **14. Publish milestone 3.** Republish to the Dino World artifact.
 
 ## Milestone 4: Town and boss dinos (later, only if he loves it)
 
-- [ ] **15. Home town.** A small town in the middle: a house where his dinos heal (if they have health to heal; check first) and one friendly grown-up NPC who gives tips. Uses the step 13 text box.
-- [ ] **16. Boss dino, part 1.** One boss per zone, standing on the map (not in grass). Talking to it starts a battle with a high-level wild dino and the "boss" feel: bigger picture, its own intro line. Reuse the existing battle; don't build a new one.
-- [ ] **17. Boss dino, part 2: badges.** Beating a boss gives a badge, shown on the home screen. Badges must reach the cloud save, so read `mergeSaves` first and add a top-level `badges` field that merges by union. Never change the save key or remove saved fields.
+- [ ] **15. Home town.** A small town in the middle: a house that shows his caught dinos, and one friendly grown-up NPC who gives tips. Uses the step 13 text box.
+- [ ] **16. Boss dino, part 1.** One boss per zone, standing on the map (not in grass). Talking to it starts a bigger catch challenge (3 questions in a row), with a bigger picture and its own intro line.
+- [ ] **17. Boss dino, part 2: badges.** Beating a boss gives a badge, shown on the title bar. Saved like everything else (rule 5).
 - [ ] **18. Publish milestone 4.**
 
 ## Cost log
@@ -66,4 +60,4 @@ One line per session, so we learn how big a step can be. Check usage at claude.a
 
 | Date | Step | Model | % of week used | Notes |
 |------|------|-------|----------------|-------|
-| 2026-10-22 | 1 + 2 | Opus | ? (not measured) | Done together in one chat. Map fits the screen at a whole-number scale, so it's a bit small on iPhone until step 6's camera. The Explore button is hidden until overworld.js loads, so publishing index.html alone never shows a broken button. |
+| 2026-10-22 | 1 + 2 | Opus | ? (not measured) | Done together in one chat, first inside Dino Go, then moved to its own page (world.html) in the same chat. Map fits the screen at a whole-number scale, so it's a bit small on iPhone until step 6's camera. |
