@@ -47,7 +47,7 @@ All 40 dinos now have art (done 2026-10-22).
 - [ ] B3, B5-B7 and A4-A7 are untouched.
 
 ## C. Bigger ideas (from CLAUDE.md, moved here)
-- [ ] **C1. Explore screen** (2026-10-17): before encounters he walks a little avatar around illustrated habitats (forest, swamp, beach, volcano); rustling bushes / footprints trigger a dino matched to that habitat. He liked the feel of a 2.5D pixel RPG (top-down map, wandering, boss fights). No real GPS.
+- [ ] **C1. Explore screen** (2026-10-17): before encounters he walks a little avatar around illustrated habitats (forest, swamp, beach, volcano); rustling bushes / footprints trigger a dino matched to that habitat. He liked the feel of a 2.5D pixel RPG (top-down map, wandering, boss fights). No real GPS. Build plan in small leftover-token steps: OVERWORLD-PLAN.md (2026-10-22).
 - [ ] **C2. Evolution** (overlaps B4).
 - [ ] **C3. Raids / boss fights** (overlaps A5).
 - [ ] **C4. Printed track cards** (fill-in-the-blank words).
