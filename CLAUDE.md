@@ -38,6 +38,8 @@ Answer glow: the right maths answer (after 2 wrong taps) and the right spelling 
 ## Spelling
 Homework words come from the parent screen (S.words). PATTERNS is a built-in word bank (Year 1 and Year 2 spelling patterns) behind the "Suggest words" button: it fills the words box with ~8 words, never ones in CHALLENGE, and nothing saves until Save words. "Challenge words" is a separate setting (S.challenge) that mixes CHALLENGE words into ~1 catch in 4.
 
+Spelling battles (2026-11-04): grown-up setting "Battle questions" (S.battle: "math" default, "words", "mix" = about half each). makeQ() hands off to wordQ(slot) in the "Spelling questions in battle" section: easy move = one missing letter, medium = two letters side by side, hard = pick the right spelling of 4. Gaps go on vowels and never the first letter. misspell() makes the wrong spellings from real slips (wrong vowel, ie/ei swap, dropped vowel or double letter first; look-alike consonants after) and never offers a real word (known() = PATTERNS + CHALLENGE + DEFAULT_WORDS + COMMON). Spelling questions have lvl 0 so they never move the maths level; clues and "one like before" (same word) work as for maths.
+
 ## Levels and growth
 Level = 1 + floor(xp/3), unchanged; everything below is worked out from saved xp, nothing extra is saved (mergeSaves only keeps xp/wins/caught/t per dino, so never put new per-dino fields there without updating it).
 - All 3 moves for every dino from level 1 (Josiah, 2026-11-04: he doesn't follow levels yet; the reward is the bigger hits and the super move). L3 title "Brave", L4 shield charges after 2 right answers (3 before), L5 "Mighty" + glow, L8 every fight starts with a shield, L10 "Legendary" + golden aura.

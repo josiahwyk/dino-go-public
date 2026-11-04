@@ -256,6 +256,14 @@ h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
 .pvc th{font-size:.85rem;color:var(--muted);padding:0 4px}
 .pvc td{background:#fff;border-radius:10px;min-width:44px;height:42px;text-align:center;font-size:1.6rem;box-shadow:0 3px 0 var(--line)}
 .pvc th.hi{color:var(--lava-dk)} .pvc td.hi{background:#FFE7D6;outline:3px solid var(--lava)}
+/* Spelling questions in battle: the word in small slots (the gap in orange), word choices two per row in the reading font */
+.slots.sm{gap:6px}
+.slots.sm .slot{width:44px;height:56px;font-size:2.2rem;border-radius:12px;border-bottom-width:5px}
+.slot.ask{background:var(--lava);color:#fff;border-bottom-color:var(--lava-dk)}
+.choices.wide,.choices.letters{flex-wrap:wrap}
+.choices.wide button,.choices.letters button{font-family:var(--body);font-weight:700}
+.choices.wide button{flex:1 1 40%;max-width:280px;font-size:2rem}
+@media (max-width:560px){.slots.sm{gap:4px}.slots.sm .slot{width:36px;height:48px;font-size:1.8rem}.choices.wide button{font-size:1.7rem}}
 .qbox .again{font-family:var(--display);font-weight:800;font-size:1rem;color:var(--lava-dk);background:#fff;border-radius:999px;padding:2px 14px;box-shadow:0 2px 0 var(--line)}
 .choices .shp{width:52px;height:52px}
 .glow{animation:glow 1s ease-in-out infinite;outline:5px solid var(--lava)!important}
@@ -426,6 +434,11 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
         <h3>Maths in battles</h3>
         <p>Questions follow the Australian Curriculum (v9). Levels 1–6 are Year 1 and levels 7–12 are Year 2. It moves up a level by itself after 5 right first time in a row, and back down if he's stuck twice. About 1 in 5 questions reviews an easier level.</p>
         <div class="seg" id="p-math"></div>
+      </div>
+      <div class="panel">
+        <h3>Battle questions</h3>
+        <p>What he answers to attack in a battle. Spelling words uses this week's words (plus challenge words if they're on): the easy move fills in one missing letter, the medium move two letters, and the hard move picks the right spelling out of four. Mix asks maths and spelling about half each.</p>
+        <div class="seg" id="p-battle"><button data-b="math" aria-pressed="false">Maths</button><button data-b="words" aria-pressed="false">Spelling words</button><button data-b="mix" aria-pressed="false">Mix of both</button></div>
       </div>
       <div class="panel">
         <h3>Glow the right answer</h3>
@@ -1181,12 +1194,13 @@ const QUESTIONS={
   11:[groupsY2,arrayQ,repAdd,shareY2,bagsY2,fracShaded,fracPick,fracOf],
   12:[coinsTotal,changeNote,changeCents,twoItems,spendLeft,eachCost,storyY2],
 };
-function makeQ(fixed){
+function makeQ(fixed,slot){
   // With one move the question is at his level, and 1 in 5 reviews an easier level: any earlier level up to Year 1's end, then only the 3 levels just below.
   // With a move menu (fixed given) the move decides the level instead.
   // A question he missed earlier comes back first (a new one of the same kind, at the level it was asked at).
   const due=RETRY.findIndex(r=>r.wait<=0);
   if(due>=0){const r=RETRY.splice(due,1)[0],q=r.gen(); Object.assign(q,{gen:r.gen,lvl:r.lvl,retry:true,tries:r.tries}); return q}
+  if(useWords())return wordQ(slot);
   const L=S.mathLvl, lv=fixed||((L>1&&Math.random()<.2)?between(L>6?L-3:1,L-1):L); let q,gen,g=0;
   do{gen=pick(QUESTIONS[lv]);q=gen();g++}while(E.q&&q.say===E.q.say&&g<6);
   q.gen=gen; q.lvl=lv; return q;
@@ -1461,7 +1475,7 @@ function pickMove(i){if(E.phase!=="menu")return; chooseMove(i)}
 function chooseMove(i,preface){
   E.phase="q"; E.slot=i; E.busy=false;
   const multi=slotsOf(S.owned[E.me]).length>1;
-  E.q=makeQ(multi?Math.max(1,Math.min(MAXL,S.mathLvl+MOVE_SLOTS[i].dq)):0);
+  E.q=makeQ(multi?Math.max(1,Math.min(MAXL,S.mathLvl+MOVE_SLOTS[i].dq)):0,i);
   $("moves").hidden=true; $("q-row").hidden=false; $("choices").hidden=false;
   showQ();
   const again=E.q.retry?"Here's one like before! ":"";
@@ -1469,7 +1483,7 @@ function chooseMove(i,preface){
 }
 function showQ(){
   hideHint(); $("qbox").innerHTML=(E.q.retry?'<div class="again">🔁 One like before</div>':"")+E.q.html;
-  const box=$("choices"); box.innerHTML="";
+  const box=$("choices"); box.innerHTML=""; box.classList.toggle("wide",!!E.q.wide); box.classList.toggle("letters",!!E.q.letters);
   E.q.choices.forEach(v=>{const k=document.createElement("button");k.innerHTML=E.q.label?E.q.label(v):v;k.dataset.v=v;
     k.setAttribute("aria-label",E.q.sayAns?E.q.sayAns(v):String(v));k.onclick=()=>answer(v,k);box.appendChild(k)});
 }
@@ -1512,7 +1526,7 @@ async function answer(v,btn){
   const mv=movesOf(me),m={name:fin?`SUPER ${mv[2].toUpperCase()}`:mv[E.slot],slot:E.slot,fin};
   stopWind(true); hpBar();
   if(q.retry&&first)callout("You got it!",$("b-me"),"#2F9E44",-.1);
-  say(`${q.sayAns?q.sayAns(v):v}! ${q.retry&&first?"You got it this time! ":""}${fin?"Super move! ":""}${m.name}!${shieldUp?" Shield ready!":""}`);
+  say(`${q.sayRight||(q.sayAns?q.sayAns(v):v)}! ${q.retry&&first?"You got it this time! ":""}${fin?"Super move! ":""}${m.name}!${shieldUp?" Shield ready!":""}`);
   if(first&&!fin&&E.combo===finNeed()-1){sfx.combo(E.combo); callout("Super almost ready!",$("b-me"),"#F2762E",-.95)}
   await (fin?superAttack(m):attack(m)); if(gen!==BG)return;
   if(fin){E.combo=0; hpBar();}
@@ -1572,6 +1586,51 @@ function pickWord(){
   const home=S.words&&S.words.length?S.words:DEFAULT_WORDS, ch=S.challenge!==false&&Math.random()<.25, w=ch?CHALLENGE:home;
   let x=w[rand(w.length)]; if(w.length>1&&x===S.lastWord)x=w[rand(w.length)];
   S.lastWord=x; save(); E.challenge=ch; return x;
+}
+
+/* ---------- Spelling questions in battle (grown-up setting "Battle questions": maths, words or a mix) ---------- */
+// Same homework + challenge words as catching. The move picks the kind: easy = one missing letter, medium = two missing letters
+// side by side, hard = pick the right spelling. Spelling questions have lvl 0, so they never move his maths level.
+let KNOWN=null; // every real word the game knows: a wrong spelling on offer is never a real word (no their/there traps)
+// plus common English words that aren't in the lists (from the first few hundred sight words)
+const COMMON="the of and a to in is you that it he was for on are as with his they i at be this have from or one had by word but not what all were we when your can said there use an each which she do how their if will up other about out many then them these so some her would make like him into time has look two more write go see number no way could people my than first water been call who its now find long down day did get come made may part over new sound take only little work know place year live me back give most very after thing our just name good man think say great where help through much before line right too mean old any same tell boy follow came want show also around form three small set put end does another well large must big even such because turn here why ask went men read need land different home us move try kind hand again change off play spell air away animal house point page letter mother answer found still learn should world hat sat mat bat rat bad dad mad sad bed fed led red ten hen pen men pin win bin tin hot got lot not pot dot cut hut nut but fun run sun bun bug hug mug rug dog log fog hog den din dim ham him hum hop hip hit hut lap lip lop map mop nap net nod pad pat peg pet pig pit pod pop pup rag ram rim rip rob rod rot rub sap sip sit sob tap tip top tub van vet wag web wet wig yes yet zip cold fold mold bold sold toad load road loud lord last lost list lust fast fist mast mist past best rest test vest west nest pest cake take make lake bake rake wake sake came game name same tame late gate hate mate rate home some come dome more sore bore core tore wore door poor floor block clock rock sock lock duck luck stack track".split(" ");
+const known=()=>KNOWN||(KNOWN=new Set([...PATTERNS.flatMap(p=>p.list.flatMap(x=>x.split("/"))),...CHALLENGE,...DEFAULT_WORDS,...COMMON]));
+const useWords=()=>S.battle==="words"||(S.battle==="mix"&&Math.random()<.5);
+function battleWord(){
+  const home=S.words&&S.words.length?S.words:DEFAULT_WORDS, w=S.challenge!==false&&Math.random()<.25?CHALLENGE:home;
+  const ws=w.filter(x=>!E.q||x!==E.q.word); return pick(ws.length?ws:w);
+}
+const VOW="aeiou";
+// Slips children really make, most likely first, never touching the first letter: a wrong vowel, two vowels swapped (ie/ei), a vowel or a
+// doubled letter left out (shold, dolar); then a look-alike consonant (b/d) or a doubled consonant. Shuffled within each group.
+function misspell(w){
+  const k=known(),seen=new Set([w]),tiers=[[],[]],add=(t,v)=>{if(v.length>=2&&!seen.has(v)&&!k.has(v)&&!(S.words||[]).includes(v)){seen.add(v);tiers[t].push(v)}};
+  const at=(i,s)=>w.slice(0,i)+s+w.slice(i+1), v=c=>VOW.includes(c);
+  for(let i=1;i<w.length;i++){
+    if(v(w[i])){for(const c of (CONFUSE[w[i]]||""))add(0,at(i,c)); if(w.length>3&&[...w].filter(v).length>1)add(0,at(i,""))}
+    if(i<w.length-1&&v(w[i])&&v(w[i+1])&&w[i]!==w[i+1])add(0,w.slice(0,i)+w[i+1]+w[i]+w.slice(i+2));
+    if(w[i]===w[i-1])add(0,at(i,""));
+    if(!v(w[i])){for(const c of (CONFUSE[w[i]]||""))if(!v(c))add(1,at(i,c)); if(w[i]!==w[i-1]&&w[i]!==w[i+1]&&i<w.length-1)add(1,at(i,w[i]+w[i]))}
+  }
+  return [...shuffle(tiers[0]),...shuffle(tiers[1])];
+}
+const chunkAlts=p=>{const s=new Set([p[1]+p[0]]);for(let i=0;i<2;i++)for(const c of (CONFUSE[p[i]]||""))s.add(i?p[0]+c:c+p[1]);s.delete(p);return [...s]};
+const wordSlots=(w,at,n)=>`<div class="slots sm">${[...w].map((c,i)=>i>=at&&i<at+n?'<div class="slot ask">?</div>':`<div class="slot">${c}</div>`).join("")}</div>`;
+function wordQ(slot,word){
+  const w=word||battleWord(),kind=slot||0,base={word:w,sayRight:w,lvl:0,gen:()=>wordQ(kind,w)};
+  if(kind===2){
+    const blanks=`<div class="slots sm">${'<div class="slot"></div>'.repeat(w.length)}</div>`;
+    return {...base,html:words("Listen, then tap the right spelling"),say:`Which one spells ${w}? ${w}.`,ans:w,choices:shuffle([w,...misspell(w).slice(0,3)]),wide:true,
+      hint:clue(`${w} has ${w.length} letters. Say it slowly, then check each one.`,blanks,words(`${w.length} letters`))};
+  }
+  // where the gap goes: on a vowel if possible (the part most often misspelled), never the first letter (he hears that one easily)
+  const n=kind===1&&w.length>=3?2:1, all=[...Array(w.length-n+1).keys()], starts=all.length>1?all.slice(1):all, vs=starts.filter(i=>[...w.slice(i,i+n)].some(c=>VOW.includes(c)));
+  const at=pick(vs.length?vs:starts), part=w.slice(at,at+n), opts=new Set([part]);
+  shuffle(n===1?[...(CONFUSE[part]||"")]:chunkAlts(part)).forEach(a=>{if(opts.size<4)opts.add(a)});
+  for(let g=0;opts.size<4&&g<60;g++)opts.add(n===1?pick([..."abcdefghijklmnoprstuvwy"]):pick([...VOW])+pick([..."aeiourlnwy"]));
+  const which=n===1?"letter is":"letters are";
+  return {...base,html:wordSlots(w,at,n)+words(`Which ${which} missing?`),say:`${w}. Which ${which} missing?`,ans:part,choices:shuffle([...opts]),letters:true,
+    hint:clue(`Listen again: ${w}. Say it slowly and listen for the sound in the gap.`,wordSlots(w,at,n))};
 }
 function startCatch(intro){
   const w=E.wild, word=pickWord(); E.word=word; E.pos=0; E.lm=0; E.busy=false;
@@ -1698,7 +1757,9 @@ function syncMath(){
   document.querySelectorAll("#p-hits button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.h===S.hits)));
   document.querySelectorAll("#p-chal button").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.c==="1")===(S.challenge!==false))));
   document.querySelectorAll("#p-hint button").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.h==="1")===(S.hintAnswer===true))));
+  document.querySelectorAll("#p-battle button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.b===(S.battle||"math"))));
 }
+document.querySelectorAll("#p-battle button").forEach(b=>b.onclick=()=>{S.battle=b.dataset.b;save();syncMath()});
 document.querySelectorAll("#p-hits button").forEach(b=>b.onclick=()=>{S.hits=+b.dataset.h;save();syncMath()});
 document.querySelectorAll("#p-chal button").forEach(b=>b.onclick=()=>{S.challenge=b.dataset.c==="1";save();syncMath()});
 document.querySelectorAll("#p-hint button").forEach(b=>b.onclick=()=>{S.hintAnswer=b.dataset.h==="1";save();syncMath()});
