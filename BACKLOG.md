@@ -7,7 +7,7 @@ Rules that apply to everything here: every instruction is spoken aloud, big tap 
 ## F. Learning fixes (teacher + parent review, 2026-11-04)
 Why: the game tests him but rarely teaches him. A wrong answer only says "Ouch, try again", so he can tap through the choices without learning how. Order agreed with Josiah: F1, then F2-F4; F5 later. Nothing here changes the number of right answers needed to win.
 
-- [x] **F1. Wrong answers teach.** Built 2026-11-04 (all 60 question kinds have a clue; tested at iPhone and iPad size). Published as artifact v21 (commit 806d507). Not yet tried by him.
+- [x] **F1. Wrong answers teach.** Built 2026-11-04 (all 60 question kinds have a clue; tested at iPhone and iPad size). Published as artifact v21; v22 adds ✕ to hide the clue and 💡 to bring it back (Josiah, after first play). Not yet tried by him.
   - A wrong choice is crossed out and can't be tapped again.
   - After the first miss, a hint appears under the question and is spoken: the strategy, not the answer. Kinds: number-line hops (count on / back, jump the tens then the ones, count up for change), counting by 2s/5s/10s along the groups, tens-and-ones place-value chart, "look at the biggest place first" for comparing, the part of a pattern that repeats, numbered equal parts for fractions. The last step is always a "?" so he still works out the answer himself.
   - A question he missed comes back as a fresh one of the same kind about 2 rounds later ("Here's one like before!"), and is cheered if he gets it right first time. Kept in memory only (not saved); if the battle ends first it comes up in the next battle.

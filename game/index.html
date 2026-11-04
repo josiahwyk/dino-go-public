@@ -234,6 +234,7 @@ h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
 .choices button.nope::after{content:"";position:absolute;inset:10px 18%;background:linear-gradient(45deg,transparent 47%,#B3361FCC 47% 53%,transparent 53%),linear-gradient(-45deg,transparent 47%,#B3361FCC 47% 53%,transparent 53%)}
 /* Clue after a wrong answer: drawn over the arena so the question and choices don't move */
 .cluecard{position:absolute;left:50%;top:4px;translate:-50% 0;z-index:5;width:min(94%,560px);background:#fffffff2;border:3px solid var(--lava);border-radius:20px;padding:6px 12px 8px;box-shadow:0 6px 0 var(--line);display:flex;flex-direction:column;align-items:center;gap:6px;animation:hintIn .35s ease-out;cursor:pointer}
+.cluecard .cc-x{position:absolute;top:4px;right:6px;width:44px;height:44px;border:0;border-radius:50%;background:#FFE7D6;color:var(--lava-dk);font-size:1.3rem;font-weight:800;display:grid;place-items:center}
 .cluecard h4{margin:0;font-family:var(--display);font-weight:800;font-size:1.05rem;color:var(--lava-dk)}
 .cluecard .eq.words{font-size:clamp(1rem,3.4vw,1.3rem)}
 .cluecard .strip{gap:6px}
@@ -368,6 +369,7 @@ textarea{font:inherit;font-size:1.1rem;border-radius:12px;border:2px solid #1E2B
     <div class="q" id="q-row">
       <button class="icon-btn" id="b-say" aria-label="Say the question again">🔊</button>
       <div class="qbox" id="qbox" aria-live="polite"></div>
+      <button class="icon-btn" id="b-clue" aria-label="Show the clue again" hidden>💡</button>
     </div>
     <div class="choices" id="choices"></div>
     <div class="moves" id="moves" hidden>
@@ -1188,9 +1190,13 @@ function makeQ(fixed){
 // Questions he got wrong first time come back as a fresh one of the same kind 2 rounds later ("one like before"). Memory only, not saved;
 // if the battle ends first they come up in the next battle. Each kind comes back at most twice, and only 3 wait at a time.
 let RETRY=[];
+// The card covers the dinos, so ✕ tucks it away and the 💡 button by the question brings it back (tapping the card itself says the clue again).
 function showHint(){hideHint(); const h=E.q&&E.q.hint; if(!h||!h.html)return;
-  const d=document.createElement("div"); d.className="cluecard"; d.id="hint"; d.innerHTML=`<h4>💡 Clue</h4>${h.html}`; d.onclick=()=>say(h.say); $("arena").appendChild(d)}
-function hideHint(){const d=$("hint"); if(d)d.remove()}
+  const d=document.createElement("div"); d.className="cluecard"; d.id="hint"; d.innerHTML=`<button class="cc-x" aria-label="Hide the clue">✕</button><h4>💡 Clue</h4>${h.html}`;
+  d.onclick=()=>say(h.say); d.querySelector(".cc-x").onclick=e=>{e.stopPropagation(); d.hidden=true; $("b-clue").hidden=false};
+  $("arena").appendChild(d)}
+function hideHint(){const d=$("hint"); if(d)d.remove(); $("b-clue").hidden=true}
+$("b-clue").onclick=()=>{const d=$("hint"); if(!d)return; d.hidden=false; $("b-clue").hidden=true; say(E.q.hint.say)};
 
 /* ---------- Battle effects ---------- */
 const TCOL={plant:"#3E9B4F",meat:"#D9443A",sea:"#2F7FD1",fly:"#8A55C9"};
