@@ -201,13 +201,13 @@ h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
 .cubes{display:grid;grid-template-columns:repeat(2,12px);gap:2px;align-content:end;margin-left:8px}
 .cube{width:12px;height:12px;border-radius:3px;background:var(--lava);box-shadow:0 2px 0 var(--line)}
 .rl{display:flex;flex-direction:column;align-items:center;gap:3px}
-.rl b{font-family:var(--display);font-weight:800;font-size:.95rem;line-height:1;color:var(--leaf)}
-.cubes.lg{grid-template-columns:repeat(3,18px);gap:3px;margin-bottom:19px} .cubes.lg .cube{width:18px;height:18px}
-.coins{display:grid;grid-template-columns:repeat(3,auto);gap:4px;align-content:end;margin:0 0 19px 10px}
+.rl b{display:none} /* running counts under each ten: hidden (Josiah, 2026-11-04: they made the bars harder to read) */
+.cubes.lg{grid-template-columns:repeat(3,18px);gap:3px} .cubes.lg .cube{width:18px;height:18px}
+.coins{display:grid;grid-template-columns:repeat(3,auto);gap:4px;align-content:end;margin:0 0 0 10px}
 .coins .coin{width:36px;height:36px;font-size:.8rem}
 .fstack .row-vis{flex-direction:column;gap:4px}
 .pvs{display:flex;flex-direction:column;align-items:center;gap:6px}
-@media (max-width:560px){.base{gap:3px}.rl .rod{height:76px}.rl b{font-size:.74rem}.coins{gap:3px;margin-left:6px}.coins .coin{width:28px;height:28px;font-size:.62rem}.cubes.lg{margin-bottom:16px;grid-template-columns:repeat(3,15px)}.cubes.lg .cube{width:15px;height:15px}.coins{margin-bottom:16px}}
+@media (max-width:560px){.base{gap:3px}.rl .rod{height:76px}.rl b{font-size:.74rem}.coins{gap:3px;margin-left:6px}.coins .coin{width:28px;height:28px;font-size:.62rem}.cubes.lg{grid-template-columns:repeat(3,15px)}.cubes.lg .cube{width:15px;height:15px}}
 .grp{display:grid;gap:4px;padding:8px;border:3px solid var(--leaf);border-radius:18px;background:#ffffffaa}
 .grp i,.berry{width:16px;height:16px;border-radius:50%;background:var(--t-meat);display:block}
 .coin{width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE9A8,#E2B23C 70%,#C9961F);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1rem;color:#6E4C00;box-shadow:0 2px 0 var(--line)}
@@ -876,7 +876,7 @@ function tensOnes(){
   const t=between(1,9),o=between(0,9),ans=t*10+o,s=new Set([ans]);
   if(o>0&&o!==t)s.add(o*10+t); s.add(ans+(ans<100?10:-10)); s.add(ans+(o<9?1:-1));
   const choices=[...s].slice(0,4); for(const v of nums(ans,[1,10]))if(choices.length<4&&!choices.includes(v))choices.push(v);
-  return {html:`<div class="base">${tensRun(t)}${o?`<div style="margin:0 0 19px 8px">${frames(rep(o,"a"))}</div>`:""}</div>`+words(`${t} ${plural(t,"ten","tens")} and ${o} ${plural(o,"one","ones")}`),
+  return {html:`<div class="base">${tensRun(t)}${o?`<div style="margin-left:8px">${frames(rep(o,"a"))}</div>`:""}</div>`+words(`${t} ${plural(t,"ten","tens")} and ${o} ${plural(o,"one","ones")}`),
     say:`${t} ${plural(t,"ten","tens")} and ${o} ${plural(o,"one","ones")}. Count the tens by 10s, then count on the ones. What number is that?`,ans,choices:choices.sort((a,b)=>a-b),hint:Clue.tens(t,o)};
 }
 function nextTo(){const n=between(10,119);return Math.random()<.6
