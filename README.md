@@ -1,12 +1,12 @@
 # Dino Go
 
-A dinosaur-catching learning game I built for my son. Wild dinos appear, he weakens them in a battle by answering maths questions, then catches them by spelling a word. Caught dinos go into a dino book with stats and facts, and they level up the more he plays.
+A dinosaur-catching learning game I built for my kid. Wild dinos appear, you weaken them in a battle by answering maths questions, then catch them by spelling a word. Caught dinos go into a dino book with stats and facts, and they level up the more you play.
 
 It runs in the browser on an iPad or phone. No accounts, no ads, no build step.
 
 ## What it does
 
-- **Maths battles** follow the Australian Curriculum (v9), Year 1 and Year 2: place value, adding and taking away, skip counting, equal groups, fractions, money. There are twelve levels and the game moves up or down by itself based on how he's going. It also tracks which kinds of question he finds hardest and asks those more often.
+- **Maths battles** follow the Australian Curriculum (v9), Year 1 and Year 2: place value, adding and taking away, skip counting, equal groups, fractions, money. There are twelve levels and the game moves up or down by itself based on how the player is going. It also tracks which kinds of question they find hardest and asks those more often.
 - **Spelling catches** use this week's homework words, typed in by a grown-up, plus an optional built-in word bank sorted by spelling pattern.
 - **Everything is spoken aloud**, so a child who can't read yet can still play. Every spelling word comes with a short sentence ("cat... The cat sat on the mat... cat").
 - **Clues instead of answers.** A wrong answer shows a picture clue (number-line hops, place-value charts, counting strips) with the last step left as a "?", and the same kind of question comes back a couple of rounds later.
@@ -57,4 +57,4 @@ The scripts are plain `<script>` tags that share globals, so order matters: a fi
 
 ## Built with
 
-Written with [Claude Code](https://claude.com/claude-code). I designed the game, tested every screen with my son and decided what to keep; Claude wrote most of the code.
+Written with [Claude Code](https://claude.com/claude-code). I designed the game, tested every screen with my kid and decided what to keep; Claude wrote most of the code.
