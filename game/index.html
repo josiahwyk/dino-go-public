@@ -910,8 +910,9 @@ function missingPart(max){const b=between(5,max),a=between(1,b-1);return {html:e
 // AC9M1N02: "35 is 2 tens and 15 ones"
 function tensOnesOther(){
   const t=between(2,9),o=between(0,9),n=t*10+o,ans=10+o,s=new Set([ans,o,ans+1,ans-1]);
-  return {html:eq(String(n))+`<div class="base">${'<i class="rod"></i>'.repeat(t-1)}<div class="strip" style="margin-left:8px"><b class="ask">?</b></div></div>`+words(`${t-1} ${plural(t-1,"ten","tens")} and ? ones`),
-    say:`${n} is ${t-1} ${plural(t-1,"ten","tens")} and how many ones?`,ans,choices:[...s].filter(v=>v>=0).slice(0,4).sort((a,b)=>a-b),
+  // Shown already broken so he can count it: the tens left as rods, the broken ten as a full blue ten-frame, the ones in orange.
+  return {html:eq(String(n))+`<div class="row-vis"><div class="base">${'<i class="rod"></i>'.repeat(t-1)}</div>${frames([...rep(10,"b"),...rep(o,"a")])}</div>`+words(`${t-1} ${plural(t-1,"ten","tens")} and ? ones`),
+    say:`${n} is ${t} tens${o?` and ${o} ${plural(o,"one","ones")}`:""}. Break one ten into 10 ones. Now it's ${t-1} ${plural(t-1,"ten","tens")} and how many ones?`,ans,choices:[...s].filter(v=>v>=0).slice(0,4).sort((a,b)=>a-b),
     hint:o?clue(`Break one ten into 10 ones. Start at 10 and count on ${o} more ${plural(o,"one","ones")}.`,numLine(jumps(10,o))):clue("Break one ten into ones. How many ones make one ten?",words("1 ten = ? ones"))};
 }
 // AC9M1N01: numbers that look and sound alike, e.g. 16, 60, 61, 66
