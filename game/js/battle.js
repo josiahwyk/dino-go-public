@@ -116,7 +116,7 @@ function hpBar() {
   p.classList.toggle("ready", E.shield);
   $("b-me").parentElement.classList.toggle("shielded", E.shield);
 }
-// A round: the wild dino winds up, they pick a move (if they have more than one), then answers the question that move asks.
+// A round: the wild dino winds up, they pick a move (if they have more than one), then answer the question that move asks.
 function beginRound() {
   E.busy = false;
   E.miss = 0;

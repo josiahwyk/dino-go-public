@@ -35,7 +35,7 @@ To add a dino: add it to SPECIES (js/data/species.js), put its 512px .jpg in gam
 
 ## Rules
 - Designed for a young child: every instruction spoken aloud (speechSynthesis), big buttons, difficulty adapts.
-- Battles: each round the wild dino winds up a move, they pick one of their 3 moves (easier / their level / harder question), then answers. Right = their dino hits; wrong = the wind-up lands. Every battle takes exactly S.hits right answers. Details, the super meter and fainting are in docs/GAME-RULES.md.
+- Battles: each round the wild dino winds up a move, they pick one of their 3 moves (easier / their level / harder question), then answer. Right = their dino hits; wrong = the wind-up lands. Every battle takes exactly S.hits right answers. Details, the super meter and fainting are in docs/GAME-RULES.md.
 - Dino facts in SPECIES haven't been checked against a source yet.
 - Later scope: printed track cards (fill-in-the-blank words), NFC, evolution, raids, Cantonese.
 - Idea (2026-10-17): an "explore" screen before encounters, like Pokémon: they walk a little avatar around illustrated habitats (forest, swamp, beach, volcano) and rustling bushes / footprints trigger a dino matched to that habitat. Josiah liked the feel of a 2.5D pixel RPG (top-down map, wandering, boss fights). No real GPS.

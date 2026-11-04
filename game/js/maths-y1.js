@@ -74,7 +74,7 @@ function makeTen() {
     hint: Clue.gap(a, 10),
   };
 }
-// Year 1 tens pictures: each ten has its running count under it (10, 20, 30...), so they count by tens and then counts on the ones.
+// Year 1 tens pictures: each ten has its running count under it (10, 20, 30...), so they count by tens and then count on the ones.
 const tensRun = (t, cls = "rod") =>
   Array.from({ length: t }, (_, i) => `<span class="rl"><i class="${cls}"></i><b>${10 * (i + 1)}</b></span>`).join("");
 function tensOnes() {
