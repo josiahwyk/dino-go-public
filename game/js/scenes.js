@@ -119,7 +119,7 @@ function seeded(s) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
-// Where the ground starts: just above his dino's feet in a battle, under the egg and wild dino when catching, a bit below the middle at home.
+// Where the ground starts: just above their dino's feet in a battle, under the egg and wild dino when catching, a bit below the middle at home.
 function horizon(H, u) {
   const feet = (sel) => {
     const e = document.querySelector(sel);

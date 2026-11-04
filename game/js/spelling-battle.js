@@ -1,6 +1,6 @@
 /* ---------- Spelling questions in battle (grown-up setting "Battle questions": maths, words or a mix) ---------- */
 // Same homework + challenge words as catching. The move picks the kind: easy = one missing letter, medium = two missing letters
-// side by side, hard = pick the right spelling. Spelling questions have lvl 0, so they never move his maths level.
+// side by side, hard = pick the right spelling. Spelling questions have lvl 0, so they never move their maths level.
 let KNOWN = null; // every real word the game knows: a wrong spelling on offer is never a real word (no their/there traps)
 
 const known = () =>
@@ -76,7 +76,7 @@ function wordQ(slot, word) {
       ),
     };
   }
-  // where the gap goes: on a vowel if possible (the part most often misspelled), never the first letter (he hears that one easily)
+  // where the gap goes: on a vowel if possible (the part most often misspelled), never the first letter (they hear that one easily)
   const n = kind === 1 && w.length >= 3 ? 2 : 1,
     all = [...Array(w.length - n + 1).keys()],
     starts = all.length > 1 ? all.slice(1) : all,

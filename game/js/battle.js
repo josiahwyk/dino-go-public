@@ -1,12 +1,12 @@
 /* ---------- Battle (maths) ---------- */
-let BG = 0; // bumped when a battle starts or he goes home, so a fight he left stops itself
+let BG = 0; // bumped when a battle starts or they go home, so a fight they left stops itself
 function startBattle(meId, intro) {
   BG++;
   E.me = meId;
   const me = BY[meId],
     w = E.wild,
     o = S.owned[meId];
-  // The wild dino's health (from SPECIES) is taken off by his hits. Every battle takes exactly S.hits right answers (see hitDamage).
+  // The wild dino's health (from SPECIES) is taken off by their hits. Every battle takes exactly S.hits right answers (see hitDamage).
   E.maxHp = w.hp;
   E.hp = E.maxHp;
   E.turn = 0;
@@ -14,7 +14,7 @@ function startBattle(meId, intro) {
   E.combo = 0;
   E.round = 0;
   E.phase = "";
-  // His dino's health is its dino-book Health stat. Each wrong answer costs about a sixth of it
+  // Their dino's health is its dino-book Health stat. Each wrong answer costs about a sixth of it
   // (a bit more against strong wild dinos), so it faints after roughly 5-6 wrong answers in one fight.
   E.myMax = me.hp + (lvl(o) - 1) * 2;
   E.myHp = E.myMax;
@@ -116,7 +116,7 @@ function hpBar() {
   p.classList.toggle("ready", E.shield);
   $("b-me").parentElement.classList.toggle("shielded", E.shield);
 }
-// A round: the wild dino winds up, he picks a move (if he has more than one), then answers the question that move asks.
+// A round: the wild dino winds up, they pick a move (if they have more than one), then answers the question that move asks.
 function beginRound() {
   E.busy = false;
   E.miss = 0;
@@ -207,7 +207,7 @@ async function answer(v, btn) {
     me = BY[E.me];
   let o = S.owned[E.me];
   if (v !== q.ans) {
-    // Wrong: his attack misses and the wild dino's wind-up lands (unless his shield is charged). The combo and shield pips start again.
+    // Wrong: their attack misses and the wild dino's wind-up lands (unless their shield is charged). The combo and shield pips start again.
     // The wrong choice is crossed out. The first miss on a question queues one like it for later and shows a clue.
     E.busy = true;
     E.miss++;
@@ -254,7 +254,7 @@ async function answer(v, btn) {
     shieldNeed: shieldNeed(o),
   });
   if (first) noteSkill(q.key, true);
-  // His maths level adapts (see RULES.adaptLevel). Either change is saved.
+  // Their maths level adapts (see RULES.adaptLevel). Either change is saved.
   if (RULES.adaptLevel(S, q.lvl, E.miss) || first) save();
   const mv = movesOf(me),
     m = { name: fin ? `SUPER ${mv[2].toUpperCase()}` : mv[E.slot], slot: E.slot, fin };

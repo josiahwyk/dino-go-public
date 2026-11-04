@@ -53,9 +53,9 @@ const QUESTIONS = {
   12: [coinsTotal, changeNote, changeCents, twoItems, spendLeft, eachCost, storyY2],
 };
 function makeQ(fixed, slot) {
-  // With one move the question is at his level, and 1 in 5 reviews an easier level: any earlier level up to Year 1's end, then only the 3 levels just below.
+  // With one move the question is at their level, and 1 in 5 reviews an easier level: any earlier level up to Year 1's end, then only the 3 levels just below.
   // With a move menu (fixed given) the move decides the level instead.
-  // A question he missed earlier comes back first (a new one of the same kind, at the level it was asked at).
+  // A question they missed earlier comes back first (a new one of the same kind, at the level it was asked at).
   const due = RETRY.findIndex((r) => r.wait <= 0);
   if (due >= 0) {
     const r = RETRY.splice(due, 1)[0],
@@ -70,7 +70,7 @@ function makeQ(fixed, slot) {
     return q;
   }
   if (useWords()) return wordQ(slot);
-  // About 1 in 3 questions is the kind he finds hardest at this level (see skills below); the rest are picked at random.
+  // About 1 in 3 questions is the kind they find hardest at this level (see skills below); the rest are picked at random.
   const L = S.mathLvl,
     lv = fixed || (L > 1 && Math.random() < 0.2 ? between(L > 6 ? L - 3 : 1, L - 1) : L),
     weak = Math.random() < 1 / 3 ? weakest(lv) : null;
@@ -88,7 +88,7 @@ function makeQ(fixed, slot) {
   return q;
 }
 // Skills: for each kind of maths question (one generator in QUESTIONS), right-first-time out of tries, saved as S.skills["level:name"]=[right,tries].
-// Only the last ~10 tries count (older ones fade out), so a kind he has since learned stops coming up as "hardest".
+// Only the last ~10 tries count (older ones fade out), so a kind they have since learned stops coming up as "hardest".
 const skillKey = (lv, gen) => `${lv}:${gen.name || QUESTIONS[lv].indexOf(gen)}`;
 function weakest(lv) {
   const sk = S.skills || {},
@@ -114,7 +114,7 @@ function noteSkill(k, ok) {
   }
   S.skills[k] = [Math.round(r * 100) / 100, n];
 }
-// Questions he got wrong first time come back as a fresh one of the same kind 2 rounds later ("one like before"). Memory only, not saved;
+// Questions they got wrong first time come back as a fresh one of the same kind 2 rounds later ("one like before"). Memory only, not saved;
 // if the battle ends first they come up in the next battle. Each kind comes back at most twice, and only 3 wait at a time.
 let RETRY = [];
 // The card covers the dinos, so ✕ tucks it away and the 💡 button by the question brings it back (tapping the card itself says the clue again).

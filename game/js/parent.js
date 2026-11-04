@@ -20,7 +20,7 @@ gear.onclick = () => {
   });
   $("p-pattern").appendChild(g);
 });
-// Fills the words box (not saved until he taps Save words) with about 8 words for the chosen pattern, never ones from the Challenge list.
+// Fills the words box (not saved until they tap Save words) with about 8 words for the chosen pattern, never ones from the Challenge list.
 $("p-suggest").onclick = () => {
   const p = PATTERNS[+$("p-pattern").value],
     skip = new Set(CHALLENGE),

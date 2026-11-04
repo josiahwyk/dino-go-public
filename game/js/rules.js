@@ -1,8 +1,8 @@
 /* ---------- Battle rules (no screen, sound or saving here, so tests/run.js can check them) ---------- */
 // The battle screen (battle.js) asks these what happens, then does the animation, speech and saving itself.
 const RULES = {
-  // His maths level adapts. Questions at his level count both ways: 5 right first time in a row moves him up,
-  // being stuck (2+ wrong taps) on 2 questions moves him down. A harder question (from a bigger move) right first time
+  // Their maths level adapts. Questions at their level count both ways: 5 right first time in a row moves them up,
+  // being stuck (2+ wrong taps) on 2 questions moves them down. A harder question (from a bigger move) right first time
   // also counts toward moving up, and a miss on it never counts toward stuck. Easier questions and spelling (lvl 0) count for nothing.
   // Changes s (the save) in place; returns true if anything changed, so the caller knows to save.
   adaptLevel(s, qLvl, miss) {

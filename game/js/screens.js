@@ -21,7 +21,7 @@ function goHome() {
   $("cele").hidden = true;
   const team = $("h-team");
   team.innerHTML = "";
-  // Up to 4 dinos he hasn't caught yet, as "?" shadows. Tapping one finds that dino.
+  // Up to 4 dinos they haven't caught yet, as "?" shadows. Tapping one finds that dino.
   const hiding = shuffle(SPECIES.filter((s) => hasArt(s.id) && !S.owned[s.id])).slice(0, 4);
   $("h-tease").textContent = hiding.length ? "Who's hiding? Tap one!" : "You found them all! Tap Find for a Rematch!";
   $("h-tease").hidden = !hiding.length && !Object.keys(S.owned).length;

@@ -71,7 +71,7 @@ function tap(t) {
   t.classList.remove("shake");
   void t.offsetWidth;
   t.classList.add("shake");
-  // The right tile only glows after 3 wrong taps; after 2 he hears the word again.
+  // The right tile only glows after 3 wrong taps; after 2 they hear the word again.
   if (E.lm >= 3) {
     const g = [...document.querySelectorAll(".tile:not(.used)")].find((x) => x.dataset.c === need);
     if (g && S.hintAnswer === true) g.classList.add("glow");

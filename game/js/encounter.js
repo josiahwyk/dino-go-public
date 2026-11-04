@@ -4,20 +4,20 @@ function newEncounter(wild, rematch = false) {
   return {
     wild,
     rematch,
-    first: false, // his very first dino: no battle, straight to the catch
+    first: false, // their very first dino: no battle, straight to the catch
     // Battle (startBattle fills these in)
-    me: null, // id of the dino he battles with
+    me: null, // id of the dino they battle with
     hp: 0, // the wild dino's health
     maxHp: 0,
     turn: 0, // right answers so far (the fight ends on the S.hits-th)
-    myHp: 0, // his dino's health
+    myHp: 0, // their dino's health
     myMax: 0,
-    wildDmg: 0, // what a landed wind-up costs his dino
+    wildDmg: 0, // what a landed wind-up costs their dino
     round: 0,
     phase: "", // "menu" (pick a move), "q" (answer the question) or "won"
     busy: false, // an animation is playing, so taps are ignored
     menuSay: "", // what the 🔊 button repeats on the move menu
-    slot: 0, // the move he picked (0 basic, 1 second, 2 special)
+    slot: 0, // the move they picked (0 basic, 1 second, 2 special)
     q: null, // the question being asked
     miss: 0, // wrong taps on this question
     combo: 0, // super meter
@@ -33,7 +33,7 @@ function newEncounter(wild, rematch = false) {
   };
 }
 let E = newEncounter(null);
-// Wild dinos are only ones he hasn't caught yet. Once he has every dino that has art, repeats are allowed again (shown as "Rematch!").
+// Wild dinos are only ones they haven't caught yet. Once they have every dino that has art, repeats are allowed again (shown as "Rematch!").
 function pickWild() {
   let pool = SPECIES.filter((s) => hasArt(s.id));
   if (!pool.length) pool = SPECIES;

@@ -1,5 +1,5 @@
 /* ---------- Levels, moves and growth (everything here is worked out from the saved xp, nothing extra is saved) ---------- */
-// Every dino has all 3 moves from level 1 (2026-11-04: he doesn't follow levels yet, so the reward is the bigger hits and the super move).
+// Every dino has all 3 moves from level 1 (2026-11-04: they don't follow levels yet, so the reward is the bigger hits and the super move).
 // Level perks: L3 "Brave", L4 shield after 2, L5 "Mighty" + glow, L8 free shield each fight, L10 "Legendary" + golden aura.
 const MOVE_NAMES = {
   // [basic, second, special]; dinos not listed use their type's set in MOVE_DEFAULT
@@ -36,8 +36,8 @@ const MOVE_DEFAULT = {
   fly: ["Wing flap", "Dive bomb", "Wing gust"],
 };
 const movesOf = (sp) => MOVE_NAMES[sp.id] || MOVE_DEFAULT[sp.type];
-// Slot 0 basic, 1 second, 2 special. dq: how much harder than his maths level the question is. power: share of the wild dino's remaining health
-// (see hitDamage). The number of right answers to win never changes, whichever moves he picks.
+// Slot 0 basic, 1 second, 2 special. dq: how much harder than their maths level the question is. power: share of the wild dino's remaining health
+// (see hitDamage). The number of right answers to win never changes, whichever moves they pick.
 const MOVE_SLOTS = [
   { need: 1, power: 1, dq: -1, stars: 1, charge: 1, tag: "Easy question", icon: "⚡", style: "nip", size: 1 },
   { need: 1, power: 1.6, dq: 0, stars: 2, charge: 1, tag: "Medium question", icon: "💥", style: "charge", size: 1.25 },
@@ -70,7 +70,7 @@ const fullSay = (sp, o) => {
 };
 const shieldNeed = (o) => (lvl(o) >= 4 ? 2 : 3);
 const startsShielded = (o) => lvl(o) >= 8;
-// New things a level gives him: returned as spoken/written lines. title = the name changes (evolution celebration).
+// New things a level gives them: returned as spoken/written lines. title = the name changes (evolution celebration).
 function perks(sp, o, L) {
   const out = [],
     t = { 3: "Brave", 5: "Mighty", 10: "Legendary" }[L];

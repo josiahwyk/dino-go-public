@@ -1,5 +1,5 @@
 /* ---------- Clues (shown after a wrong answer) ---------- */
-// Each question carries hint {html,say}: the strategy, never the answer. The step that gives the answer is always a "?" so he still works it out.
+// Each question carries hint {html,say}: the strategy, never the answer. The step that gives the answer is always a "?" so they still work it out.
 const clue = (say, ...parts) => ({ say, html: parts.join("") });
 // Hops on an empty number line, the way Year 1-2 classes teach it: 1s for small steps, jump to the next ten when a hop of 7-9 crosses one
 // ("make ten"), tens first then ones for big steps.

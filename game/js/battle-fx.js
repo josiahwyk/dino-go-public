@@ -462,7 +462,7 @@ function dizzy(box) {
     iterations: 3,
   }).then(() => dz.remove());
 }
-// His dino runs out of health: it flops over, the wild dino runs off, back to the home screen.
+// Their dino runs out of health: it flops over, the wild dino runs off, back to the home screen.
 async function faint() {
   const me = BY[E.me],
     w = E.wild;

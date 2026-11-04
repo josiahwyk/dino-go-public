@@ -365,14 +365,14 @@
     );
     return c;
   }
-  // Down and up get a 3rd frame: the step mirrored, so his feet take turns.
+  // Down and up get a 3rd frame: the step mirrored, so their feet take turns.
   const HERO = {
     down: [...HERO_PX.down.map((f) => spriteImg(f)), spriteImg(HERO_PX.down[1], true)],
     up: [...HERO_PX.up.map((f) => spriteImg(f)), spriteImg(HERO_PX.up[1], true)],
     right: HERO_PX.right.map((f) => spriteImg(f)),
     left: HERO_PX.right.map((f) => spriteImg(f, true)),
   };
-  // x,y = the tile he's on (or walking to); px,py = where he's drawn while sliding between tiles.
+  // x,y = the tile they're on (or walking to); px,py = where they're drawn while sliding between tiles.
   const hero = { x: 19, y: 16, px: 19, py: 16, dir: "down", frame: 0 };
 
   /* ---------- Drawing ---------- */
@@ -388,11 +388,11 @@
     S = Math.max(1, Math.round((36 * dpr) / TILE));
     draw();
   }
-  // The camera keeps him in the middle, but stops at the map's edges (centres the map if the screen is bigger than it).
+  // The camera keeps them in the middle, but stops at the map's edges (centres the map if the screen is bigger than it).
   function camera(centre, view, size) {
     return size <= view ? (size - view) / 2 : Math.min(Math.max(centre - view / 2, 0), size - view);
   }
-  // Called on resize and while he's sliding, not every frame (rule 9). The map is one ready-made picture, scaled up, with him on top.
+  // Called on resize and while they're sliding, not every frame (rule 9). The map is one ready-made picture, scaled up, with them on top.
   function draw() {
     const camX = camera(hero.px * TILE + TILE / 2, cv.width / S, WORLD.width),
       camY = camera(hero.py * TILE + TILE / 2, cv.height / S, WORLD.height);
@@ -407,12 +407,12 @@
       Y = oy + Math.round(hero.py * TILE * S);
     ctx.fillStyle = "rgba(0,0,0,.2)";
     ctx.fillRect(X + 4 * S, Y + 14 * S, 8 * S, 2 * S);
-    ctx.fillRect(X + 3 * S, Y + 15 * S, 10 * S, S); // soft shadow under his feet
+    ctx.fillRect(X + 3 * S, Y + 15 * S, 10 * S, S); // soft shadow under their feet
     ctx.drawImage(HERO[hero.dir][hero.frame], X, Y, TILE * S, TILE * S);
   }
 
   /* ---------- Walking ----------
-   One tile per step with a short slide. Holding a D-pad button (or arrow key) keeps him walking. Trees and water block him; he still turns to face them. */
+   One tile per step with a short slide. Holding a D-pad button (or arrow key) keeps them walking. Trees and water block them; they still turn to face them. */
   const STEP_MS = 180,
     SOLID = new Set(["R", "W"]);
   const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };

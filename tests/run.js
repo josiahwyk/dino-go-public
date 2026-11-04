@@ -18,7 +18,7 @@ function check(cond, msg) {
   if (!cond) throw new Error(msg);
 }
 const show = (q) => JSON.stringify({ say: q.say, ans: q.ans, choices: q.choices });
-// Story questions name his dino and the wild one, so every test starts mid-battle.
+// Story questions name their dino and the wild one, so every test starts mid-battle.
 const _load = loadGame;
 loadGame = (o) => {
   const g = _load(o);
@@ -89,7 +89,7 @@ test("skills keep only about the last 10 tries", () => {
 });
 
 // ---------- Battles ----------
-test("every battle takes exactly S.hits right answers, whatever moves he picks", () => {
+test("every battle takes exactly S.hits right answers, whatever moves they pick", () => {
   const g = loadGame();
   const powers = g.MOVE_SLOTS.map((m) => m.power);
   for (const hits of [4, 6, 8])
@@ -194,7 +194,7 @@ test("merge doesn't share objects with its inputs", () => {
 });
 
 // ---------- Rules pulled out of the battle screen (see js/rules.js) ----------
-test("adaptive level: 5 right first time at his level moves him up, 2 stuck moves him down", () => {
+test("adaptive level: 5 right first time at their level moves them up, 2 stuck moves them down", () => {
   const g = loadGame();
   if (!g.rules) throw new Error("js/rules.js not loaded");
   const s = { mathLvl: 4, streak: 0, stuck: 0 };
