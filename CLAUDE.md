@@ -2,13 +2,8 @@
 
 Learning game for my son: Pokémon-Go-style dinosaur catching. Maths battles weaken wild dinos; spelling catches them; a dino book shows stats and facts.
 
-## REMINDER: before this repo is ever made public
-The repo (github.com/josiahwyk/dino-go) is PRIVATE and contains personal info. If Josiah ever wants to make it public (or share it), stop and remind him to remove or genericise first:
-- His son's age and details: this file (CLAUDE.md), docs/ (BACKLOG.md, GAME-RULES.md, DESIGN-05.md), assets/dino_prompts.md (age details are in CLAUDE.local.md, which is not committed).
-- Names: "Josiah" in CLAUDE.md and docs/.
-- The live game link in this file (claude.ai artifact, shared with anyone who has the link): decide whether it should stay public.
-- Git history: every earlier commit keeps the old text and the author email (josiahwyk@gmail.com). Deleting lines from the files is not enough. Either start a fresh public repo with a clean first commit, or rewrite history, before changing visibility.
-- assets/originals/ (the Gemini downloads) and the Gemini art: check he is happy to publish them.
+## Private details stay out of the repo
+This repo is meant to be public. His age and any other personal details about him live in CLAUDE.local.md (git-ignored, on this computer only). Read it, design for it, but never write his age, name, school or similar into a committed file, commit message or published page.
 
 ## Files
 No build step: the game is plain files, opened in a browser.
