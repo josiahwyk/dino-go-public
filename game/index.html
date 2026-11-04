@@ -688,7 +688,8 @@ function goHome(){
 }
 
 /* ---------- Levels, moves and growth (everything here is worked out from the saved xp, nothing extra is saved) ---------- */
-// Level perks: L1 basic move, L3 second move + "Brave", L4 shield after 2, L5 special move + "Mighty" + glow, L8 free shield each fight, L10 "Legendary" + golden aura.
+// Every dino has all 3 moves from level 1 (2026-11-04: he doesn't follow levels yet, so the reward is the bigger hits and the super move).
+// Level perks: L3 "Brave", L4 shield after 2, L5 "Mighty" + glow, L8 free shield each fight, L10 "Legendary" + golden aura.
 const MOVE_NAMES={ // [basic, second, special]; dinos not listed use their type's set in MOVE_DEFAULT
   "01_triceratops":["Horn poke","Horn charge","Triple horn storm"],"02_stegosaurus":["Tail flick","Spike swing","Thagomizer smash"],
   "03_brachiosaurus":["Neck bonk","Big stomp","Sky-high slam"],"04_ankylosaurus":["Club tap","Club swing","Mega club smash"],
@@ -709,8 +710,8 @@ const movesOf=sp=>MOVE_NAMES[sp.id]||MOVE_DEFAULT[sp.type];
 // (see hitDamage). The number of right answers to win never changes, whichever moves he picks.
 const MOVE_SLOTS=[
   {need:1,power:1,  dq:-1,stars:1,charge:1,tag:"Easy question",  icon:"⚡",style:"nip",   size:1},
-  {need:3,power:1.6,dq:0, stars:2,charge:1,tag:"Medium question",icon:"💥",style:"charge",size:1.25},
-  {need:5,power:2.4,dq:1, stars:3,charge:2,tag:"Hard question · super charges ×2",icon:"🌟",style:"jump",size:1.6}];
+  {need:1,power:1.6,dq:0, stars:2,charge:1,tag:"Medium question",icon:"💥",style:"charge",size:1.25},
+  {need:1,power:2.4,dq:1, stars:3,charge:2,tag:"Hard question · super charges ×2",icon:"🌟",style:"jump",size:1.6}];
 const FIN_POWER=3.4;
 // Super meter (E.combo): a right-first-time answer adds the move's charge (the hard move adds 2), the first wrong tap on a question takes 1 away.
 // Full at 3, so a 6-answer battle can have 2 supers (more with hard moves). The number of right answers to win never changes.
@@ -724,13 +725,13 @@ const shieldNeed=o=>lvl(o)>=4?2:3;
 const startsShielded=o=>lvl(o)>=8;
 // New things a level gives him: returned as spoken/written lines. title = the name changes (evolution celebration).
 function perks(sp,o,L){
-  const m=movesOf(sp), out=[], t={3:"Brave",5:"Mighty",10:"Legendary"}[L];
-  if(L===3)out.push(`New move: ${m[1]}`); if(L===5)out.push(`New move: ${m[2]}`);
+  const out=[], t={3:"Brave",5:"Mighty",10:"Legendary"}[L];
+  if(t)out.push(`New name: ${t} ${sp.name}`);
   if(L===4)out.push("Your shield charges after 2 right answers"); if(L===8)out.push("Every fight starts with a shield");
   if(L===5)out.push("It glows now"); if(L===10)out.push("A golden glow");
   return {title:t,lines:out};
 }
-const NEXT_PERK=[[3,"a second move"],[4,"a faster shield"],[5,"a special move and a glow"],[8,"a free shield each fight"],[10,"a golden glow"]];
+const NEXT_PERK=[[3,"a new name"],[4,"a faster shield"],[5,"a new name and a glow"],[8,"a free shield each fight"],[10,"a golden glow"]];
 // Level badge and glow on a dino's picture (call after art())
 function decorate(el,id,badge=true,atLevel){
   el.classList.remove("aura5","aura10"); el.querySelectorAll(".lvbadge").forEach(b=>b.remove());
