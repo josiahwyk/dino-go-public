@@ -233,15 +233,15 @@ h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
 .choices button.nope{pointer-events:none;position:relative;background:#ECE7DA;color:#56664F99}
 .choices button.nope::after{content:"";position:absolute;inset:10px 18%;background:linear-gradient(45deg,transparent 47%,#B3361FCC 47% 53%,transparent 53%),linear-gradient(-45deg,transparent 47%,#B3361FCC 47% 53%,transparent 53%)}
 /* Clue after a wrong answer: drawn over the arena so the question and choices don't move */
-.hint{position:absolute;left:50%;top:4px;translate:-50% 0;z-index:5;width:min(94%,560px);background:#fffffff2;border:3px solid var(--lava);border-radius:20px;padding:6px 12px 8px;box-shadow:0 6px 0 var(--line);display:flex;flex-direction:column;align-items:center;gap:6px;animation:hintIn .35s ease-out;cursor:pointer}
-.hint h4{margin:0;font-family:var(--display);font-weight:800;font-size:1.05rem;color:var(--lava-dk)}
-.hint .eq.words{font-size:clamp(1rem,3.4vw,1.3rem)}
-.hint .strip{gap:6px}
-.hint .strip b{min-width:44px;height:44px;font-size:1.35rem;border-radius:12px;padding:0 6px}
-.hint .pie{width:54px;height:54px}
-.hint .berry{width:16px;height:16px}
-.hint .fk span{display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--display);font-weight:800;font-size:.95rem}
-.hint .deal{display:flex;flex-direction:column;gap:4px}
+.cluecard{position:absolute;left:50%;top:4px;translate:-50% 0;z-index:5;width:min(94%,560px);background:#fffffff2;border:3px solid var(--lava);border-radius:20px;padding:6px 12px 8px;box-shadow:0 6px 0 var(--line);display:flex;flex-direction:column;align-items:center;gap:6px;animation:hintIn .35s ease-out;cursor:pointer}
+.cluecard h4{margin:0;font-family:var(--display);font-weight:800;font-size:1.05rem;color:var(--lava-dk)}
+.cluecard .eq.words{font-size:clamp(1rem,3.4vw,1.3rem)}
+.cluecard .strip{gap:6px}
+.cluecard .strip b{min-width:44px;height:44px;font-size:1.35rem;border-radius:12px;padding:0 6px}
+.cluecard .pie{width:54px;height:54px}
+.cluecard .berry{width:16px;height:16px}
+.cluecard .fk span{display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--display);font-weight:800;font-size:.95rem}
+.cluecard .deal{display:flex;flex-direction:column;gap:4px}
 @keyframes hintIn{from{opacity:0;translate:-50% -10px}}
 .nl{display:block;width:100%;height:auto}
 .nl-base,.nl-tick{stroke:var(--ink);stroke-width:3;stroke-linecap:round}
@@ -250,7 +250,7 @@ h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
 .nl-n{font:800 20px var(--display);fill:var(--ink);text-anchor:middle}
 .nl-n.ask{fill:#fff} .nl-ask{fill:var(--lava)}
 @keyframes hop{to{stroke-dashoffset:0}} @keyframes nlIn{to{opacity:1}}
-@media (prefers-reduced-motion:reduce){.hint{animation:none}.nl-hop{animation:none;stroke-dashoffset:0}.nl-by{animation:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.cluecard{animation:none}.nl-hop{animation:none;stroke-dashoffset:0}.nl-by{animation:none;opacity:1}}
 .pvc{border-collapse:separate;border-spacing:5px 4px;font-family:var(--display);font-weight:800}
 .pvc th{font-size:.85rem;color:var(--muted);padding:0 4px}
 .pvc td{background:#fff;border-radius:10px;min-width:44px;height:42px;text-align:center;font-size:1.6rem;box-shadow:0 3px 0 var(--line)}
@@ -1189,7 +1189,7 @@ function makeQ(fixed){
 // if the battle ends first they come up in the next battle. Each kind comes back at most twice, and only 3 wait at a time.
 let RETRY=[];
 function showHint(){hideHint(); const h=E.q&&E.q.hint; if(!h||!h.html)return;
-  const d=document.createElement("div"); d.className="hint"; d.id="hint"; d.innerHTML=`<h4>💡 Clue</h4>${h.html}`; d.onclick=()=>say(h.say); $("arena").appendChild(d)}
+  const d=document.createElement("div"); d.className="cluecard"; d.id="hint"; d.innerHTML=`<h4>💡 Clue</h4>${h.html}`; d.onclick=()=>say(h.say); $("arena").appendChild(d)}
 function hideHint(){const d=$("hint"); if(d)d.remove()}
 
 /* ---------- Battle effects ---------- */
