@@ -708,11 +708,13 @@ const movesOf=sp=>MOVE_NAMES[sp.id]||MOVE_DEFAULT[sp.type];
 // Slot 0 basic, 1 second, 2 special. dq: how much harder than his maths level the question is. power: share of the wild dino's remaining health
 // (see hitDamage). The number of right answers to win never changes, whichever moves he picks.
 const MOVE_SLOTS=[
-  {need:1,power:1,  dq:-1,stars:1,tag:"Easy question",  icon:"⚡",style:"nip",   size:1},
-  {need:3,power:1.6,dq:0, stars:2,tag:"Medium question",icon:"💥",style:"charge",size:1.25},
-  {need:5,power:2.4,dq:1, stars:3,tag:"Hard question",  icon:"🌟",style:"jump",  size:1.6}];
+  {need:1,power:1,  dq:-1,stars:1,charge:1,tag:"Easy question",  icon:"⚡",style:"nip",   size:1},
+  {need:3,power:1.6,dq:0, stars:2,charge:1,tag:"Medium question",icon:"💥",style:"charge",size:1.25},
+  {need:5,power:2.4,dq:1, stars:3,charge:2,tag:"Hard question · super charges ×2",icon:"🌟",style:"jump",size:1.6}];
 const FIN_POWER=3.4;
-const finNeed=()=>Math.min(5,S.hits); // right answers in a row for the finisher (4 on Short battles so it can still happen)
+// Super meter (E.combo): a right-first-time answer adds the move's charge (the hard move adds 2), the first wrong tap on a question takes 1 away.
+// Full at 3, so a 6-answer battle can have 2 supers (more with hard moves). The number of right answers to win never changes.
+const finNeed=()=>3;
 const slotsOf=o=>MOVE_SLOTS.map((m,i)=>i).filter(i=>lvl(o)>=MOVE_SLOTS[i].need);
 const titleFor=L=>L>=10?"Legendary":L>=5?"Mighty":L>=3?"Brave":"";
 const titleOf=o=>titleFor(lvl(o));
@@ -1439,7 +1441,7 @@ function beginRound(){
   windUp();
   const warn=`${E.wild.say} is winding up ${E.wind}!${first?" Get it right to stop it!":""}`;
   if(slots.length<2){chooseMove(slots[0],warn);return}
-  showMenu(slots,`${warn} Pick a move!${first?" A bigger move asks a harder question, but it hits harder.":""}`);
+  showMenu(slots,`${warn} Pick a move!${first?" A bigger move asks a harder question, but it hits harder, and the biggest one charges your super move twice as fast.":""}`);
 }
 function showMenu(slots,spoken){
   E.phase="menu"; E.menuSay=spoken; const mv=movesOf(BY[E.me]),col=TCOL[BY[E.me].type];
@@ -1476,7 +1478,7 @@ async function answer(v,btn){
   if(v!==q.ans){
     // Wrong: his attack misses and the wild dino's wind-up lands (unless his shield is charged). The combo and shield pips start again.
     // The wrong choice is crossed out. The first miss on a question queues one like it for later and shows a clue.
-    E.busy=true; E.miss++; E.shieldN=0; E.combo=0; sfx.bad(); btn.classList.add("nope"); hpBar();
+    E.busy=true; E.miss++; E.shieldN=0; if(E.miss===1)E.combo=Math.max(0,E.combo-1); sfx.bad(); btn.classList.add("nope"); hpBar();
     if(E.miss===1&&q.gen&&RETRY.length<3&&(q.tries||0)<2)RETRY.push({gen:q.gen,lvl:q.lvl,wait:2,tries:(q.tries||0)+1});
     say("Missed! Look out!"); dodge();
     await wait(650); if(gen!==BG)return;
@@ -1492,9 +1494,9 @@ async function answer(v,btn){
   }
   E.busy=true; hideHint();
   const first=E.miss===0;
-  // Right first time: the combo grows and the shield charges (2 pips from level 4, otherwise 3).
+  // Right first time: the super meter charges by the move's charge and the shield charges (2 pips from level 4, otherwise 3).
   let shieldUp=false;
-  if(first){E.combo++; if(!E.shield){E.shieldN++; if(E.shieldN>=shieldNeed(o)){E.shield=true;E.shieldN=0;shieldUp=true}}}
+  if(first){E.combo+=MOVE_SLOTS[E.slot||0].charge; if(!E.shield){E.shieldN++; if(E.shieldN>=shieldNeed(o)){E.shield=true;E.shieldN=0;shieldUp=true}}}
   const fin=first&&E.combo>=finNeed();
   // adapt difficulty. Questions at his current level count as before. A harder question (from a bigger move) right first time also counts
   // toward moving up, and a wrong answer on it never counts toward "stuck"; easier questions don't count at all.
@@ -1509,7 +1511,7 @@ async function answer(v,btn){
   stopWind(true); hpBar();
   if(q.retry&&first)callout("You got it!",$("b-me"),"#2F9E44",-.1);
   say(`${q.sayAns?q.sayAns(v):v}! ${q.retry&&first?"You got it this time! ":""}${fin?"Super move! ":""}${m.name}!${shieldUp?" Shield ready!":""}`);
-  if(E.combo>=3&&!fin){sfx.combo(E.combo); callout(`Combo ×${E.combo}!`,$("b-me"),"#F2762E",-.95)}
+  if(first&&!fin&&E.combo===finNeed()-1){sfx.combo(E.combo); callout("Super almost ready!",$("b-me"),"#F2762E",-.95)}
   await (fin?superAttack(m):attack(m)); if(gen!==BG)return;
   if(fin){E.combo=0; hpBar();}
   if(shieldUp&&E.hp>0){sfx.block(); callout("Shield ready!",$("b-me"),"#2F7FD1",-.1); await wait(700);}
