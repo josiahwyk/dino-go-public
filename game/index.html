@@ -202,11 +202,12 @@ h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
 .cube{width:12px;height:12px;border-radius:3px;background:var(--lava);box-shadow:0 2px 0 var(--line)}
 .rl{display:flex;flex-direction:column;align-items:center;gap:3px}
 .rl b{font-family:var(--display);font-weight:800;font-size:.95rem;line-height:1;color:var(--leaf)}
-.cubes.big{grid-template-columns:repeat(3,18px);gap:3px;margin-bottom:19px} .cubes.big .cube{width:18px;height:18px}
+.cubes.lg{grid-template-columns:repeat(3,18px);gap:3px;margin-bottom:19px} .cubes.lg .cube{width:18px;height:18px}
 .coins{display:grid;grid-template-columns:repeat(3,auto);gap:4px;align-content:end;margin:0 0 19px 10px}
 .coins .coin{width:36px;height:36px;font-size:.8rem}
 .fstack .row-vis{flex-direction:column;gap:4px}
-@media (max-width:560px){.base{gap:4px}.rl .rod{height:76px}.rl b{font-size:.8rem}.coins{gap:3px;margin-left:6px}.coins .coin{width:28px;height:28px;font-size:.62rem}.cubes.big{margin-bottom:16px;grid-template-columns:repeat(3,15px)}.cubes.big .cube{width:15px;height:15px}.coins{margin-bottom:16px}}
+.pvs{display:flex;flex-direction:column;align-items:center;gap:6px}
+@media (max-width:560px){.base{gap:3px}.rl .rod{height:76px}.rl b{font-size:.74rem}.coins{gap:3px;margin-left:6px}.coins .coin{width:28px;height:28px;font-size:.62rem}.cubes.lg{margin-bottom:16px;grid-template-columns:repeat(3,15px)}.cubes.lg .cube{width:15px;height:15px}.coins{margin-bottom:16px}}
 .grp{display:grid;gap:4px;padding:8px;border:3px solid var(--leaf);border-radius:18px;background:#ffffffaa}
 .grp i,.berry{width:16px;height:16px;border-radius:50%;background:var(--t-meat);display:block}
 .coin{width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE9A8,#E2B23C 70%,#C9961F);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1rem;color:#6E4C00;box-shadow:0 2px 0 var(--line)}
@@ -875,7 +876,7 @@ function tensOnes(){
   const t=between(1,9),o=between(0,9),ans=t*10+o,s=new Set([ans]);
   if(o>0&&o!==t)s.add(o*10+t); s.add(ans+(ans<100?10:-10)); s.add(ans+(o<9?1:-1));
   const choices=[...s].slice(0,4); for(const v of nums(ans,[1,10]))if(choices.length<4&&!choices.includes(v))choices.push(v);
-  return {html:`<div class="base">${tensRun(t)}<div class="cubes big">${'<i class="cube"></i>'.repeat(o)}</div></div>`+words(`${t} ${plural(t,"ten","tens")} and ${o} ${plural(o,"one","ones")}`),
+  return {html:`<div class="base">${tensRun(t)}${o?`<div style="margin:0 0 19px 8px">${frames(rep(o,"a"))}</div>`:""}</div>`+words(`${t} ${plural(t,"ten","tens")} and ${o} ${plural(o,"one","ones")}`),
     say:`${t} ${plural(t,"ten","tens")} and ${o} ${plural(o,"one","ones")}. Count the tens by 10s, then count on the ones. What number is that?`,ans,choices:choices.sort((a,b)=>a-b),hint:Clue.tens(t,o)};
 }
 function nextTo(){const n=between(10,119);return Math.random()<.6
@@ -994,8 +995,9 @@ function mix(ans,extras=[],spread=[1,2],min=0,max=Infinity){
 }
 // Base-ten pictures: rods = tens (green), cubes = ones (orange); alt = the second number in yellow; gt/gu fade the tens/ones being taken away
 const bt=(n,o={})=>{const t=Math.floor(n/10),u=n%10,r=o.alt?"rod stack":"rod",c=o.alt?"cube gold":"cube",gt=o.gt||0,gu=o.gu||0;
-  return `<div class="base">${Array.from({length:t},(_,i)=>`<i class="${r}${i>=t-gt?" ghost":""}"></i>`).join("")}${u?`<div class="cubes">${Array.from({length:u},(_,i)=>`<i class="${c}${i>=u-gu?" ghost":""}"></i>`).join("")}</div>`:""}</div>`};
-const pv=(h,t,o)=>`<div class="base">${'<i class="flat"></i>'.repeat(h)}${'<i class="rod"></i>'.repeat(t)}${o?`<div class="cubes">${'<i class="cube"></i>'.repeat(o)}</div>`:""}</div>`;
+  return `<div class="base">${Array.from({length:t},(_,i)=>`<span class="rl"><i class="${r}${i>=t-gt?" ghost":""}"></i><b>${10*(i+1)}</b></span>`).join("")}${u?`<div class="cubes lg">${Array.from({length:u},(_,i)=>`<i class="${c}${i>=u-gu?" ghost":""}"></i>`).join("")}</div>`:""}</div>`};
+// Hundreds counted by 100s on the top row, then the tens carry on from there on the row below (100, 200, 210, 220...), like tensRun for Year 1
+const pv=(h,t,o)=>`<div class="pvs"><div class="base">${Array.from({length:h},(_,i)=>`<span class="rl"><i class="flat"></i><b>${100*(i+1)}</b></span>`).join("")}</div>${t||o?`<div class="base">${Array.from({length:t},(_,i)=>`<span class="rl"><i class="rod"></i><b>${h*100+10*(i+1)}</b></span>`).join("")}${o?`<div class="cubes lg">${'<i class="cube"></i>'.repeat(o)}</div>`:""}</div>`:""}</div>`;
 const pair=(a,b)=>`<div class="row-vis">${bt(a)}${bt(b,{alt:true})}</div>`;
 const $L={label:v=>"$"+v,sayAns:v=>`${v} ${plural(v,"dollar","dollars")}`}, cL={label:v=>v+"c",sayAns:v=>`${v} cents`};
 
@@ -1053,7 +1055,7 @@ function subPlain(){
   return {html:eq(`${a} − ${b} = ?`)+`<div class="row-vis">${bt(a,{gt:t2,gu:o2})}</div>`,say:`${a} take away ${b}?`,ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2,10],1,99),hint:Clue.on(a,-b)};
 }
 function tensTo100(){
-  const k=between(1,9),a=k*10,ans=100-a,take=Math.random()<.4,rods=`<div class="base">${Array.from({length:10},(_,i)=>`<i class="rod${i>=k?" ghost":""}"></i>`).join("")}</div>`;
+  const k=between(1,9),a=k*10,ans=100-a,take=Math.random()<.4,rods=`<div class="base">${Array.from({length:10},(_,i)=>`<span class="rl"><i class="rod${i>=k?" ghost":""}"></i><b>${10*(i+1)}</b></span>`).join("")}</div>`;
   return take?{html:eq(`100 − ${a} = ?`)+rods,say:`100 take away ${a}?`,ans,choices:mix(ans,[ans+10,ans-10,ans+20,ans-20],[10],10,90),hint:Clue.on(100,-a)}
     :{html:eq(`${a} + ? = 100`)+rods,say:`${a} and how many more make 100?`,ans,choices:mix(ans,[ans+10,ans-10,ans+20,ans-20],[10],10,90),hint:Clue.gap(a,100)};
 }
