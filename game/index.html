@@ -230,7 +230,32 @@ h2{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800}
 .choices{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;max-width:760px;width:100%;margin:0 auto}
 .choices button{flex:1 1 130px;max-width:180px;min-height:84px;border:0;border-radius:22px;background:#fff;font-family:var(--display);font-weight:800;font-size:2.4rem;box-shadow:0 6px 0 var(--line);display:grid;place-items:center}
 .choices button:active{transform:translateY(4px);box-shadow:0 2px 0 var(--line)}
-.choices button.nope{opacity:.3;pointer-events:none}
+.choices button.nope{pointer-events:none;position:relative;background:#ECE7DA;color:#56664F99}
+.choices button.nope::after{content:"";position:absolute;inset:10px 18%;background:linear-gradient(45deg,transparent 47%,#B3361FCC 47% 53%,transparent 53%),linear-gradient(-45deg,transparent 47%,#B3361FCC 47% 53%,transparent 53%)}
+/* Clue after a wrong answer: drawn over the arena so the question and choices don't move */
+.hint{position:absolute;left:50%;top:4px;translate:-50% 0;z-index:5;width:min(94%,560px);background:#fffffff2;border:3px solid var(--lava);border-radius:20px;padding:6px 12px 8px;box-shadow:0 6px 0 var(--line);display:flex;flex-direction:column;align-items:center;gap:6px;animation:hintIn .35s ease-out;cursor:pointer}
+.hint h4{margin:0;font-family:var(--display);font-weight:800;font-size:1.05rem;color:var(--lava-dk)}
+.hint .eq.words{font-size:clamp(1rem,3.4vw,1.3rem)}
+.hint .strip{gap:6px}
+.hint .strip b{min-width:44px;height:44px;font-size:1.35rem;border-radius:12px;padding:0 6px}
+.hint .pie{width:54px;height:54px}
+.hint .berry{width:16px;height:16px}
+.hint .fk span{display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--display);font-weight:800;font-size:.95rem}
+.hint .deal{display:flex;flex-direction:column;gap:4px}
+@keyframes hintIn{from{opacity:0;translate:-50% -10px}}
+.nl{display:block;width:100%;height:auto}
+.nl-base,.nl-tick{stroke:var(--ink);stroke-width:3;stroke-linecap:round}
+.nl-hop{fill:none;stroke:var(--lava);stroke-width:4;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:hop .4s ease-out forwards}
+.nl-by{font:800 17px var(--display);fill:var(--lava-dk);text-anchor:middle;opacity:0;animation:nlIn .2s forwards}
+.nl-n{font:800 20px var(--display);fill:var(--ink);text-anchor:middle}
+.nl-n.ask{fill:#fff} .nl-ask{fill:var(--lava)}
+@keyframes hop{to{stroke-dashoffset:0}} @keyframes nlIn{to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.hint{animation:none}.nl-hop{animation:none;stroke-dashoffset:0}.nl-by{animation:none;opacity:1}}
+.pvc{border-collapse:separate;border-spacing:5px 4px;font-family:var(--display);font-weight:800}
+.pvc th{font-size:.85rem;color:var(--muted);padding:0 4px}
+.pvc td{background:#fff;border-radius:10px;min-width:44px;height:42px;text-align:center;font-size:1.6rem;box-shadow:0 3px 0 var(--line)}
+.pvc th.hi{color:var(--lava-dk)} .pvc td.hi{background:#FFE7D6;outline:3px solid var(--lava)}
+.qbox .again{font-family:var(--display);font-weight:800;font-size:1rem;color:var(--lava-dk);background:#fff;border-radius:999px;padding:2px 14px;box-shadow:0 2px 0 var(--line)}
 .choices .shp{width:52px;height:52px}
 .glow{animation:glow 1s ease-in-out infinite;outline:5px solid var(--lava)!important}
 @keyframes glow{50%{transform:scale(1.08)}}
@@ -762,116 +787,172 @@ function frames(cells){let h="";for(let i=0;i<cells.length;i+=10){const c=cells.
 function nums(ans,spread=[1,2],min=0){const s=new Set([ans]);for(let g=0;s.size<4&&g<80;g++){const v=ans+pick(spread)*(Math.random()<.5?-1:1);if(v>=min)s.add(v)}return [...s].sort((a,b)=>a-b)}
 const plural=(n,one,many)=>n===1?one:many;
 
-const add=(a,b)=>({html:eq(`${a} + ${b} = ?`)+frames([...rep(a,"a"),...rep(b,"b")]),say:`${a} plus ${b}?`,ans:a+b,choices:nums(a+b,[1,2],1)});
-const sub=(a,b)=>({html:eq(`${a} − ${b} = ?`)+frames([...rep(a-b,"a"),...rep(b,"x")]),say:`${a} take away ${b}?`,ans:a-b,choices:nums(a-b,[1,2])});
-function makeTen(){const a=between(1,9);return {html:eq(`${a} + ? = 10`)+frames([...rep(a,"a"),...rep(10-a,"e")]),say:`${a} and how many more make 10?`,ans:10-a,choices:nums(10-a,[1,2])}}
+/* ---------- Clues (shown after a wrong answer) ---------- */
+// Each question carries hint {html,say}: the strategy, never the answer. The step that gives the answer is always a "?" so he still works it out.
+const clue=(say,...parts)=>({say,html:parts.join("")});
+// Hops on an empty number line, the way Year 1-2 classes teach it: 1s for small steps, jump to the next ten when a hop of 7-9 crosses one
+// ("make ten"), tens first then ones for big steps.
+function jumps(a,d){
+  const s=d<0?-1:1,pts=[a],toTen=v=>s>0?(10-v%10)%10:v%10; let v=a,n=Math.abs(d);
+  if(n<10){const t=toTen(v); if(n>6&&t>0&&t<n){pts.push(v+=s*t);pts.push(v+=s*(n-t))} else for(let i=0;i<n;i++)pts.push(v+=s); return pts}
+  for(let k=Math.floor(n/10);k>0;k--)pts.push(v+=s*10);
+  let r=n%10; if(!r)return pts;
+  const t=toTen(v); if(t>0&&t<r){pts.push(v+=s*t);r-=t}
+  pts.push(v+=s*r); return pts;
+}
+// pts must only go up or only go down (a line going down is drawn smallest on the left, hops going left). ask = which point shows "?" (-1 none).
+function numLine(pts,ask=pts.length-1,u=""){
+  const n=pts.length,gap=n>8?52:64,W=gap*(n-1)+64,rev=pts[n-1]<pts[0],x=i=>32+(rev?n-1-i:i)*gap;
+  let s=`<svg class="nl" viewBox="0 0 ${W} 112" style="max-width:${Math.round(W*1.15)}px" aria-hidden="true"><line class="nl-base" x1="8" y1="72" x2="${W-8}" y2="72"/>`;
+  for(let i=1;i<n;i++){const a=x(i-1),b=x(i),d=pts[i]-pts[i-1],h=Math.min(44,14+Math.abs(b-a)*.25),dl=(.3+i*.45).toFixed(2)+"s",m=(a+b)/2;
+    s+=`<path class="nl-hop" pathLength="1" style="animation-delay:${dl}" d="M${a} 70Q${m} ${70-2*h} ${b} 70"/><text class="nl-by" style="animation-delay:${dl}" x="${m}" y="${64-h}">${d<0?"−":"+"}${u}${Math.abs(d)}</text>`}
+  pts.forEach((p,i)=>{s+=`<line class="nl-tick" x1="${x(i)}" y1="63" x2="${x(i)}" y2="81"/>`+(i===ask?`<rect class="nl-ask" x="${x(i)-22}" y="85" width="44" height="26" rx="8"/><text class="nl-n ask" x="${x(i)}" y="105">?</text>`:`<text class="nl-n" x="${x(i)}" y="105">${u}${p}</text>`)});
+  return s+"</svg>";
+}
+const PL=["hundreds","tens","ones"];
+const dg=(n,cols)=>String(n).padStart(cols," ").slice(-cols).split("").map(c=>c===" "?"":c);
+// Place-value chart: rows of digits, hi = the column to highlight
+function pvChart(rows,hi=-1,cols=3){const hd=["100s","10s","1s"].slice(3-cols),c=i=>i===hi?' class="hi"':"";
+  return `<table class="pvc"><tr>${hd.map((h,i)=>`<th${c(i)}>${h}</th>`).join("")}</tr>${rows.map(r=>`<tr>${r.map((d,i)=>`<td${c(i)}>${d}</td>`).join("")}</tr>`).join("")}</table>`}
+const boxes=xs=>`<div class="strip">${xs.map(x=>`<b>${x}</b>`).join("")}</div>`;
+const Clue={
+  on:(a,d,u="")=>clue(d>0?`Start at ${u?"$":""}${a}. Hop on ${d}. Where do you land?`:`Start at ${u?"$":""}${a}. Hop back ${-d}. Where do you land?`,numLine(jumps(a,d),undefined,u)),
+  add:(a,b,u="")=>a>=b?Clue.on(a,b,u):{...Clue.on(b,a,u),say:`Start with the bigger number, ${b}. Hop on ${a}. Where do you land?`},
+  // missing part, difference, change: hop from a up to b; the answer is how far it hopped
+  gap:(a,b,u="")=>clue(`Start at ${a} and hop up to ${b}. How far did you hop altogether?`,numLine(jumps(a,b-a),-1,u)),
+  steps:(a,b)=>{const s=b>a?1:-1;return clue(`Count the hops from ${a} to ${b}.`,numLine(Array.from({length:Math.abs(b-a)+1},(_,i)=>a+i*s),-1))},
+  seq:(seq,hide,step)=>clue(`Each hop is ${step}. Count by ${step}s to find the missing number.`,numLine(seq,hide)),
+  count:(k,g,u="")=>clue(`Count by ${k}s, one number for each group.`,boxes(Array.from({length:g},(_,i)=>i<g-1?u+k*(i+1):"?"))),
+  howMany:(k,n)=>clue(`Count by ${k}s until you reach ${n}. How many numbers did you say?`,boxes(Array.from({length:n/k},(_,i)=>k*(i+1)))),
+  tens:(t,o)=>o?clue(`Count the tens: ${Array.from({length:t},(_,i)=>10*(i+1)).join(", ")}. Then count on ${o} ${plural(o,"one","ones")}.`,boxes(Array.from({length:t},(_,i)=>10*(i+1))),numLine(jumps(t*10,o)))
+    :clue("Count the tens by 10s, one number for each ten.",boxes(Array.from({length:t},(_,i)=>i<t-1?10*(i+1):"?"))),
+  pv:(h,t,o)=>clue("Put each part in its place: hundreds, tens and ones. An empty place gets a zero.",pvChart([[h,t,o]])),
+  cmp:(a,b,big)=>{const cols=Math.max(String(a).length,String(b).length),da=dg(a,cols),db=dg(b,cols);let i=0;while(i<cols-1&&da[i]===db[i])i++;
+    const p=PL[3-cols+i],same=i?`The ${PL[3-cols+i-1]} are the same, so look at the ${p}.`:`Look at the ${p} first.`;
+    return clue(`${same} Which number has ${big?"more":"fewer"} ${p}?`,pvChart([da,db],i,cols))},
+  ten:(n,d)=>{const st=Math.abs(d),p=st===10?"ten":"hundred",cols=String(n).length;
+    return clue(`${st} ${d>0?"more":"less"} means one ${d>0?"more":"less"} ${p}. Which digit changes?`,numLine([n,n+d]),pvChart([dg(n,cols)],cols-(st===10?2:3),cols))},
+  tensIn:n=>{const h=Math.floor(n/100),t=(n/10)%10,hs=Array.from({length:h},(_,i)=>10*(i+1));
+    return clue(`Every hundred is 10 tens. Count by 10s for the hundreds${t?`, then count on the other ${t} ${plural(t,"ten","tens")}`:""}.`,
+      t?boxes(hs)+numLine(jumps(10*h,t)):boxes(hs.map((v,i)=>i<h-1?v:"?")),words("tens"))},
+  hear:n=>{const t=Math.floor(n/10);return clue(`Listen: ${numWord(n)}. ${n>=20?`${TENS[t][0].toUpperCase()+TENS[t].slice(1)} means ${t} tens.`:"Teen numbers start with a 1."}`,words(numWord(n)),pvChart([[t,"?"]],0,2))},
+  unit:unit=>clue(`Find the part that repeats: ${unit.map(k=>SHAPES[k]).join(", ")}. Then say it again and again.`,`<div class="strip">${unit.map(k=>`<b>${shape(k)}</b>`).join("")}</div>`,words("again and again...")),
+  deal:(n,d)=>clue(`Give one berry to each dino, again and again, until all ${n} are gone. Then count one dino's berries.`,`<div class="deal">${`<div class="row-vis">${'<i class="berry"></i>'.repeat(n/d)}</div>`.repeat(d)}</div>`),
+  frac:()=>clue("Count the equal parts. 2 parts make halves, 4 parts make quarters, 8 parts make eighths.",`<div class="row-vis fk">${[2,4,8].map(p=>`<span>${fracSvg("pie",p,0)}${p} parts</span>`).join("")}</div>`),
+};
+
+const add=(a,b)=>({html:eq(`${a} + ${b} = ?`)+frames([...rep(a,"a"),...rep(b,"b")]),say:`${a} plus ${b}?`,ans:a+b,choices:nums(a+b,[1,2],1),hint:Clue.add(a,b)});
+const sub=(a,b)=>({html:eq(`${a} − ${b} = ?`)+frames([...rep(a-b,"a"),...rep(b,"x")]),say:`${a} take away ${b}?`,ans:a-b,choices:nums(a-b,[1,2]),hint:Clue.on(a,-b)});
+function makeTen(){const a=between(1,9);return {html:eq(`${a} + ? = 10`)+frames([...rep(a,"a"),...rep(10-a,"e")]),say:`${a} and how many more make 10?`,ans:10-a,choices:nums(10-a,[1,2]),hint:Clue.gap(a,10)}}
 function tensOnes(){
   const t=between(1,9),o=between(0,9),ans=t*10+o,s=new Set([ans]);
   if(o>0&&o!==t)s.add(o*10+t); s.add(ans+(ans<100?10:-10)); s.add(ans+(o<9?1:-1));
   const choices=[...s].slice(0,4); for(const v of nums(ans,[1,10]))if(choices.length<4&&!choices.includes(v))choices.push(v);
   return {html:`<div class="base">${'<i class="rod"></i>'.repeat(t)}<div class="cubes">${'<i class="cube"></i>'.repeat(o)}</div></div>`+words(`${t} ${plural(t,"ten","tens")} and ${o} ${plural(o,"one","ones")}`),
-    say:`${t} ${plural(t,"ten","tens")} and ${o} ${plural(o,"one","ones")}. What number is that?`,ans,choices:choices.sort((a,b)=>a-b)};
+    say:`${t} ${plural(t,"ten","tens")} and ${o} ${plural(o,"one","ones")}. What number is that?`,ans,choices:choices.sort((a,b)=>a-b),hint:Clue.tens(t,o)};
 }
 function nextTo(){const n=between(10,119);return Math.random()<.6
-  ?{html:strip([n-1,n,"?"]),say:`What number comes after ${n}?`,ans:n+1,choices:nums(n+1,[1,2,10])}
-  :{html:strip(["?",n,n+1]),say:`What number comes before ${n}?`,ans:n-1,choices:nums(n-1,[1,2,10])};}
+  ?{html:strip([n-1,n,"?"]),say:`What number comes after ${n}?`,ans:n+1,choices:nums(n+1,[1,2,10]),hint:clue(`What comes after ${n}? Count on one.`,numLine([n,n+1]))}
+  :{html:strip(["?",n,n+1]),say:`What number comes before ${n}?`,ans:n-1,choices:nums(n-1,[1,2,10]),hint:clue(`Count back one from ${n}.`,numLine([n,n-1]))};}
 function bigger(){const a=between(10,120);let b=a;while(b===a)b=Math.random()<.5?Math.floor(a/10)*10+rand(10):between(10,120);
-  return {html:words("Which number is bigger?"),say:`Which number is bigger, ${a} or ${b}?`,ans:Math.max(a,b),choices:[a,b]};}
+  return {html:words("Which number is bigger?"),say:`Which number is bigger, ${a} or ${b}?`,ans:Math.max(a,b),choices:[a,b],hint:Clue.cmp(a,b,true)};}
 function skip(){
   const step=pick([2,5,10]),start=step*rand(step===2?20:step===5?12:8),seq=[0,1,2,3,4].map(i=>start+i*step);
   const hide=Math.random()<.7?4:between(1,3),ans=seq[hide];
   return {html:strip(seq.map((v,i)=>i===hide?"?":v))+words(`Count by ${step}s`),
-    say:`Count by ${step}s. ${seq.map((v,i)=>i===hide?"what":v).join(", ")}?`,ans,choices:nums(ans,[1,step])};
+    say:`Count by ${step}s. ${seq.map((v,i)=>i===hide?"what":v).join(", ")}?`,ans,choices:nums(ans,[1,step]),hint:Clue.seq(seq,hide,step)};
 }
 function groups(){
   const k=pick([2,5,10]),g=between(2,5),cols=Math.min(k,5);
   const grp=`<div class="grp" style="grid-template-columns:repeat(${cols},16px)">${"<i></i>".repeat(k)}</div>`;
   return {html:`<div class="row-vis">${grp.repeat(g)}</div>`+words(`${g} groups of ${k}`),
-    say:`${g} groups of ${k}. How many altogether? Count by ${k}s.`,ans:g*k,choices:nums(g*k,[k,1],1)};
+    say:`${g} groups of ${k}. How many altogether? Count by ${k}s.`,ans:g*k,choices:nums(g*k,[k,1],1),hint:Clue.count(k,g)};
 }
 function pattern(){
   const [A,B,C]=shuffle(Object.keys(SHAPES)),unit=pick([[A,B],[A,A,B],[A,B,B],[A,B,C]]);
   const len=unit.length*2+rand(unit.length),seq=Array.from({length:len},(_,i)=>unit[i%unit.length]),ans=unit[len%unit.length];
   const choices=shuffle([...new Set([...unit,...Object.keys(SHAPES)])].slice(0,3)); if(!choices.includes(ans))choices[0]=ans;
   return {html:`<div class="strip">${seq.map(k=>`<b>${shape(k)}</b>`).join("")}<b class="ask">?</b></div>`,
-    say:`${seq.map(k=>SHAPES[k]).join(", ")}. What shape comes next?`,ans,choices,label:shape,sayAns:k=>SHAPES[k]};
+    say:`${seq.map(k=>SHAPES[k]).join(", ")}. What shape comes next?`,ans,choices,label:shape,sayAns:k=>SHAPES[k],hint:Clue.unit(unit)};
 }
 
 function share(){
   const d=between(2,4),each=between(1,5),n=d*each,s=src(E.me);
   const dino=s?`<img class="mini" src="${s}" alt="">`:'<span style="font-size:2.4rem">🦕</span>';
   return {html:`<div class="row-vis">${'<i class="berry"></i>'.repeat(n)}</div><div class="row-vis">${dino.repeat(d)}</div>`+words(`${n} berries shared by ${d} dinos`),
-    say:`${n} berries, shared equally between ${d} dinos. How many berries does each dino get?`,ans:each,choices:nums(each,[1,2],1)};
+    say:`${n} berries, shared equally between ${d} dinos. How many berries does each dino get?`,ans:each,choices:nums(each,[1,2],1),hint:Clue.deal(n,d)};
 }
 function story(){
   const me=BY[E.me].name,wild=E.wild.name;
   return pick([
     ()=>{const a=between(5,15),b=between(1,a-1),t=`There are ${a} eggs in the nest. ${b} ${plural(b,"egg hatches","eggs hatch")}. How many eggs are left?`;
-      return {html:words(t)+frames([...rep(a-b,"a"),...rep(b,"x")]),say:t,ans:a-b,choices:nums(a-b,[1,2])}},
+      return {html:words(t)+frames([...rep(a-b,"a"),...rep(b,"x")]),say:t,ans:a-b,choices:nums(a-b,[1,2]),hint:Clue.on(a,-b)}},
     ()=>{const a=between(3,12),b=between(2,20-a),t=`Your ${me} ate ${a} berries, then ${b} more. How many berries altogether?`;
-      return {html:words(t)+frames([...rep(a,"a"),...rep(b,"b")]),say:t,ans:a+b,choices:nums(a+b,[1,2],1)}},
+      return {html:words(t)+frames([...rep(a,"a"),...rep(b,"b")]),say:t,ans:a+b,choices:nums(a+b,[1,2],1),hint:Clue.add(a,b)}},
     ()=>{const a=between(6,15),b=between(2,a-1),t=`Your ${me} found ${a} leaves. The wild ${wild} found ${b}. How many more did your ${me} find?`;
-      return {html:words(t)+frames([...rep(b,"b"),...rep(a-b,"a")]),say:t,ans:a-b,choices:nums(a-b,[1,2])}},
+      return {html:words(t)+frames([...rep(b,"b"),...rep(a-b,"a")]),say:t,ans:a-b,choices:nums(a-b,[1,2]),hint:Clue.gap(b,a)}},
   ])();
 }
 function money(){
   const a=between(3,10),b=between(1,a-1),t=`You have ${a} dollars. A dino egg costs ${b} ${plural(b,"dollar","dollars")}. How much money is left?`;
   const coins=Array.from({length:a},(_,i)=>`<span class="coin" style="${i>=a-b?"opacity:.3":""}">$1</span>`).join("");
-  return {html:words(t)+`<div class="row-vis">${coins}</div>`,say:t,ans:a-b,choices:nums(a-b,[1,2])};
+  return {html:words(t)+`<div class="row-vis">${coins}</div>`,say:t,ans:a-b,choices:nums(a-b,[1,2]),hint:Clue.on(a,-b)};
 }
 /* Harder Year 1 variants, each modelled on an official AC9 elaboration */
 const ONES=["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"],TENS=["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
 const numWord=n=>n<20?ONES[n]:n>=100?"one hundred"+(n>100?" and "+numWord(n-100):""):TENS[Math.floor(n/10)]+(n%10?"-"+ONES[n%10]:"");
 // AC9M1N02 part-part-whole: "4 and how many more make 9?"
-function missingPart(max){const b=between(5,max),a=between(1,b-1);return {html:eq(`${a} + ? = ${b}`)+frames([...rep(a,"a"),...rep(b-a,"e")]),say:`${a} and how many more make ${b}?`,ans:b-a,choices:nums(b-a,[1,2])}}
+function missingPart(max){const b=between(5,max),a=between(1,b-1);return {html:eq(`${a} + ? = ${b}`)+frames([...rep(a,"a"),...rep(b-a,"e")]),say:`${a} and how many more make ${b}?`,ans:b-a,choices:nums(b-a,[1,2]),hint:Clue.gap(a,b)}}
 // AC9M1N02: "35 is 2 tens and 15 ones"
 function tensOnesOther(){
   const t=between(2,9),o=between(0,9),n=t*10+o,ans=10+o,s=new Set([ans,o,ans+1,ans-1]);
   return {html:eq(String(n))+`<div class="base">${'<i class="rod"></i>'.repeat(t-1)}<div class="strip" style="margin-left:8px"><b class="ask">?</b></div></div>`+words(`${t-1} ${plural(t-1,"ten","tens")} and ? ones`),
-    say:`${n} is ${t-1} ${plural(t-1,"ten","tens")} and how many ones?`,ans,choices:[...s].filter(v=>v>=0).slice(0,4).sort((a,b)=>a-b)};
+    say:`${n} is ${t-1} ${plural(t-1,"ten","tens")} and how many ones?`,ans,choices:[...s].filter(v=>v>=0).slice(0,4).sort((a,b)=>a-b),
+    hint:o?clue(`Break one ten into 10 ones. Start at 10 and count on ${o} more ${plural(o,"one","ones")}.`,numLine(jumps(10,o))):clue("Break one ten into ones. How many ones make one ten?",words("1 ten = ? ones"))};
 }
 // AC9M1N01: numbers that look and sound alike, e.g. 16, 60, 61, 66
 function lookAlike(){
   let a=between(1,9),b=between(1,9); while(b===a)b=between(1,9);
   const opts=shuffle([...new Set([a*10+b,b*10+a,a*11,b*10,a*10])]).slice(0,4),ans=pick(opts);
-  return {html:words("Tap the number")+words(`<b style="font-size:1.4em">${numWord(ans)}</b>`),say:`Tap the number ${ans}.`,ans,choices:opts.sort((x,y)=>x-y)};
+  return {html:words("Tap the number")+words(`<b style="font-size:1.4em">${numWord(ans)}</b>`),say:`Tap the number ${ans}.`,ans,choices:opts.sort((x,y)=>x-y),hint:Clue.hear(ans)};
 }
 // AC9M1N01 hundreds chart: 10 more / 10 less
 function tenMore(){const n=between(10,110),up=n+10<=120&&Math.random()<.6,ans=up?n+10:n-10;
-  return {html:strip(up?[n,"?"]:["?",n])+words(up?"10 more":"10 less"),say:`What is 10 ${up?"more":"less"} than ${n}?`,ans,choices:nums(ans,[1,10])};}
+  return {html:strip(up?[n,"?"]:["?",n])+words(up?"10 more":"10 less"),say:`What is 10 ${up?"more":"less"} than ${n}?`,ans,choices:nums(ans,[1,10]),hint:Clue.ten(n,up?10:-10)};}
 // AC9M1A01: count $2 coins by twos, $5 and $10 notes by fives and tens
 function countMoney(){
   const [v,cls]=pick([[2,"coin"],[5,"note five"],[10,"note ten"]]),k=between(2,v===2?10:v===5?8:6);
   return {html:`<div class="row-vis">${`<span class="${cls}">$${v}</span>`.repeat(k)}</div>`+words(`Count by ${v}s`),
-    say:`Count by ${v}s. How many dollars altogether?`,ans:k*v,choices:nums(k*v,[v,1],1)};
+    say:`Count by ${v}s. How many dollars altogether?`,ans:k*v,choices:nums(k*v,[v,1],1),hint:Clue.count(v,k,"$")};
 }
 // AC9M1N03: stacks of ten $1 coins plus leftovers
 function coinStacks(){const g=between(1,9),o=between(0,9),ans=g*10+o;
   return {html:`<div class="base">${'<i class="rod stack"></i>'.repeat(g)}<div class="cubes">${'<i class="cube gold"></i>'.repeat(o)}</div></div>`+words(`${g} ${plural(g,"stack","stacks")} of 10 $1 coins and ${o} more`),
-    say:`${g} ${plural(g,"stack","stacks")} of 10 coins, and ${o} more ${plural(o,"coin","coins")}. How many dollars?`,ans,choices:nums(ans,[1,10],1)};}
+    say:`${g} ${plural(g,"stack","stacks")} of 10 coins, and ${o} more ${plural(o,"coin","coins")}. How many dollars?`,ans,choices:nums(ans,[1,10],1),hint:Clue.tens(g,o)};}
 // AC9M1A02: longer repeating units, e.g. SSCSC
 function longPattern(){
   const [A,B,C]=shuffle(Object.keys(SHAPES)),unit=pick([[A,A,B,A,B],[A,B,C,C],[A,B,B,C]]);
   const len=unit.length+1+rand(unit.length),seq=Array.from({length:len},(_,i)=>unit[i%unit.length]),ans=unit[len%unit.length];
   const choices=shuffle([...new Set(unit)]); if(choices.length<3)choices.push(Object.keys(SHAPES).find(k=>!choices.includes(k)));
   return {html:`<div class="strip">${seq.map(k=>`<b>${shape(k)}</b>`).join("")}<b class="ask">?</b></div>`,
-    say:`${seq.map(k=>SHAPES[k]).join(", ")}. What shape comes next?`,ans,choices,label:shape,sayAns:k=>SHAPES[k]};
+    say:`${seq.map(k=>SHAPES[k]).join(", ")}. What shape comes next?`,ans,choices,label:shape,sayAns:k=>SHAPES[k],hint:Clue.unit(unit)};
 }
 // AC9M1N06: "How many wheels are needed for 3 cars?"
 function equalGroups(){
   const o=pick([{n:"cars",e:4,w:"wheels"},{n:"dinos",e:4,w:"legs"},{n:"birds",e:2,w:"legs"},{n:"hands",e:5,w:"fingers"},{n:"tricycles",e:3,w:"wheels"}]),g=between(2,5);
   const grp=`<div class="grp" style="grid-template-columns:repeat(${Math.min(o.e,3)},16px)">${"<i></i>".repeat(o.e)}</div>`;
-  return {html:`<div class="row-vis">${grp.repeat(g)}</div>`+words(`${g} ${o.n}: how many ${o.w}?`),say:`How many ${o.w} on ${g} ${o.n}?`,ans:g*o.e,choices:nums(g*o.e,[o.e,1],1)};
+  return {html:`<div class="row-vis">${grp.repeat(g)}</div>`+words(`${g} ${o.n}: how many ${o.w}?`),say:`How many ${o.w} on ${g} ${o.n}?`,ans:g*o.e,choices:nums(g*o.e,[o.e,1],1),hint:Clue.count(o.e,g)};
 }
 // AC9M1N05: whole-dollar money stories ("I had $14 and was given $15")
 function moneyAdd(){const a=between(5,15),b=between(5,15),t=`You had ${a} dollars. You got ${b} dollars for your birthday. How many dollars do you have now?`;
-  return {html:words(t),say:t,ans:a+b,choices:nums(a+b,[1,2,10],1)};}
+  return {html:words(t),say:t,ans:a+b,choices:nums(a+b,[1,2,10],1),hint:Clue.add(a,b)};}
 // AC9M1N05: people getting on and off a bus
 function bus(){const a=between(4,12),off=between(1,a-1),on=between(1,8),t=`${a} people are on the bus. ${off} get off. Then ${on} get on. How many people are on the bus now?`;
-  return {html:words(t),say:t,ans:a-off+on,choices:nums(a-off+on,[1,2])};}
+  return {html:words(t),say:t,ans:a-off+on,choices:nums(a-off+on,[1,2]),
+  hint:clue(`First take away the ${off} who got off. Then add the ${on} who got on.`,words(`${a} − ${off} = ?`),words(`then ? + ${on}`))};}
 // AC9M1N06: grouping, "How many bags?"
 function bags(){const k=pick([2,3,4,5]),b=between(2,5),n=k*b;
-  return {html:`<div class="row-vis">${'<i class="berry"></i>'.repeat(n)}</div>`+words(`${n} berries in bags of ${k}`),say:`${n} berries go into bags of ${k}. How many bags do you need?`,ans:b,choices:nums(b,[1,2],1)};}
+  return {html:`<div class="row-vis">${'<i class="berry"></i>'.repeat(n)}</div>`+words(`${n} berries in bags of ${k}`),say:`${n} berries go into bags of ${k}. How many bags do you need?`,ans:b,choices:nums(b,[1,2],1),hint:Clue.howMany(k,n)};}
 
 /* ---------- Maths questions: Australian Curriculum v9, Year 2 (levels 7-12) ---------- */
 // mix() builds the tap choices: the answer, the slip a child is most likely to make (extras[0], always used if valid),
@@ -895,35 +976,35 @@ const $L={label:v=>"$"+v,sayAns:v=>`${v} ${plural(v,"dollar","dollars")}`}, cL={
 const numChoices=(h,t,o)=>{const n=h*100+t*10+o;return mix(n,[h*100+o*10+t,+(`${h}${t||""}${o||""}`),n+10,n-10,n+100],[1,10],1,999)};
 function pvBlocks(){
   const h=between(1,5),t=between(0,9),o=between(0,9),w=`${h} ${plural(h,"hundred","hundreds")}, ${t} ${plural(t,"ten","tens")} and ${o} ${plural(o,"one","ones")}`;
-  return {html:pv(h,t,o)+words(w),say:`${w}. What number is that?`,ans:h*100+t*10+o,choices:numChoices(h,t,o)};
+  return {html:pv(h,t,o)+words(w),say:`${w}. What number is that?`,ans:h*100+t*10+o,choices:numChoices(h,t,o),hint:Clue.pv(h,t,o)};
 }
 function digitValue(){
   let ds; do{ds=[between(1,9),between(1,9),between(1,9)]}while(new Set(ds).size<3); // distinct digits so "the 5" is clear
   const p=rand(3),d=ds[p],n=ds[0]*100+ds[1]*10+ds[2],hi=x=>`<span style="color:var(--lava)">${x}</span>`;
-  return {html:eq(ds.map((x,i)=>i===p?hi(x):x).join(""))+words(`What is the ${hi(d)} worth?`),say:`In ${n}, what is the ${d} worth?`,ans:d*10**(2-p),choices:[d,d*10,d*100]};
+  return {html:eq(ds.map((x,i)=>i===p?hi(x):x).join(""))+words(`What is the ${hi(d)} worth?`),say:`In ${n}, what is the ${d} worth?`,ans:d*10**(2-p),choices:[d,d*10,d*100],hint:clue(`The ${d} is in the ${PL[p]} place. What are ${d} ${PL[p]} worth?`,pvChart([ds],p))};
 }
 function partition(){
   const h=between(1,9),t=between(0,9);let o=between(0,9); if(!t&&!o)o=between(1,9);
   const parts=[h*100,t*10,o].filter(x=>x);
-  return {html:eq(parts.join(" + ")+" = ?"),say:`${parts.join(" plus ")}. What number is that?`,ans:h*100+t*10+o,choices:numChoices(h,t,o)};
+  return {html:eq(parts.join(" + ")+" = ?"),say:`${parts.join(" plus ")}. What number is that?`,ans:h*100+t*10+o,choices:numChoices(h,t,o),hint:Clue.pv(h,t,o)};
 }
 function partMissing(){
   const h=between(1,9),t=between(1,9),o=between(1,9),n=h*100+t*10+o,k=rand(3),parts=[h*100,t*10,o],ans=parts[k];
   const extras=[[h,h*10,ans+100],[t,t*100,ans+10],[o*10,o+1,o-1]][k];
-  return {html:eq(`${n} = ${parts.map((p,i)=>i===k?"?":p).join(" + ")}`),say:`${n} equals ${parts.map((p,i)=>i===k?"what":p).join(" plus ")}. What is the missing part?`,ans,choices:mix(ans,extras,[1,10],1,999)};
+  return {html:eq(`${n} = ${parts.map((p,i)=>i===k?"?":p).join(" + ")}`),say:`${n} equals ${parts.map((p,i)=>i===k?"what":p).join(" plus ")}. What is the missing part?`,ans,choices:mix(ans,extras,[1,10],1,999),hint:clue(`Look at the ${PL[k]} digit in ${n}. What is it worth?`,pvChart([[h,t,o]],k))};
 }
 function moreLess(){
   const step=Math.random()<.6?10:100,up=Math.random()<.5,s=up?1:-1,n=up?between(100,1000-step):between(100+step,999),ans=n+s*step;
   const extras=step===10?[n+100*s,n+s,n-10*s]:[n+10*s,n+s,n-100*s];
-  return {html:strip(up?[n,"?"]:["?",n])+words(`${step} ${up?"more":"less"}`),say:`What is ${step} ${up?"more":"less"} than ${n}?`,ans,choices:mix(ans,extras,[1,10,100],0,1000)};
+  return {html:strip(up?[n,"?"]:["?",n])+words(`${step} ${up?"more":"less"}`),say:`What is ${step} ${up?"more":"less"} than ${n}?`,ans,choices:mix(ans,extras,[1,10,100],0,1000),hint:Clue.ten(n,s*step)};
 }
 function biggerSmaller(){
   const big=Math.random()<.5,a=between(100,999);let b; do{b=Math.random()<.7?Math.floor(a/100)*100+rand(100):between(100,999)}while(b===a);
-  return {html:words(`Which number is ${big?"bigger":"smaller"}?`),say:`Which number is ${big?"bigger":"smaller"}, ${a} or ${b}?`,ans:big?Math.max(a,b):Math.min(a,b),choices:[a,b]};
+  return {html:words(`Which number is ${big?"bigger":"smaller"}?`),say:`Which number is ${big?"bigger":"smaller"}, ${a} or ${b}?`,ans:big?Math.max(a,b):Math.min(a,b),choices:[a,b],hint:Clue.cmp(a,b,big)};
 }
 function howManyTens(){
   const n=between(10,99)*10;
-  return {html:eq(String(n))+words("How many tens?"),say:`How many tens are in ${n}?`,ans:n/10,choices:mix(n/10,[Math.floor(n/100),(n/10)%10,n/10+10],[1,2],1)};
+  return {html:eq(String(n))+words("How many tens?"),say:`How many tens are in ${n}?`,ans:n/10,choices:mix(n/10,[Math.floor(n/100),(n/10)%10,n/10+10],[1,2],1),hint:Clue.tensIn(n)};
 }
 
 // Level 8: add and take away within 100, no trading (AC9M2N04)
@@ -933,7 +1014,7 @@ function addPlain(){
   else if(k==="ones"){t1=between(1,9);o1=between(0,8);t2=0;o2=between(1,9-o1)}
   else{t1=between(1,8);o1=between(0,8);t2=between(1,9-t1);o2=between(1,9-o1)}
   const a=t1*10+o1,b=t2*10+o2,ans=a+b;
-  return {html:eq(`${a} + ${b} = ?`)+pair(a,b),say:`${a} plus ${b}?`,ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2,10],1,99)};
+  return {html:eq(`${a} + ${b} = ?`)+pair(a,b),say:`${a} plus ${b}?`,ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2,10],1,99),hint:Clue.add(a,b)};
 }
 function subPlain(){
   const k=pick(["tens","ones","both"]);let t1,o1,t2,o2;
@@ -941,27 +1022,27 @@ function subPlain(){
   else if(k==="ones"){t1=between(1,9);o1=between(1,9);t2=0;o2=between(1,o1)}
   else{t1=between(2,9);o1=between(1,9);t2=between(1,t1-1);o2=between(1,o1)}
   const a=t1*10+o1,b=t2*10+o2,ans=a-b;
-  return {html:eq(`${a} − ${b} = ?`)+`<div class="row-vis">${bt(a,{gt:t2,gu:o2})}</div>`,say:`${a} take away ${b}?`,ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2,10],1,99)};
+  return {html:eq(`${a} − ${b} = ?`)+`<div class="row-vis">${bt(a,{gt:t2,gu:o2})}</div>`,say:`${a} take away ${b}?`,ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2,10],1,99),hint:Clue.on(a,-b)};
 }
 function tensTo100(){
   const k=between(1,9),a=k*10,ans=100-a,take=Math.random()<.4,rods=`<div class="base">${Array.from({length:10},(_,i)=>`<i class="rod${i>=k?" ghost":""}"></i>`).join("")}</div>`;
-  return take?{html:eq(`100 − ${a} = ?`)+rods,say:`100 take away ${a}?`,ans,choices:mix(ans,[ans+10,ans-10,ans+20,ans-20],[10],10,90)}
-    :{html:eq(`${a} + ? = 100`)+rods,say:`${a} and how many more make 100?`,ans,choices:mix(ans,[ans+10,ans-10,ans+20,ans-20],[10],10,90)};
+  return take?{html:eq(`100 − ${a} = ?`)+rods,say:`100 take away ${a}?`,ans,choices:mix(ans,[ans+10,ans-10,ans+20,ans-20],[10],10,90),hint:Clue.on(100,-a)}
+    :{html:eq(`${a} + ? = 100`)+rods,say:`${a} and how many more make 100?`,ans,choices:mix(ans,[ans+10,ans-10,ans+20,ans-20],[10],10,90),hint:Clue.gap(a,100)};
 }
 
 // Level 9: trading / regrouping within 100 (AC9M2N04)
 function addTrade(){
   const o1=between(2,9),o2=between(10-o1,9),t2=between(0,6),t1=between(1,8-t2),a=t1*10+o1,b=t2*10+o2,ans=a+b; // ones make 10 or more, total stays under 100
-  return {html:eq(`${a} + ${b} = ?`)+pair(a,b),say:`${a} plus ${b}?`,ans,choices:mix(ans,[ans-10,ans+10,ans+1,ans-1],[1,2],1,99)}; // ans-10 = forgot to trade
+  return {html:eq(`${a} + ${b} = ?`)+pair(a,b),say:`${a} plus ${b}?`,ans,choices:mix(ans,[ans-10,ans+10,ans+1,ans-1],[1,2],1,99),hint:Clue.add(a,b)}; // ans-10 = forgot to trade
 }
 function subTrade(){
   const t1=between(2,9),o1=between(0,7),t2=between(0,t1-1),o2=between(o1+1,9),a=t1*10+o1,b=t2*10+o2,ans=a-b;
   const slip=(t1-t2)*10+(o2-o1); // took the smaller ones from the larger
-  return {html:eq(`${a} − ${b} = ?`)+`<div class="row-vis">${bt(a)}</div>`,say:`${a} take away ${b}?`,ans,choices:mix(ans,[slip,ans+10,ans+1,ans-1],[1,2],1,99)};
+  return {html:eq(`${a} − ${b} = ?`)+`<div class="row-vis">${bt(a)}</div>`,say:`${a} take away ${b}?`,ans,choices:mix(ans,[slip,ans+10,ans+1,ans-1],[1,2],1,99),hint:Clue.on(a,-b)};
 }
 function bridgeTen(){
   const extra=Math.random()<.5?0:between(1,2),t=between(1,extra?7:8),o=between(1,9),a=t*10+o,target=(t+1+extra)*10,ans=target-a;
-  return {html:eq(`${a} + ? = ${target}`)+bt(a),say:`${a} and how many more make ${target}?`,ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2],1)};
+  return {html:eq(`${a} + ? = ${target}`)+bt(a),say:`${a} and how many more make ${target}?`,ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2],1),hint:Clue.gap(a,target)};
 }
 
 // Level 10: skip counting by 2s, 3s, 5s, 10s and additive patterns (AC9M2A01, AC9M2N05)
@@ -970,42 +1051,42 @@ function skipY2(){
   const start=down?step*between(5,10)+off:step*rand(8)+off,seq=[0,1,2,3,4].map(i=>start+(down?-i:i)*step);
   const hide=Math.random()<.6?4:between(1,3),ans=seq[hide],dir=down?"back":"on";
   return {html:strip(seq.map((v,i)=>i===hide?"?":v))+words(`Count ${dir} by ${step}s`),
-    say:`Count ${dir} by ${step}s. ${seq.map((v,i)=>i===hide?"what":v).join(", ")}?`,ans,choices:mix(ans,[ans+step,ans-step,ans+1,ans-1],[1,2])};
+    say:`Count ${dir} by ${step}s. ${seq.map((v,i)=>i===hide?"what":v).join(", ")}?`,ans,choices:mix(ans,[ans+step,ans-step,ans+1,ans-1],[1,2]),hint:Clue.seq(seq,hide,step)};
 }
 function stepGuess(){
   const step=pick([2,3,5,10]),down=Math.random()<.25,off=Math.random()<.2?between(1,step-1):0;
   const start=down?step*between(5,9)+off:step*rand(6)+off,seq=[0,1,2,3].map(i=>start+(down?-i:i)*step),w=down?"down":"up";
-  return {html:strip(seq)+words(`How much does it go ${w} each time?`),say:`The numbers go ${seq.join(", ")}. How much does it go ${w} each time?`,ans:step,choices:[2,3,5,10]};
+  return {html:strip(seq)+words(`How much does it go ${w} each time?`),say:`The numbers go ${seq.join(", ")}. How much does it go ${w} each time?`,ans:step,choices:[2,3,5,10],hint:Clue.steps(seq[0],seq[1])};
 }
 function growing(){
   const step=between(1,3),a=between(1,5),seq=[a,a+step,a+2*step],ans=a+3*step;
   const tile=n=>`<div class="grp" style="grid-template-columns:repeat(${Math.min(n,4)},16px)">${"<i></i>".repeat(n)}</div>`;
   return {html:`<div class="row-vis">${seq.map(tile).join("")}<div class="strip"><b class="ask">?</b></div></div>`+words("How many dots come next?"),
-    say:`The groups have ${seq.join(", ")} dots. How many dots come next?`,ans,choices:mix(ans,[ans+1,ans-1,ans+step,ans-step],[1,2],1)};
+    say:`The groups have ${seq.join(", ")} dots. How many dots come next?`,ans,choices:mix(ans,[ans+1,ans-1,ans+step,ans-step],[1,2],1),hint:clue("How many more dots each time? Add that many again.",numLine([...seq,ans]))};
 }
 
 // Level 11: equal groups, arrays, sharing, halves, quarters and eighths (AC9M2N05, AC9M2N03, AC9M2M02)
 function groupsY2(){
   const k=pick([2,3,4,5,10]),g=between(2,k===10?4:6),grp=`<div class="grp" style="grid-template-columns:repeat(${Math.min(k,5)},16px)">${"<i></i>".repeat(k)}</div>`;
-  return {html:`<div class="row-vis">${grp.repeat(g)}</div>`+words(`${g} groups of ${k}`),say:`${g} groups of ${k}. How many altogether?`,ans:g*k,choices:mix(g*k,[g*k+k,g*k-k,g+k],[1,2],1)};
+  return {html:`<div class="row-vis">${grp.repeat(g)}</div>`+words(`${g} groups of ${k}`),say:`${g} groups of ${k}. How many altogether?`,ans:g*k,choices:mix(g*k,[g*k+k,g*k-k,g+k],[1,2],1),hint:Clue.count(k,g)};
 }
 function arrayQ(){
   const r=between(2,5),c=between(2,5);
-  return {html:`<div class="arr" style="grid-template-columns:repeat(${c},20px)">${"<i></i>".repeat(r*c)}</div>`+words(`${r} rows of ${c}`),say:`${r} rows of ${c}. How many dots altogether?`,ans:r*c,choices:mix(r*c,[r+c,r*c+c,r*c-c],[1,2],1)};
+  return {html:`<div class="arr" style="grid-template-columns:repeat(${c},20px)">${"<i></i>".repeat(r*c)}</div>`+words(`${r} rows of ${c}`),say:`${r} rows of ${c}. How many dots altogether?`,ans:r*c,choices:mix(r*c,[r+c,r*c+c,r*c-c],[1,2],1),hint:Clue.count(c,r)};
 }
 function repAdd(){
   const k=pick([2,3,4,5]),g=between(3,5),grp=`<div class="grp" style="grid-template-columns:repeat(${Math.min(k,5)},16px)">${"<i></i>".repeat(k)}</div>`;
-  return {html:eq(Array(g).fill(k).join(" + ")+" = ?")+`<div class="row-vis">${grp.repeat(g)}</div>`,say:`${Array(g).fill(k).join(" plus ")}. How many altogether?`,ans:g*k,choices:mix(g*k,[g*k+k,g*k-k,g+k],[1,2],1)};
+  return {html:eq(Array(g).fill(k).join(" + ")+" = ?")+`<div class="row-vis">${grp.repeat(g)}</div>`,say:`${Array(g).fill(k).join(" plus ")}. How many altogether?`,ans:g*k,choices:mix(g*k,[g*k+k,g*k-k,g+k],[1,2],1),hint:Clue.count(k,g)};
 }
 function shareY2(){
   const d=between(2,5),each=between(2,6),n=d*each,s=src(E.me);
   const dino=s?`<img class="mini" src="${s}" alt="">`:'<span style="font-size:2.4rem">🦕</span>';
   return {html:`<div class="row-vis">${'<i class="berry"></i>'.repeat(n)}</div><div class="row-vis">${dino.repeat(d)}</div>`+words(`${n} berries shared by ${d} dinos`),
-    say:`${n} berries, shared equally between ${d} dinos. How many berries does each dino get?`,ans:each,choices:mix(each,[each+1,each-1,d,n-d],[1,2],1)};
+    say:`${n} berries, shared equally between ${d} dinos. How many berries does each dino get?`,ans:each,choices:mix(each,[each+1,each-1,d,n-d],[1,2],1),hint:Clue.deal(n,d)};
 }
 function bagsY2(){
   const k=pick([2,3,4,5,10]),b=between(2,k===10?4:6),n=k*b;
-  return {html:`<div class="row-vis">${'<i class="berry"></i>'.repeat(n)}</div>`+words(`${n} berries in bags of ${k}`),say:`${n} berries go into bags of ${k}. How many bags do you need?`,ans:b,choices:mix(b,[k,b+1,b-1],[1,2],1)};
+  return {html:`<div class="row-vis">${'<i class="berry"></i>'.repeat(n)}</div>`+words(`${n} berries in bags of ${k}`),say:`${n} berries go into bags of ${k}. How many bags do you need?`,ans:b,choices:mix(b,[k,b+1,b-1],[1,2],1),hint:Clue.howMany(k,n)};
 }
 const FRN={2:"half",4:"quarter",8:"eighth"}, FRS={"1/2":"one half","1/4":"one quarter","1/8":"one eighth"};
 const fracLabel=k=>`<span class="fr"><i>1</i><i>${k.slice(2)}</i></span>`;
@@ -1019,55 +1100,58 @@ function fracSvg(kind,parts,on=0){
 }
 function fracShaded(){
   const parts=pick([2,4,8]),kind=pick(["pie","rect"]);
-  return {html:`<div class="row-vis">${fracSvg(kind,parts,rand(parts))}</div>`+words("What fraction is shaded?"),say:"What fraction of the shape is shaded?",ans:"1/"+parts,choices:shuffle(["1/2","1/4","1/8"]),label:fracLabel,sayAns:k=>FRS[k]};
+  return {html:`<div class="row-vis">${fracSvg(kind,parts,rand(parts))}</div>`+words("What fraction is shaded?"),say:"What fraction of the shape is shaded?",ans:"1/"+parts,choices:shuffle(["1/2","1/4","1/8"]),label:fracLabel,sayAns:k=>FRS[k],hint:Clue.frac()};
 }
 function fracPick(){
   const parts=pick([2,4,8]),kind=pick(["pie","rect"]);
-  return {html:words(`Tap the shape with <b>one ${FRN[parts]}</b> shaded`),say:`Tap the shape with one ${FRN[parts]} shaded.`,ans:"1/"+parts,choices:shuffle(["1/2","1/4","1/8"]),label:k=>fracSvg(kind,+k.slice(2),0),sayAns:k=>FRS[k]};
+  return {html:words(`Tap the shape with <b>one ${FRN[parts]}</b> shaded`),say:`Tap the shape with one ${FRN[parts]} shaded.`,ans:"1/"+parts,choices:shuffle(["1/2","1/4","1/8"]),label:k=>fracSvg(kind,+k.slice(2),0),sayAns:k=>FRS[k],
+    hint:clue(`One ${FRN[parts]} means ${parts} equal parts, with one part shaded. Count the parts in each shape.`,words(`one ${FRN[parts]} = ${parts} equal parts`))};
 }
 function fracOf(){
   const parts=pick([2,2,4,8]),each=parts===8?between(1,3):parts===4?between(2,5):between(2,8),n=parts*each,w=parts===2?"half":parts===4?"a quarter":"an eighth";
   const grp=`<div class="grp" style="grid-template-columns:repeat(${Math.min(each,4)},16px)">${"<i></i>".repeat(each)}</div>`;
-  return {html:`<div class="row-vis">${grp.repeat(parts)}</div>`+words(`${w[0].toUpperCase()+w.slice(1)} of ${n} = ?`),say:`${n} berries in ${parts} equal groups. What is ${w} of ${n}?`,ans:each,choices:mix(each,[each+1,each-1,parts,n-each],[1,2],1)};
+  return {html:`<div class="row-vis">${grp.repeat(parts)}</div>`+words(`${w[0].toUpperCase()+w.slice(1)} of ${n} = ?`),say:`${n} berries in ${parts} equal groups. What is ${w} of ${n}?`,ans:each,choices:mix(each,[each+1,each-1,parts,n-each],[1,2],1),
+    hint:clue(`${w[0].toUpperCase()+w.slice(1)} of ${n} means ${parts} equal groups. Count the berries in one group.`,words(`${n} berries, ${parts} equal groups`))};
 }
 
 // Level 12: money, change and story problems (AC9M2N06, AC9M2N04)
 function coinsTotal(){
   let cs; do{cs=[];let t=0;for(let i=between(3,5);i>0;i--){const v=pick([50,20,10,5]);if(t+v<100){cs.push(v);t+=v}}}while(cs.length<3);
   cs.sort((a,b)=>b-a); const ans=cs.reduce((a,b)=>a+b,0);
-  return {html:`<div class="row-vis">${cs.map(v=>`<span class="coin silver">${v}c</span>`).join("")}</div>`+words("How many cents?"),say:"Count the coins. How many cents altogether?",ans,choices:mix(ans,[ans+5,ans-5,ans+10,ans-10],[5,10],5,95),...cL};
+  return {html:`<div class="row-vis">${cs.map(v=>`<span class="coin silver">${v}c</span>`).join("")}</div>`+words("How many cents?"),say:"Count the coins. How many cents altogether?",ans,choices:mix(ans,[ans+5,ans-5,ans+10,ans-10],[5,10],5,95),...cL,
+    hint:clue(`Start with the biggest coin, ${cs[0]} cents. Count on each coin.`,numLine(cs.map((_,i)=>cs.slice(0,i+1).reduce((a,b)=>a+b,0))))};
 }
 function changeNote(){
   const a=pick([5,10,20]),b=a===5?between(1,4):a===10?between(1,9):between(2,19),ans=a-b,t=`You pay with a $${a} note. A toy costs $${b}. How much change do you get?`;
-  return {html:words(t)+`<div class="row-vis"><span class="note ${{5:"five",10:"ten",20:"twenty"}[a]}">$${a}</span></div>`,say:t,ans,choices:mix(ans,[b,ans+1,ans-1],[1,2],1,a),...$L};
+  return {html:words(t)+`<div class="row-vis"><span class="note ${{5:"five",10:"ten",20:"twenty"}[a]}">$${a}</span></div>`,say:t,ans,choices:mix(ans,[b,ans+1,ans-1],[1,2],1,a),...$L,hint:{...Clue.gap(b,a,"$"),say:`Count up from the price, ${b} dollars, to ${a} dollars. How far did you hop?`}};
 }
 function changeCents(){
   const pay=pick([50,100]),p=5*between(1,pay===50?9:19),ans=pay-p,t=`You pay with ${pay===50?"a 50 cent coin":"a $1 coin"}. A sticker costs ${p} cents. How much change do you get?`;
-  return {html:words(t)+`<div class="row-vis"><span class="coin${pay===50?" silver":""}">${pay===50?"50c":"$1"}</span></div>`,say:t,ans,choices:mix(ans,[ans+5,ans-5,ans+10,ans-10],[5,10],5,pay-5),...cL};
+  return {html:words(t)+`<div class="row-vis"><span class="coin${pay===50?" silver":""}">${pay===50?"50c":"$1"}</span></div>`,say:t,ans,choices:mix(ans,[ans+5,ans-5,ans+10,ans-10],[5,10],5,pay-5),...cL,hint:{...Clue.gap(p,pay),say:`Count up from ${p} cents to ${pay} cents. How far did you hop?`}};
 }
 function twoItems(){
   const big=Math.random()<.5,a=big?between(11,45):between(2,9),b=big?between(11,45):between(2,9),ans=a+b,t=`A toy costs $${a} and a book costs $${b}. How much altogether?`;
-  return {html:words(t),say:t,ans,choices:mix(ans,big?[ans-10,ans+10,ans+1,ans-1]:[ans+1,ans-1,a,b],[1,2],1),...$L};
+  return {html:words(t),say:t,ans,choices:mix(ans,big?[ans-10,ans+10,ans+1,ans-1]:[ans+1,ans-1,a,b],[1,2],1),...$L,hint:Clue.add(a,b,"$")};
 }
 function spendLeft(){
   const h=pick([20,30,50,100]),s=between(6,h-3),ans=h-s,t=`You have $${h}. You spend $${s}. How much money is left?`;
-  return {html:words(t),say:t,ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2],1),...$L};
+  return {html:words(t),say:t,ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2],1),...$L,hint:Clue.on(h,-s,"$")};
 }
 function eachCost(){
   const g=between(2,5),p=pick([2,5,10]),thing=pick(["eggs","stickers","toys","cards"]),t=`${g} ${thing} cost $${p} each. How much for all ${g}?`;
   const one=p===2?'<span class="coin">$2</span>':`<span class="note ${p===5?"five":"ten"}">$${p}</span>`;
-  return {html:words(t)+`<div class="row-vis">${one.repeat(g)}</div>`,say:t,ans:g*p,choices:mix(g*p,[g+p,g*p+p,g*p-p],[1,2],1),...$L};
+  return {html:words(t)+`<div class="row-vis">${one.repeat(g)}</div>`,say:t,ans:g*p,choices:mix(g*p,[g+p,g*p+p,g*p-p],[1,2],1),...$L,hint:Clue.count(p,g,"$")};
 }
 function storyY2(){
   const me=E.me?BY[E.me].name:"dino",wild=E.wild?E.wild.name:"dino";
   const take=(t)=>({html:words(t),say:t});
   return pick([
     ()=>{const o1=between(2,9),o2=between(10-o1,9),a=between(2,5)*10+o1,b=between(1,3)*10+o2,ans=a+b,t=`There are ${a} eggs in the nest. Then ${b} more eggs are laid. How many eggs are there now?`;
-      return {...take(t),ans,choices:mix(ans,[ans-10,ans+10,ans+1,ans-1],[1,2],1,99)}},
+      return {...take(t),ans,choices:mix(ans,[ans-10,ans+10,ans+1,ans-1],[1,2],1,99),hint:Clue.add(a,b)}},
     ()=>{const t1=between(4,9),o1=between(0,6),t2=between(1,t1-2),o2=between(o1+1,9),a=t1*10+o1,b=t2*10+o2,ans=a-b,t=`Your ${me} collected ${a} leaves. It gave ${b} leaves to the wild ${wild}. How many leaves does your ${me} have left?`;
-      return {...take(t),ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2],1,99)}},
+      return {...take(t),ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2],1,99),hint:Clue.on(a,-b)}},
     ()=>{const t1=between(4,9),o1=between(0,6),t2=between(1,t1-2),o2=between(o1+1,9),a=t1*10+o1,b=t2*10+o2,ans=a-b,t=`Your ${me} has ${a} points. The wild ${wild} has ${b} points. How many more points does your ${me} have?`;
-      return {...take(t),ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2],1,99)}},
+      return {...take(t),ans,choices:mix(ans,[ans+10,ans-10,ans+1,ans-1],[1,2],1,99),hint:Clue.gap(b,a)}},
   ])();
 }
 
@@ -1094,10 +1178,19 @@ const QUESTIONS={
 function makeQ(fixed){
   // With one move the question is at his level, and 1 in 5 reviews an easier level: any earlier level up to Year 1's end, then only the 3 levels just below.
   // With a move menu (fixed given) the move decides the level instead.
-  const L=S.mathLvl, lv=fixed||((L>1&&Math.random()<.2)?between(L>6?L-3:1,L-1):L); let q,g=0;
-  do{q=pick(QUESTIONS[lv])();g++}while(E.q&&q.say===E.q.say&&g<6);
-  q.lvl=lv; return q;
+  // A question he missed earlier comes back first (a new one of the same kind, at the level it was asked at).
+  const due=RETRY.findIndex(r=>r.wait<=0);
+  if(due>=0){const r=RETRY.splice(due,1)[0],q=r.gen(); Object.assign(q,{gen:r.gen,lvl:r.lvl,retry:true,tries:r.tries}); return q}
+  const L=S.mathLvl, lv=fixed||((L>1&&Math.random()<.2)?between(L>6?L-3:1,L-1):L); let q,gen,g=0;
+  do{gen=pick(QUESTIONS[lv]);q=gen();g++}while(E.q&&q.say===E.q.say&&g<6);
+  q.gen=gen; q.lvl=lv; return q;
 }
+// Questions he got wrong first time come back as a fresh one of the same kind 2 rounds later ("one like before"). Memory only, not saved;
+// if the battle ends first they come up in the next battle. Each kind comes back at most twice, and only 3 wait at a time.
+let RETRY=[];
+function showHint(){hideHint(); const h=E.q&&E.q.hint; if(!h||!h.html)return;
+  const d=document.createElement("div"); d.className="hint"; d.id="hint"; d.innerHTML=`<h4>💡 Clue</h4>${h.html}`; d.onclick=()=>say(h.say); $("arena").appendChild(d)}
+function hideHint(){const d=$("hint"); if(d)d.remove()}
 
 /* ---------- Battle effects ---------- */
 const TCOL={plant:"#3E9B4F",meat:"#D9443A",sea:"#2F7FD1",fly:"#8A55C9"};
@@ -1303,7 +1396,7 @@ function startBattle(meId,intro){
   // His dino's health is its dino-book Health stat. Each wrong answer costs about a sixth of it
   // (a bit more against strong wild dinos), so it faints after roughly 5-6 wrong answers in one fight.
   E.myMax=me.hp+(lvl(o)-1)*2; E.myHp=E.myMax; E.wildDmg=Math.max(2,Math.round(E.myMax*(.13+.01*w.atk)));
-  E.shieldN=0; E.shield=startsShielded(o);
+  E.shieldN=0; E.shield=startsShielded(o); hideHint();
   art($("b-me"),me); decorate($("b-me"),meId); art($("b-wild"),w); $("b-wild").classList.remove("winding"); $("b-warn").hidden=true;
   preloadAtk(me.id); preloadAtk(w.id); // so the pose swap doesn't flicker
   $("b-me-name").innerHTML=nameHtml(me,o);
@@ -1335,7 +1428,7 @@ function hpBar(){
 }
 // A round: the wild dino winds up, he picks a move (if he has more than one), then answers the question that move asks.
 function beginRound(){
-  E.busy=false; E.miss=0; E.round++;
+  E.busy=false; E.miss=0; E.round++; RETRY.forEach(r=>r.wait--);
   const slots=slotsOf(S.owned[E.me]), first=E.round===1;
   windUp();
   const warn=`${E.wild.say} is winding up ${E.wind}!${first?" Get it right to stop it!":""}`;
@@ -1361,21 +1454,24 @@ function chooseMove(i,preface){
   E.q=makeQ(multi?Math.max(1,Math.min(MAXL,S.mathLvl+MOVE_SLOTS[i].dq)):0);
   $("moves").hidden=true; $("q-row").hidden=false; $("choices").hidden=false;
   showQ();
-  if(preface)say(`${preface} ${E.q.say}`,true); else say(`${movesOf(BY[E.me])[i]}! ${E.q.say}`);
+  const again=E.q.retry?"Here's one like before! ":"";
+  if(preface)say(`${preface} ${again}${E.q.say}`,true); else say(`${movesOf(BY[E.me])[i]}! ${again}${E.q.say}`);
 }
 function showQ(){
-  $("qbox").innerHTML=E.q.html;
+  hideHint(); $("qbox").innerHTML=(E.q.retry?'<div class="again">🔁 One like before</div>':"")+E.q.html;
   const box=$("choices"); box.innerHTML="";
   E.q.choices.forEach(v=>{const k=document.createElement("button");k.innerHTML=E.q.label?E.q.label(v):v;k.dataset.v=v;
     k.setAttribute("aria-label",E.q.sayAns?E.q.sayAns(v):String(v));k.onclick=()=>answer(v,k);box.appendChild(k)});
 }
-$("b-say").onclick=()=>{if(E.q)say(E.q.say)};
+$("b-say").onclick=()=>{if(E.q)say(E.q.say+($("hint")?" "+E.q.hint.say:""))};
 $("m-say").onclick=()=>say(E.menuSay||"Pick a move!");
 async function answer(v,btn){
   if(E.busy||E.phase!=="q")return; const q=E.q,gen=BG,me=BY[E.me]; let o=S.owned[E.me];
   if(v!==q.ans){
     // Wrong: his attack misses and the wild dino's wind-up lands (unless his shield is charged). The combo and shield pips start again.
+    // The wrong choice is crossed out. The first miss on a question queues one like it for later and shows a clue.
     E.busy=true; E.miss++; E.shieldN=0; E.combo=0; sfx.bad(); btn.classList.add("nope"); hpBar();
+    if(E.miss===1&&q.gen&&RETRY.length<3&&(q.tries||0)<2)RETRY.push({gen:q.gen,lvl:q.lvl,wait:2,tries:(q.tries||0)+1});
     say("Missed! Look out!"); dodge();
     await wait(650); if(gen!==BG)return;
     stopWind(false);
@@ -1383,9 +1479,12 @@ async function answer(v,btn){
     if(E.myHp<=0){await faint(); return;}
     if(E.miss>=2&&S.hintAnswer===true){const g=[...$("choices").children].find(b=>b.dataset.v===String(q.ans)); if(g)g.classList.add("glow");}
     windUp(); E.busy=false;
-    say(`${blocked?"Blocked! Your shield saved you.":"Ouch!"} Try again. ${q.say}`); return;
+    const oops=blocked?"Blocked! Your shield saved you.":"Ouch!";
+    if(E.miss===1&&q.hint){showHint(); say(`${oops} Here's a clue. ${q.hint.say}`)}
+    else say(`${oops} Try again. ${q.say}`);
+    return;
   }
-  E.busy=true;
+  E.busy=true; hideHint();
   const first=E.miss===0;
   // Right first time: the combo grows and the shield charges (2 pips from level 4, otherwise 3).
   let shieldUp=false;
@@ -1402,7 +1501,8 @@ async function answer(v,btn){
   }
   const mv=movesOf(me),m={name:fin?`SUPER ${mv[2].toUpperCase()}`:mv[E.slot],slot:E.slot,fin};
   stopWind(true); hpBar();
-  say(`${q.sayAns?q.sayAns(v):v}! ${fin?"Super move! ":""}${m.name}!${shieldUp?" Shield ready!":""}`);
+  if(q.retry&&first)callout("You got it!",$("b-me"),"#2F9E44",-.1);
+  say(`${q.sayAns?q.sayAns(v):v}! ${q.retry&&first?"You got it this time! ":""}${fin?"Super move! ":""}${m.name}!${shieldUp?" Shield ready!":""}`);
   if(E.combo>=3&&!fin){sfx.combo(E.combo); callout(`Combo ×${E.combo}!`,$("b-me"),"#F2762E",-.95)}
   await (fin?superAttack(m):attack(m)); if(gen!==BG)return;
   if(fin){E.combo=0; hpBar();}

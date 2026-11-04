@@ -4,6 +4,24 @@ Ideas and open items, newest thinking first. Move an item to "Done" with the dat
 
 Rules that apply to everything here: every instruction is spoken aloud, big tap targets, designed for a young child; test at iPhone size (about 428x660) and iPad; cloud save stays working (republish keeping the db + user capabilities, never change the save key or delete saved fields); new perks should be computed from data already saved (xp, wins, caught) where possible.
 
+## F. Learning fixes (teacher + parent review, 2026-11-04)
+Why: the game tests him but rarely teaches him. A wrong answer only says "Ouch, try again", so he can tap through the choices without learning how. Order agreed with Josiah: F1, then F2-F4; F5 later. Nothing here changes the number of right answers needed to win.
+
+- [x] **F1. Wrong answers teach.** Built 2026-11-04 (all 60 question kinds have a clue; tested at iPhone and iPad size). Not yet published to the live artifact or tried by him.
+  - A wrong choice is crossed out and can't be tapped again.
+  - After the first miss, a hint appears under the question and is spoken: the strategy, not the answer. Kinds: number-line hops (count on / back, jump the tens then the ones, count up for change), counting by 2s/5s/10s along the groups, tens-and-ones place-value chart, "look at the biggest place first" for comparing, the part of a pattern that repeats, numbered equal parts for fractions. The last step is always a "?" so he still works out the answer himself.
+  - A question he missed comes back as a fresh one of the same kind about 2 rounds later ("Here's one like before!"), and is cheered if he gets it right first time. Kept in memory only (not saved); if the battle ends first it comes up in the next battle.
+- [ ] **F2. The hard move is worth picking.** Today the big move only shows a bigger damage number. Give the his-level and harder moves something he can feel: a right answer on them counts double toward the super move and earns a star, and stars add bonus XP after the win. Needs a decision from Josiah first: is more XP for harder moves OK (it speeds up his favourite dino).
+- [ ] **F3. Track each maths skill, not one level.** Count right-first-time per question kind (per generator) and serve the weakest kinds at his level more often (about 1 in 3 questions). Saved on S (not per dino), so check mergeSaves keeps it when syncing.
+- [ ] **F4. Spelling.**
+  - a) Every word is said with a short sentence ("sea... the fish swim in the sea... sea"), needed for sound-alike pairs (see/sea, their/there) and words like read/live. Sentences for the PATTERNS + CHALLENGE + default words; homework words without one fall back to the word alone.
+  - b) Tiles are sound chunks for digraph words (sh, ch, ai, igh...) and each tile says its sound when tapped.
+  - c) For words he has spelled right before: show the word for 2 seconds, hide it, then he spells it (look, cover, spell).
+  - d) More spelling practice: catching needs 2 words instead of 1 (setting on the grown-up screen).
+- [ ] **F5. (later) Parent report.** Log which wrong choice he picks (mix() already knows the likely slip) and misspellings; show "this week" on the grown-up screen.
+- [ ] **F6. A reason to pick a dino.** In battle every dino plays the same today: wild hits take a share of his dino's max health, so Health cancels out; Attack is only shown in the book; types are labels. Plan: type matchups shown as a "Super pick!" badge on the pick screen and spoken (strong match = super move one answer sooner and less damage from wrong answers); one trait per dino from its stats ("Tough" = survives more wrong answers, fixing the Health cancel-out; "Strong" = super move sooner); catch-up XP for low-level dinos (B6). Josiah to approve the type rules.
+- [ ] **F7. Better voice.** He dislikes the robotic voice. Step 1: grown-up voice picker with a test button that prefers "Premium"/"Enhanced" voices (Josiah downloads one on the iPad: Settings > Accessibility > Read & Speak > Voices). Step 2 if still robotic: a "Dino-Bot" guide character. Step 3: recorded lines (Josiah's voice or an AI voice) with the device voice for numbers.
+
 ## A. Make fighting more engaging (raised 2026-10-22, chat 04)
 Why: every fight is the same loop (answer, lunge, hit, health bar) and he never decides anything. Choice and anticipation beat flashier effects at his age. Battle length (right answers needed) stays fixed because it is the maths practice.
 
