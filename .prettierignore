@@ -1,0 +1,6 @@
+# Data tables stay compact (one dino / one word per line)
+game/js/data/
+# Markup is left as written (whitespace between inline elements matters there)
+*.html
+*.md
+assets/

@@ -22,7 +22,7 @@ Budget: Josiah's leftover Pro tokens, usually 5-10% of the week on the last day 
 
 ### Starting a session (paste this)
 
-> Dino World. Read OVERWORLD-PLAN.md and do the next unticked step only. Follow its session rules: it's a separate game from Dino Go, so don't open index.html. Stop after that step, tick it, add a cost-log line and commit.
+> Dino World. Read docs/OVERWORLD-PLAN.md and do the next unticked step only. Follow its session rules: it's a separate game from Dino Go, so don't open index.html. Stop after that step, tick it, add a cost-log line and commit.
 
 ## Milestone 1: Walk around (not published yet)
 
