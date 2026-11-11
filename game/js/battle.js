@@ -220,7 +220,7 @@ async function answer(v, btn) {
       noteSkill(q.key, false);
       save();
     }
-    say("Missed! Look out!");
+    say("Oops!");
     dodge();
     await wait(650);
     if (gen !== BG) return;
@@ -237,11 +237,11 @@ async function answer(v, btn) {
     }
     windUp();
     E.busy = false;
-    const oops = blocked ? "Blocked! Your shield saved you." : "Ouch!";
+    // Kept short: the question stays on screen (the 🔊 button says it again), so only the clue or the shield is spoken.
     if (E.miss === 1 && q.hint) {
       showHint();
-      say(`${oops} Here's a clue. ${q.hint.say}`);
-    } else say(`${oops} Try again. ${q.say}`);
+      say(`${blocked ? "Blocked! " : ""}${q.hint.say}`, true);
+    } else if (blocked) say("Blocked!", true);
     return;
   }
   E.busy = true;
