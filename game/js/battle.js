@@ -89,9 +89,7 @@ function startBattle(meId, intro) {
       }
     }, 600);
   }
-  say(
-    `${intro} Your ${fullSay(me, o)} is ready!${E.shield ? " It starts with a shield!" : ""} Get it right to attack.`,
-  );
+  if (intro) say(intro);
   beginRound();
 }
 function setBar(id, hp, max) {
@@ -127,7 +125,7 @@ function beginRound() {
   windUp();
   const warn = `${E.wild.say} is winding up ${E.wind}!${first ? " Get it right to stop it!" : ""}`;
   if (slots.length < 2) {
-    chooseMove(slots[0], warn);
+    chooseMove(slots[0]);
     return;
   }
   showMenu(
@@ -160,13 +158,13 @@ function showMenu(slots, spoken) {
     }
     list.appendChild(b);
   });
-  say(spoken, true);
+  // Not spoken on its own: the moves are on screen, and the 🔊 button (m-say) reads E.menuSay on request.
 }
 function pickMove(i) {
   if (E.phase !== "menu") return;
   chooseMove(i);
 }
-function chooseMove(i, preface) {
+function chooseMove(i) {
   E.phase = "q";
   E.slot = i;
   E.busy = false;
@@ -177,8 +175,7 @@ function chooseMove(i, preface) {
   $("choices").hidden = false;
   showQ();
   const again = E.q.retry ? "Here's one like before! " : "";
-  if (preface) say(`${preface} ${again}${E.q.say}`, true);
-  else say(`${movesOf(BY[E.me])[i]}! ${again}${E.q.say}`);
+  say(`${again}${E.q.say}`);
 }
 function showQ() {
   hideHint();
@@ -261,9 +258,7 @@ async function answer(v, btn) {
   stopWind(true);
   hpBar();
   if (q.retry && first) callout("You got it!", $("b-me"), "#2F9E44", -0.1);
-  say(
-    `${q.sayRight || (q.sayAns ? q.sayAns(v) : v)}! ${q.retry && first ? "You got it this time! " : ""}${fin ? "Super move! " : ""}${m.name}!${shieldUp ? " Shield ready!" : ""}`,
-  );
+  // A right answer is silent: the attack sound and animation say it, and the next question is the next thing spoken.
   if (first && !fin && E.combo === finNeed() - 1) {
     sfx.combo(E.combo);
     callout("Super almost ready!", $("b-me"), "#F2762E", -0.95);
@@ -302,10 +297,7 @@ async function answer(v, btn) {
   decorate($("b-me"), E.me);
   $("b-me-name").innerHTML = nameHtml(me, o);
   if (big) say("You won!");
-  else
-    say(
-      `You won! ${up ? `Level up! Your ${me.say} is now level ${L}! ` : ""}Now spell the word to catch the ${w.say}!`,
-    );
+  else say(`You won!${up ? " Level up!" : ""}`);
   await knockout();
   if (gen !== BG) return;
   if (big) {

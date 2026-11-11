@@ -467,9 +467,7 @@ async function faint() {
   const me = BY[E.me],
     w = E.wild;
   stopWind(false);
-  say(
-    `Oh no! Your ${me.say} is too tired to keep going, and the wild ${w.say} ran away! Let's rest and find another dino.`,
-  );
+  say(`Oh no! The wild ${w.say} ran away!`);
   dizzy($("b-me"));
   await anim(
     fig($("b-me")),
@@ -588,11 +586,7 @@ function celebrate(id, L) {
     cele.hidden = false;
     window.scrollTo(0, 0);
     sfx.yay();
-    say(
-      evolve
-        ? `Wow! Your ${oldT ? oldT + " " : ""}${sp.say} is changing!`
-        : `Level up! Your ${sp.say} is now level ${L}!`,
-    );
+    say(evolve ? `Wow! Your ${oldT ? oldT + " " : ""}${sp.say} is changing!` : "Level up!");
     if (evolve) {
       const t = fig($("ce-art"));
       await anim(
@@ -615,7 +609,7 @@ function celebrate(id, L) {
     $("ce-list").innerHTML = pk.lines.map((l) => `<li>${l}</li>`).join("");
     confetti();
     if (evolve) screenFlash("#fff", 0.7, 500);
-    say(`${evolve ? `Your ${sp.say} is now ${fullSay(sp, o)}! ` : ""}${pk.lines.join(". ")}. Yay!`);
+    say(evolve ? `Your ${sp.say} is now ${fullSay(sp, o)}! Yay!` : "Yay!");
     await wait(900);
     ok.hidden = false;
     ok.onclick = () => {

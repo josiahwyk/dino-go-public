@@ -22,6 +22,8 @@ Word sentences (2026-11-04): SENT holds a short sentence for every word in PATTE
 
 Voice (2026-11-12): pickVoice() takes the first English voice the device offers, Australian first (en-AU, then en-GB, en-NZ, en-US), pitch 1.1. The Premium/Enhanced picker from 2026-11-04 was removed: it chose a strange default voice and Premium voices never showed up on the iPhone.
 
+What is spoken (2026-11-12): kept quiet on purpose. Spoken: the question (and its 🔊 replay), the clue after the first miss, "Oops!" and "Blocked!" on a wrong tap, the spelling word and sentence, the wild dino's arrival, "You won!", short level-up/evolve/caught/ran-away lines, and dino facts only when tapped in the book. Silent: move names, right-answer echoes, the move menu (the 🔊 button reads it), the wind-up warning, the throw line and the perk lists. The question is not repeated after a wrong tap.
+
 Spelling battles (2026-11-04): grown-up setting "Battle questions" (S.battle: "math" default, "words", "mix" = about half each). makeQ() hands off to wordQ(slot) in js/spelling-battle.js: easy move = one missing letter, medium = two letters side by side, hard = pick the right spelling of 4. Gaps go on vowels and never the first letter. misspell() makes the wrong spellings from real slips (wrong vowel, ie/ei swap, dropped vowel or double letter first; look-alike consonants after) and never offers a real word (known() = PATTERNS + CHALLENGE + DEFAULT_WORDS + COMMON). Spelling questions have lvl 0 so they never move the maths level; clues and "one like before" (same word) work as for maths.
 
 ## Levels and growth

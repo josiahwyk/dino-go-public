@@ -82,5 +82,5 @@ function startEncounter(chosen) {
       g.appendChild(b);
     });
   show("s-pick");
-  say(intro + " Who will battle?");
+  say(intro);
 }

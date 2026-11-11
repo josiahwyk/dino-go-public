@@ -81,7 +81,6 @@ function tap(t) {
 }
 async function throwEgg() {
   E.busy = true;
-  say(`${E.word}! Throw!`);
   const egg = $("egg"),
     a = $("c-art");
   const er = egg.getBoundingClientRect(),
@@ -148,7 +147,7 @@ function caught() {
   pill($("k-type"), w);
   $("k-fact").textContent = isNew ? w.fun : `Your ${w.name} got stronger! It's now level ${lvl(S.owned[w.id])}.`;
   show("s-caught");
-  say(isNew ? `You caught a ${w.say}! ${w.fun}` : `Another ${w.say}! Your ${w.say} got stronger!`);
+  say(isNew ? `You caught a ${w.say}!` : `Another ${w.say}!`);
   // a duplicate can level it up too: celebrate new moves, shields and titles here as well
   const L = isNew ? 1 : lvl(S.owned[w.id]);
   if (L > before && perks(w, S.owned[w.id], L).lines.length)
