@@ -65,13 +65,13 @@ All 40 dinos now have art (done 2026-10-22).
 - [ ] B3, B5-B7 and A4-A7 are untouched.
 
 ## C. Bigger ideas (from CLAUDE.md, moved here)
-- [ ] **C1. Explore screen** (2026-10-17): before encounters they walk a little avatar around illustrated habitats (forest, swamp, beach, volcano); rustling bushes / footprints trigger a dino matched to that habitat. Josiah liked the feel of a 2.5D pixel RPG (top-down map, wandering, boss fights). No real GPS. Now its own separate game, Dino World (game/world.html), not part of Dino Go. Build plan in small leftover-token steps: OVERWORLD-PLAN.md (2026-10-22).
+- [ ] **C1. Explore screen** (2026-10-17): before encounters they walk a little avatar around illustrated habitats (forest, swamp, beach, volcano); rustling bushes / footprints trigger a dino matched to that habitat. Josiah liked the feel of a 2.5D pixel RPG (top-down map, wandering, boss fights). No real GPS.
 - [ ] **C2. Evolution** (overlaps B4).
 - [ ] **C3. Raids / boss fights** (overlaps A5).
 - [ ] **C4. Printed track cards** (fill-in-the-blank words).
 - [ ] **C5. NFC.**
 - [ ] **C6. Cantonese.**
-- [ ] **C7. One look for both games, and a more Pokémon-like battle** (raised 2026-10-22, not urgent). Dino World's pixel map doesn't match Dino Go's rounded, illustrated style yet. Separately, Dino Go's battle doesn't feel like a Pokémon battle: the classic look (Game Boy / Switch games, not Pokémon Go) has their dino seen from behind bottom-left, the wild one facing you top-right, a name + health box for each, and a text box with the move menu along the bottom. Pokémon Go itself has no turn-based wild battle (you flick a ball at a Pokémon on the camera view). Decide later which style to aim for; changing their dino to a back view would need new art.
+- [ ] **C7. A more Pokémon-like battle** (raised 2026-10-22, not urgent). Dino Go's battle doesn't feel like a Pokémon battle: the classic look (Game Boy / Switch games, not Pokémon Go) has their dino seen from behind bottom-left, the wild one facing you top-right, a name + health box for each, and a text box with the move menu along the bottom. Pokémon Go itself has no turn-based wild battle (you flick a ball at a Pokémon on the camera view). Decide later which style to aim for; changing their dino to a back view would need new art.
 
 ## D. Content and fixes
 - [x] Art for all 40 dinos (standing + attack, published as artifact v17, 2026-10-22).

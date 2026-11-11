@@ -19,7 +19,7 @@ No build step: the game is plain files, opened in a browser.
 - assets/dinos/NN_name.jpeg (+ _attack.jpeg): full-size originals. assets/style-reference/style-sheet.jpeg: the style all dinos copy. assets/dino_prompts.md: the 40 dinos with types and image prompts. All 40 have art (standing + attack).
 - assets/originals/: the original Gemini downloads. Don't delete them.
 - docs/GAME-RULES.md: how each part works and why (maths levels, question pictures, clues, spelling, voice, levels and growth, battles). Read the relevant section before changing that part, and update it when the behaviour changes.
-- docs/BACKLOG.md: open ideas and fixes. Read it before planning a new feature and tick items off when they ship. docs/DESIGN-05.md: the battle design. docs/OVERWORLD-PLAN.md: Dino World (game/world.html + game/overworld.js), a separate game that doesn't use index.html.
+- docs/BACKLOG.md: open ideas and fixes. Read it before planning a new feature and tick items off when they ship. docs/DESIGN-05.md: the battle design.
 
 ## Live version
 Published as a claude.ai artifact (opened on their iPad): https://claude.ai/artifact/Te5KgkGw2tJm9iyCkh8PDM
