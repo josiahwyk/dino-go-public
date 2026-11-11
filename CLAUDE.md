@@ -9,6 +9,7 @@ This repo is meant to be public. Their age and any other personal details about 
 No build step: the game is plain files, opened in a browser.
 - game/index.html: the screens (markup only) and the list of scripts, loaded in order. game/style.css: all the styles.
 - game/js/: the code, one file per part of the game. They are plain scripts sharing globals, so **order matters**: a file can only use, at load time, what files above it in index.html define (calls inside functions are fine). Load order: data/species, state (save, helpers), pictures, sound, scenes, screens, growth (levels, moves), rules, encounter, maths-y1, clues, maths-y2, maths (makeQ, skills, retry), battle-fx, battle, data/words, data/sentences, catch, spelling-battle, book, parent (grown-up screen), cloud (sync), boot.
+- game/js/kiki/: the Kiki voice (a worker script, the voice model as three base64 text files, its runtime). Built and third-party files: don't edit or format them; the source and rebuild steps are in tools/kiki/worker-entry.js. sound.js starts the worker and falls back to the device voice. NOTICE.md there lists each third-party part and its licence (eSpeak NG inside the worker is GPL-3.0), with the licence texts in licenses/: keep it up to date if the bundle changes.
 - game/js/rules.js: the battle rules with no screen code (adaptive level, super meter, shield, retry queue, damage). battle.js does the animation, speech and saving around them. Put new game rules here so they can be tested.
 - game/js/data/: species facts, word lists and the spelling sentences. Kept compact (one item per line) and left out of Prettier.
 - tests/run.js: `node tests/run.js` (no installs). Plays thousands of pretend questions and battles: every question's answer is a choice, no repeated choices, every question has a clue, each kind always shows the same number of buttons, every battle takes exactly S.hits right answers, misspellings are never real words, two-device save merging keeps every dino, saves are cleaned on load. **Run it before publishing**; add a test for any new rule or generator kind. tests/harness.js loads the game's scripts in Node with a fake page.
@@ -23,7 +24,7 @@ No build step: the game is plain files, opened in a browser.
 
 ## Live version
 Published as a claude.ai artifact (opened on their iPad): https://claude.ai/artifact/Te5KgkGw2tJm9iyCkh8PDM
-Publish game/index.html as the page with style.css and every js/ file in `files` (same paths), plus any changed dino art. Run the tests first.
+Publish game/index.html as the page with style.css and every js/ file in `files` (same paths), plus any changed dino art. The js/kiki/ files only need sending when they change (they are about 46 MB); if the model changes, bump `version` in kiki-manifest.json so devices fetch it again. Run the tests first.
 To add a dino: add it to SPECIES (js/data/species.js), put its 512px .jpg in game/dinos/, run `python3 tools/cutout.py game/dinos/NN_name.jpg`, make the attack pose, run the tests (they check both .webp files exist), and publish the new .webp files with the page.
 
 ## Gotchas
@@ -34,7 +35,7 @@ To add a dino: add it to SPECIES (js/data/species.js), put its 512px .jpg in gam
 - Swallowed errors log `console.warn("Dino Go:", …)`; the game keeps going rather than stopping a child mid-battle.
 
 ## Rules
-- Designed for a young child: every instruction spoken aloud (speechSynthesis), big buttons, difficulty adapts.
+- Designed for a young child: every instruction spoken aloud (say() in sound.js: the Kiki voice, or the device's speechSynthesis until it has loaded), big buttons, difficulty adapts.
 - Battles: each round the wild dino winds up a move, they pick one of their 3 moves (easier / their level / harder question), then answer. Right = their dino hits; wrong = the wind-up lands. Every battle takes exactly S.hits right answers. Details, the super meter and fainting are in docs/GAME-RULES.md.
 - Dino facts in SPECIES haven't been checked against a source yet.
 - Later scope: printed track cards (fill-in-the-blank words), NFC, evolution, raids, Cantonese.

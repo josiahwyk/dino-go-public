@@ -317,5 +317,21 @@ test("every dino has art", () => {
   }
 });
 
+test("the voice says dino as dyno, and the Kiki voice files are all there", () => {
+  const g = loadGame();
+  check(g.sayFix("You have 3 dinos! Tap one.") === "You have 3 dynos! Tap one.", "dinos not respelt");
+  check(g.sayFix("each dino gets 2") === "each dyno gets 2", "dino not respelt");
+  check(g.sayFix("A dinosaur. Dinos!") === "A dinosaur. dynos!", "dinosaur changed, or Dinos missed");
+  const fs = require("fs"),
+    path = require("path"),
+    dir = path.join(__dirname, "..", "game", "js", "kiki");
+  const m = JSON.parse(fs.readFileSync(path.join(dir, "kiki-manifest.json"), "utf8"));
+  for (const f of ["kiki-worker.js", "ort-wasm-simd-threaded.mjs", m.wasm, m.voice.file, ...m.parts])
+    check(fs.existsSync(path.join(dir, f)), "missing file js/kiki/" + f);
+  // The model parts are base64 text: together they must decode to exactly the size the worker expects.
+  const len = m.parts.reduce((n, p) => n + Buffer.from(fs.readFileSync(path.join(dir, p), "utf8"), "base64").length, 0);
+  check(len === m.bytes, `model parts decode to ${len} bytes, manifest says ${m.bytes}`);
+});
+
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

@@ -4,3 +4,5 @@ game/js/data/
 *.html
 *.md
 assets/
+# Kiki voice: built and third-party files (source in tools/kiki/)
+game/js/kiki/

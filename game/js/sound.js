@@ -22,7 +22,80 @@ try {
 } catch (e) {
   console.warn("Dino Go:", e);
 }
+// Both voices read "dino" as "deeno"; spelt "dyno" they say it right. (Only what is spoken changes.)
+const sayFix = (text) => String(text).replace(/\bdino(s?)\b/gi, "dyno$1");
+
+/* Kiki: a small voice model that runs on the device, in a worker (js/kiki/, built from tools/kiki/).
+   It loads after the page does. Until it is ready, and whenever it fails, the device voice speaks instead. */
+let KIKI = null, // the worker, once it has said it is ready
+  kikiId = 0, // each say() gets the next id
+  kikiDead = 0, // lines up to this id were cut off
+  kikiNext = 0, // when the last scheduled sentence ends (AudioContext time)
+  kikiSrc = [];
+function startKiki() {
+  try {
+    if (typeof Worker !== "function") return;
+    const w = new Worker("js/kiki/kiki-worker.js");
+    w.onerror = (e) => {
+      console.warn("Dino Go: Kiki", e.message || e);
+      KIKI = null;
+    };
+    w.onmessage = ({ data }) => {
+      if (data.ready) KIKI = w;
+      else if (data.failed) console.warn("Dino Go: Kiki", data.failed);
+      else if (data.error) {
+        // One line could not be made: let the device voice say it, and keep Kiki for the next.
+        console.warn("Dino Go: Kiki", data.error);
+        if (data.id > kikiDead) deviceSay(kikiText[data.id] || "", true);
+      } else if (data.samples && data.id > kikiDead) kikiPlay(data.samples, data.rate);
+      if (data.done || data.error) delete kikiText[data.id];
+    };
+  } catch (e) {
+    console.warn("Dino Go:", e);
+  }
+}
+const kikiText = {};
+function kikiPlay(samples, rate) {
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state !== "running") AC.resume();
+    const buf = AC.createBuffer(1, samples.length, rate);
+    buf.getChannelData(0).set(samples);
+    const src = AC.createBufferSource();
+    src.buffer = buf;
+    src.connect(AC.destination);
+    const at = Math.max(AC.currentTime, kikiNext ? kikiNext + 0.2 : 0);
+    src.start(at);
+    kikiNext = at + buf.duration;
+    kikiSrc.push(src);
+    src.onended = () => (kikiSrc = kikiSrc.filter((s) => s !== src));
+  } catch (e) {
+    console.warn("Dino Go:", e);
+  }
+}
+// Stops whatever is being said, by either voice.
+function stopSpeech() {
+  try {
+    speechSynthesis.cancel();
+  } catch (e) {
+    console.warn("Dino Go:", e);
+  }
+  kikiDead = kikiId;
+  kikiNext = 0;
+  for (const s of kikiSrc)
+    try {
+      s.stop();
+    } catch (e) {}
+  kikiSrc = [];
+}
 function say(text, queue) {
+  text = sayFix(text);
+  if (!KIKI) return deviceSay(text, queue);
+  if (!queue) stopSpeech();
+  kikiText[++kikiId] = text;
+  KIKI.postMessage({ say: kikiId, text, flush: !queue });
+}
+function deviceSay(text, queue) {
   try {
     if (!queue) speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
@@ -137,6 +210,52 @@ document.addEventListener(
   },
   { once: true },
 );
+// iPhones and iPads mute this kind of sound (Kiki and the effects) when the ring/silent switch is on, but not
+// the device voice. A silent media track, kept playing, makes them treat the page as media, so Kiki is heard.
+let UNMUTE = null;
+function silentWav() {
+  const n = 4000, // half a second at 8 kHz, 8-bit, mono
+    b = new Uint8Array(44 + n),
+    v = new DataView(b.buffer);
+  const str = (o, s) => {
+    for (let i = 0; i < s.length; i++) b[o + i] = s.charCodeAt(i);
+  };
+  str(0, "RIFF");
+  v.setUint32(4, 36 + n, true);
+  str(8, "WAVEfmt ");
+  v.setUint32(16, 16, true);
+  v.setUint16(20, 1, true);
+  v.setUint16(22, 1, true);
+  v.setUint32(24, 8000, true);
+  v.setUint32(28, 8000, true);
+  v.setUint16(32, 1, true);
+  v.setUint16(34, 8, true);
+  str(36, "data");
+  v.setUint32(40, n, true);
+  b.fill(128, 44);
+  let s = "";
+  for (let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+  return "data:audio/wav;base64," + btoa(s);
+}
+function unmute() {
+  try {
+    if (!UNMUTE) {
+      UNMUTE = new Audio(silentWav());
+      UNMUTE.loop = true;
+      UNMUTE.setAttribute("playsinline", "");
+      UNMUTE.setAttribute("x-webkit-airplay", "deny");
+    }
+    if (UNMUTE.paused && !document.hidden) UNMUTE.play().catch(() => {});
+  } catch (e) {
+    console.warn("Dino Go:", e);
+  }
+}
+document.addEventListener("pointerdown", unmute); // every tap: it has to start inside one, and restarts after a pause
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && UNMUTE) UNMUTE.pause();
+});
+// Kiki starts once the page's own files are in, so the game is never waiting on the voice.
+window.addEventListener("load", startKiki);
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 // Resolves when the animation ends, or on a timer if the page's animation clock is paused (e.g. hidden tab), so a battle never gets stuck.

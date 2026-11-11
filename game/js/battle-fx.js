@@ -615,11 +615,7 @@ function celebrate(id, L) {
     ok.onclick = () => {
       cele.hidden = true;
       $("conf").innerHTML = "";
-      try {
-        speechSynthesis.cancel();
-      } catch (e) {
-        console.warn("Dino Go:", e);
-      }
+      stopSpeech();
       res();
     };
   });

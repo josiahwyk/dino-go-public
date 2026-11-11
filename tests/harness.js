@@ -65,7 +65,7 @@ function loadGame({ skip = ["js/boot.js"], saved = null } = {}) {
     "QUESTIONS,LEVELS,MAXL,SPECIES,BY,MOVE_SLOTS,FIN_POWER,mergeSaves:typeof mergeSaves==='function'?mergeSaves:null," +
     "misspell,known,wordQ,makeQ,skillKey,noteSkill,weakest,PATTERNS,CHALLENGE,DEFAULT_WORDS,SENT,hasArt," +
     "rules:typeof RULES==='object'?RULES:null,normalizeSave:typeof normalizeSave==='function'?normalizeSave:null," +
-    "newEncounter:typeof newEncounter==='function'?newEncounter:null})";
+    "newEncounter:typeof newEncounter==='function'?newEncounter:null,sayFix})";
   return vm.runInContext(src, ctx, { filename: "game" });
 }
 

@@ -74,11 +74,7 @@ function readSheet() {
 $("sh-say").onclick = readSheet;
 $("sh-close").onclick = () => {
   $("sheet-bg").hidden = true;
-  try {
-    speechSynthesis.cancel();
-  } catch (e) {
-    console.warn("Dino Go:", e);
-  }
+  stopSpeech();
 };
 $("sheet-bg").onclick = (e) => {
   if (e.target.id === "sheet-bg") $("sh-close").onclick();

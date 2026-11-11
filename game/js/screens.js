@@ -7,11 +7,7 @@ function show(id) {
 document.querySelectorAll("[data-home]").forEach(
   (b) =>
     (b.onclick = () => {
-      try {
-        speechSynthesis.cancel();
-      } catch (e) {
-        console.warn("Dino Go:", e);
-      }
+      stopSpeech();
       goHome();
     }),
 );
