@@ -20,7 +20,7 @@ Homework words come from the parent screen (S.words). PATTERNS is a built-in wor
 
 Word sentences (2026-11-04): SENT holds a short sentence for every word in PATTERNS, CHALLENGE, DEFAULT_WORDS and their homework list (544 words); sayWord(w) says "word... sentence... word" everywhere a spelling word is spoken (catch, Listen retries, spelling battles, clues). Homework words without one are said alone and listed when the grown-up taps Save words; add a line to SENT for them.
 
-Voice (2026-11-04): pickVoice() prefers Premium, then Enhanced, Australian first; the grown-up Voice picker (renderVoices, Test button) overrides it and is saved in localStorage "dinogo.voice" on that device only (not in S, since devices have different voices). Premium/Enhanced voices use pitch 1, others 1.1.
+Voice (2026-11-12): pickVoice() takes the first English voice the device offers, Australian first (en-AU, then en-GB, en-NZ, en-US), pitch 1.1. The Premium/Enhanced picker from 2026-11-04 was removed: it chose a strange default voice and Premium voices never showed up on the iPhone.
 
 Spelling battles (2026-11-04): grown-up setting "Battle questions" (S.battle: "math" default, "words", "mix" = about half each). makeQ() hands off to wordQ(slot) in js/spelling-battle.js: easy move = one missing letter, medium = two letters side by side, hard = pick the right spelling of 4. Gaps go on vowels and never the first letter. misspell() makes the wrong spellings from real slips (wrong vowel, ie/ei swap, dropped vowel or double letter first; look-alike consonants after) and never offers a real word (known() = PATTERNS + CHALLENGE + DEFAULT_WORDS + COMMON). Spelling questions have lvl 0 so they never move the maths level; clues and "one like before" (same word) work as for maths.
 

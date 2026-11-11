@@ -10,7 +10,7 @@ It runs in the browser on an iPad or phone. No accounts, no ads, no build step.
 - **Spelling catches** use this week's homework words, typed in by a grown-up, plus an optional built-in word bank sorted by spelling pattern.
 - **Everything is spoken aloud**, so a child who can't read yet can still play. Every spelling word comes with a short sentence ("cat... The cat sat on the mat... cat").
 - **Clues instead of answers.** A wrong answer shows a picture clue (number-line hops, place-value charts, counting strips) with the last step left as a "?", and the same kind of question comes back a couple of rounds later.
-- **A grown-up screen** (press and hold ⚙️) sets the words, maths level, battle length and voice.
+- **A grown-up screen** (press and hold ⚙️) sets the words, maths level and battle length.
 - **40 dinos**, each with a standing pose and an attack pose. The art is AI-generated (Gemini) from one shared style sheet, then cut out of its background by a small Python script.
 
 ## Run it

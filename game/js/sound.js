@@ -1,38 +1,17 @@
 /* ---------- Sound + voice ---------- */
 let AC = null,
   VOICE = null;
-// The voice: the one picked on the grown-up screen (saved on this device only, since each device has its own voices), otherwise the best
-// English voice here: Premium, then Enhanced (downloaded in Settings > Accessibility > Read & Speak > Voices), Australian first.
-const VKEY = "dinogo.voice",
-  engVoices = () => {
-    try {
-      return speechSynthesis.getVoices().filter((v) => /^en[-_]/i.test(v.lang || ""));
-    } catch (e) {
-      return [];
-    }
-  };
-const vScore = (v) => {
-  const id = (v.name + " " + v.voiceURI).toLowerCase(),
-    l = (v.lang || "").replace("_", "-");
-  return (
-    (/premium/.test(id) ? 8 : /enhanced/.test(id) ? 6 : 0) +
-    (l.startsWith("en-AU") ? 3 : /en-(GB|NZ)/.test(l) ? 2 : l.startsWith("en-US") ? 1 : 0) +
-    (/compact|eloquence|novelty/.test(id) ? -5 : 0)
-  );
-};
-const fancy = (v) => !!v && /premium|enhanced/i.test(v.name + " " + v.voiceURI);
+// The voice: the first English voice the device has, Australian first (the original Karen on iPhone and iPad).
 function pickVoice() {
   try {
-    const vs = engVoices();
-    let saved = null;
-    try {
-      saved = localStorage.getItem(VKEY);
-    } catch (e) {
-      console.warn("Dino Go:", e);
+    const vs = speechSynthesis.getVoices();
+    for (const l of ["en-AU", "en-GB", "en-NZ", "en-US"]) {
+      const v = vs.find((v) => (v.lang || "").replace("_", "-").startsWith(l));
+      if (v) {
+        VOICE = v;
+        return;
+      }
     }
-    VOICE =
-      (saved && vs.find((v) => v.voiceURI === saved)) || vs.slice().sort((a, b) => vScore(b) - vScore(a))[0] || null;
-    if ($("p-voice")) renderVoices();
   } catch (e) {
     console.warn("Dino Go:", e);
   }
@@ -48,7 +27,7 @@ function say(text, queue) {
     if (!queue) speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.rate = 0.88;
-    u.pitch = fancy(VOICE) ? 1 : 1.1;
+    u.pitch = 1.1;
     if (VOICE) {
       u.voice = VOICE;
       u.lang = VOICE.lang;

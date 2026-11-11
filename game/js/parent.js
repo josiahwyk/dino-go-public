@@ -41,7 +41,6 @@ function openParent() {
   $("p-sug-status").textContent = "";
   syncMath();
   renderAssign();
-  renderVoices();
   syncNote(cloudMsg);
   show("s-parent");
 }
@@ -104,34 +103,6 @@ document.querySelectorAll("#p-battle button").forEach(
       syncMath();
     }),
 );
-// Voice list: best first, with a star on Premium/Enhanced ones
-function renderVoices() {
-  const sel = $("p-voice"),
-    vs = engVoices().sort((a, b) => vScore(b) - vScore(a) || a.name.localeCompare(b.name));
-  sel.innerHTML = vs.length
-    ? vs
-        .map(
-          (v) =>
-            `<option value="${v.voiceURI.replace(/"/g, "&quot;")}"${VOICE && v.voiceURI === VOICE.voiceURI ? " selected" : ""}>${fancy(v) ? "⭐ " : ""}${v.name} (${v.lang})</option>`,
-        )
-        .join("")
-    : '<option value="">No English voices found</option>';
-  $("p-voice-status").textContent = vs.some(fancy)
-    ? ""
-    : "No Premium or Enhanced voice here yet: download one in Settings, then reopen the game.";
-}
-$("p-voice").onchange = () => {
-  const v = engVoices().find((x) => x.voiceURI === $("p-voice").value);
-  if (!v) return;
-  VOICE = v;
-  try {
-    localStorage.setItem(VKEY, v.voiceURI);
-  } catch (e) {
-    console.warn("Dino Go:", e);
-  }
-  say("Hello! I'm your dino guide. Let's catch some dinos!");
-};
-$("p-voice-test").onclick = () => say("Hello! I'm your dino guide. A wild T. rex appeared! 7 plus 5?");
 document.querySelectorAll("#p-hits button").forEach(
   (b) =>
     (b.onclick = () => {
