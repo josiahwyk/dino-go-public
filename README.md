@@ -46,7 +46,6 @@ game/
     catch.js         the spelling catch
     ...              book, grown-up screen, sound, scenes, sync
   dinos/             game art (.webp cut-outs, plus .jpg sources)
-  world.html         an early prototype of an explore map (separate from the main game)
 tests/               the Node test harness and tests
 tools/cutout.py      removes the white background from new dino art
 docs/                design notes, game rules and the backlog
